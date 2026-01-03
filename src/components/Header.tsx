@@ -12,7 +12,9 @@ const internationalDestinations = [
   "Iceland", "Turkey", "Singapore", "France", "Switzerland"
 ];
 
-const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?usp=pp_url&entry.FIELD_ID=";
+// WIRING COMPLETED: Your actual Form URL and Entry ID
+const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform?usp=pp_url";
+const ENTRY_ID = "entry.396208505";
 
 interface DropdownProps {
   title: string;
@@ -24,7 +26,9 @@ interface DropdownProps {
 
 const NavigationDropdown = ({ title, destinations, isOpen, onToggle, onClose }: DropdownProps) => {
   const handleDestinationClick = (destination: string) => {
-    window.open(`${GOOGLE_FORM_BASE_URL}${encodeURIComponent(destination)}`, '_blank');
+    // Correct logic for pre-filling the destination
+    const finalUrl = `${GOOGLE_FORM_BASE_URL}&${ENTRY_ID}=${encodeURIComponent(destination)}`;
+    window.open(finalUrl, '_blank');
     onClose();
   };
 
@@ -47,8 +51,9 @@ const NavigationDropdown = ({ title, destinations, isOpen, onToggle, onClose }: 
             onClick={onClose}
           />
           <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 z-50 animate-slide-down">
-            <div className="glass-panel rounded-[24px] p-6 min-w-[320px] shadow-glass">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4 font-medium">
+            {/* Added pastel styling to match your theme */}
+            <div className="bg-[#F8F7F2] border border-[#A3B18A]/30 rounded-[24px] p-6 min-w-[320px] shadow-xl backdrop-blur-md">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#638C7D] mb-4 font-bold">
                 Select Destination
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -56,7 +61,7 @@ const NavigationDropdown = ({ title, destinations, isOpen, onToggle, onClose }: 
                   <button
                     key={destination}
                     onClick={() => handleDestinationClick(destination)}
-                    className="chip-destination px-4 py-2.5 bg-secondary/50 hover:bg-primary hover:text-primary-foreground text-sm font-medium text-foreground/80 text-left transition-all"
+                    className="px-4 py-2.5 rounded-xl bg-white/50 hover:bg-[#638C7D] hover:text-white text-xs font-medium text-foreground/80 text-left transition-all border border-transparent hover:border-[#638C7D]"
                   >
                     {destination}
                   </button>
@@ -84,10 +89,11 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-7xl mx-auto">
-        <div className="glass-panel rounded-full px-8 py-4 flex items-center justify-between shadow-soft">
+        {/* Updated to use your Sage/Parchment palette */}
+        <div className="bg-[#F8F7F2]/90 border border-[#A3B18A]/20 backdrop-blur-lg rounded-full px-8 py-3 flex items-center justify-between shadow-sm">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="font-script text-3xl font-semibold text-logo italic">
+            <span className="font-serif text-2xl font-semibold text-[#344E41] italic tracking-tight">
               Triponomic
             </span>
           </Link>
@@ -112,9 +118,9 @@ const Header = () => {
             
             <Link
               to="/enquire"
-              className="nav-link text-foreground/80 hover:text-foreground font-medium text-sm tracking-wide transition-colors"
+              className="px-6 py-2 bg-[#638C7D] text-white rounded-full text-xs font-bold tracking-widest hover:bg-[#344E41] transition-all"
             >
-              Contact Us
+              CONTACT US
             </Link>
           </nav>
         </div>
