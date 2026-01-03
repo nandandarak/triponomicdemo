@@ -23,17 +23,6 @@ const HeroSection = () => {
           Your Customized Travel Partner.
         </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          className="mt-10"
-        >
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary/50 text-muted-foreground text-sm">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Crafting journeys since 2020
-          </div>
-        </motion.div>
       </div>
     </section>
   );
