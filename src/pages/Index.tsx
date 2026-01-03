@@ -6,7 +6,7 @@ import SelectionModal from "@/components/SelectionModal";
 import Footer from "@/components/Footer";
 
 // WIRING COMPLETED: Your actual Google Form URL and Entry ID added here
-const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform?usp=pp_url";
+const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/formResponse?usp=pp_url";
 const ENTRY_ID = "entry.396208505";
 
 const domesticDestinations = [
