@@ -44,29 +44,27 @@ const DestinationRow = ({
       </motion.div>
 
       {/* Cards Container */}
-      <div className="relative">
-        <div className="flex gap-6 px-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4">
-          <div className="max-w-7xl mx-auto flex gap-6">
-            {destinations.slice(0, 3).map((dest, index) => (
-              <DestinationCard
-                key={dest.name}
-                name={dest.name}
-                image={dest.image}
-                onClick={() => onDestinationClick(dest.name)}
-                index={index}
-              />
-            ))}
-            
-            {/* Gateway Card */}
+      <div className="px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
+          {destinations.slice(0, 3).map((dest, index) => (
             <DestinationCard
-              name="gateway"
-              image=""
-              isGateway
-              gatewayText={gatewayText}
-              onClick={onGatewayClick}
-              index={3}
+              key={dest.name}
+              name={dest.name}
+              image={dest.image}
+              onClick={() => onDestinationClick(dest.name)}
+              index={index}
             />
-          </div>
+          ))}
+          
+          {/* Gateway Card */}
+          <DestinationCard
+            name="gateway"
+            image=""
+            isGateway
+            gatewayText={gatewayText}
+            onClick={onGatewayClick}
+            index={3}
+          />
         </div>
       </div>
     </section>
