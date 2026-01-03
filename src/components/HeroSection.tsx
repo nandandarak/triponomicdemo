@@ -23,6 +23,15 @@ const HeroSection = () => {
           Your Customized Travel Partner.
         </motion.p>
 
+        <motion.p
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          className="mt-4 text-sm md:text-base text-muted-foreground font-light tracking-wider italic"
+        >
+          Your Vision, Our Plan. Custom-built itineraries tailored to your unique needs.
+        </motion.p>
+
       </div>
     </section>
   );
