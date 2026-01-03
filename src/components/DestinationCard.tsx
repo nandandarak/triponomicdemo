@@ -28,7 +28,7 @@ const DestinationCard = ({
         delay: index * 0.1,
         ease: [0.4, 0, 0.2, 1] 
       }}
-      className="flex-shrink-0 w-[280px] md:w-[320px]"
+      className="w-full"
     >
       <button
         onClick={onClick}
