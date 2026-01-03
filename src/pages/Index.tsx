@@ -5,7 +5,9 @@ import DestinationRow from "@/components/DestinationRow";
 import SelectionModal from "@/components/SelectionModal";
 import Footer from "@/components/Footer";
 
-const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?usp=pp_url&entry.FIELD_ID=";
+// WIRING COMPLETED: Your actual Google Form URL and Entry ID added here
+const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform?usp=pp_url";
+const ENTRY_ID = "entry.396208505";
 
 const domesticDestinations = [
   "Mumbai", "Pune", "Goa", "Leh-Ladakh", "Jaipur",
@@ -56,8 +58,10 @@ const Index = () => {
     type: "domestic",
   });
 
+  // This handles the automatic pre-filling wiring
   const handleDestinationClick = (destination: string) => {
-    window.open(`${GOOGLE_FORM_BASE_URL}${encodeURIComponent(destination)}`, '_blank');
+    const finalUrl = `${GOOGLE_FORM_BASE_URL}&${ENTRY_ID}=${encodeURIComponent(destination)}`;
+    window.open(finalUrl, '_blank');
   };
 
   const openModal = (type: "domestic" | "international") => {
