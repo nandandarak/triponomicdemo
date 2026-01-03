@@ -118,26 +118,6 @@ const EnquireNow = () => {
                 </div>
               </div>
 
-              {/* Working Hours */}
-              <div className="bg-secondary/30 rounded-card p-8">
-                <h3 className="text-lg font-medium text-foreground mb-4">
-                  Working Hours
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Monday - Friday</span>
-                    <span className="text-foreground">9:00 AM - 7:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Saturday</span>
-                    <span className="text-foreground">10:00 AM - 5:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Sunday</span>
-                    <span className="text-foreground">Closed</span>
-                  </div>
-                </div>
-              </div>
             </motion.div>
 
             {/* Form */}
