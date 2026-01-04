@@ -5,7 +5,6 @@ import DestinationRow from "@/components/DestinationRow";
 import SelectionModal from "@/components/SelectionModal";
 import EnquiryModal from "@/components/EnquiryModal";
 import Footer from "@/components/Footer";
-import SmoothScroll from "@/components/SmoothScroll";
 
 /* Destination Lists */
 const domesticDestinations = [
@@ -72,7 +71,7 @@ const internationalCards = [
 ];
 
 const Index = () => {
-  /* Selection Modal (Discover / Explore More) */
+  /* Selection Modal */
   const [selectionModal, setSelectionModal] = useState<{
     isOpen: boolean;
     type: "domestic" | "international";
@@ -81,7 +80,7 @@ const Index = () => {
     type: "domestic",
   });
 
-  /* Enquiry Modal (Google Form UI) */
+  /* Enquiry Modal */
   const [enquiryModal, setEnquiryModal] = useState<{
     isOpen: boolean;
     destination: string;
@@ -90,7 +89,6 @@ const Index = () => {
     destination: "",
   });
 
-  /* ONE SINGLE FUNCTION TO OPEN FORM */
   const openEnquiry = (destination: string) => {
     setEnquiryModal({
       isOpen: true,
@@ -106,72 +104,70 @@ const Index = () => {
   };
 
   return (
-    <SmoothScroll>
-      <div className="min-h-screen bg-background">
-        <Header />
+    <div className="min-h-screen bg-background">
+      <Header />
 
-        <main>
-          <HeroSection />
+      <main>
+        <HeroSection />
 
-          {/* Domestic Section */}
-          <DestinationRow
-            title="Discover India"
-            subtitle="Domestic Journeys"
-            destinations={domesticCards}
-            gatewayText="Discover More"
-            onGatewayClick={() =>
-              setSelectionModal({ isOpen: true, type: "domestic" })
-            }
-            onDestinationClick={openEnquiry}
-            onEnquire={openEnquiry}
-          />
-
-          {/* International Section */}
-          <DestinationRow
-            title="Beyond Borders"
-            subtitle="International Adventures"
-            destinations={internationalCards}
-            gatewayText="Explore Global"
-            onGatewayClick={() =>
-              setSelectionModal({ isOpen: true, type: "international" })
-            }
-            onDestinationClick={openEnquiry}
-            onEnquire={openEnquiry}
-          />
-        </main>
-
-        <Footer />
-
-        {/* Selection Modal */}
-        <SelectionModal
-          isOpen={selectionModal.isOpen}
-          onClose={() =>
-            setSelectionModal((prev) => ({ ...prev, isOpen: false }))
+        {/* Domestic Section */}
+        <DestinationRow
+          title="Discover India"
+          subtitle="Domestic Journeys"
+          destinations={domesticCards}
+          gatewayText="Discover More"
+          onGatewayClick={() =>
+            setSelectionModal({ isOpen: true, type: "domestic" })
           }
-          title={
-            selectionModal.type === "domestic"
-              ? "Domestic Destinations"
-              : "International Destinations"
-          }
-          destinations={
-            selectionModal.type === "domestic"
-              ? domesticDestinations
-              : internationalDestinations
-          }
-          onSelect={(destination) => {
-            setSelectionModal((prev) => ({ ...prev, isOpen: false }));
-            openEnquiry(destination);
-          }}
+          onDestinationClick={openEnquiry}
+          onEnquire={openEnquiry}
         />
 
-        {/* Enquiry Modal (SINGLE SOURCE) */}
-        <EnquiryModal
-          isOpen={enquiryModal.isOpen}
-          onClose={closeEnquiry}
-          destination={enquiryModal.destination}
+        {/* International Section */}
+        <DestinationRow
+          title="Beyond Borders"
+          subtitle="International Adventures"
+          destinations={internationalCards}
+          gatewayText="Explore Global"
+          onGatewayClick={() =>
+            setSelectionModal({ isOpen: true, type: "international" })
+          }
+          onDestinationClick={openEnquiry}
+          onEnquire={openEnquiry}
         />
-      </div>
-    </SmoothScroll>
+      </main>
+
+      <Footer />
+
+      {/* Selection Modal */}
+      <SelectionModal
+        isOpen={selectionModal.isOpen}
+        onClose={() =>
+          setSelectionModal((prev) => ({ ...prev, isOpen: false }))
+        }
+        title={
+          selectionModal.type === "domestic"
+            ? "Domestic Destinations"
+            : "International Destinations"
+        }
+        destinations={
+          selectionModal.type === "domestic"
+            ? domesticDestinations
+            : internationalDestinations
+        }
+        onSelect={(destination) => {
+          setSelectionModal((prev) => ({ ...prev, isOpen: false }));
+          openEnquiry(destination);
+        }}
+      />
+
+      {/* Enquiry Modal */}
+      <EnquiryModal
+        isOpen={enquiryModal.isOpen}
+        onClose={closeEnquiry}
+        destination={enquiryModal.destination}
+      />
+    </div>
   );
 };
 
