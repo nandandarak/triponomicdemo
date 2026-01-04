@@ -26,19 +26,20 @@ const SelectionModal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50"
+            className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm"
             onClick={onClose}
           />
 
-          {/* Modal */}
+          {/* Modal Wrapper (Perfect Centering) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 max-w-2xl w-full z-50"
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
           >
-            <div className="bg-card rounded-card p-8 shadow-hover">
+            {/* Modal Card */}
+            <div className="bg-card rounded-card p-8 shadow-hover w-full max-w-2xl">
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -49,6 +50,7 @@ const SelectionModal = ({
                     {title}
                   </h2>
                 </div>
+
                 <button
                   onClick={onClose}
                   className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-colors"
