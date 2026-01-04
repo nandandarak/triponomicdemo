@@ -210,17 +210,51 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* MOBILE MENU */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              className="md:hidden mt-4 bg-[#F8F7F2] rounded-2xl p-6 shadow-xl"
+              className="md:hidden mt-4 bg-[#F8F7F2] rounded-2xl p-6 shadow-xl max-h-[80vh] overflow-y-auto"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <p className="text-xs font-bold mb-2">Services</p>
+              {/* Domestic */}
+              <p className="text-xs font-bold mb-2">Domestic</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {domesticDestinations.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setSelectedDestination(d);
+                    }}
+                    className="px-4 py-2 bg-white/70 rounded-full text-xs"
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
 
+              {/* International */}
+              <p className="text-xs font-bold mb-2">International</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {internationalDestinations.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setSelectedDestination(d);
+                    }}
+                    className="px-4 py-2 bg-white/70 rounded-full text-xs"
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+
+              {/* Services */}
+              <p className="text-xs font-bold mb-2">Services</p>
               <div className="flex flex-col gap-2 mb-4">
                 {servicesList.map(({ label, icon: Icon }) => (
                   <button
