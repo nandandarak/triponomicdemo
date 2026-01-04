@@ -1,91 +1,195 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Coins, ArrowRight } from "lucide-react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { Clock, Coins, Sun, ArrowRight } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
-const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, onEnquire }: any) => {
-  const [isHovered, setIsHovered] = useState(false);
+interface DestinationData {
+  duration: string;
+  investment: string;
+  bestTime: string;
+}
 
-  // This style is isolated ONLY to this variable
-  const dottedBackground = {
-    backgroundColor: "#FDFCF9",
-    backgroundImage: "radial-gradient(circle, #D4AF37 0.6px, transparent 0.6px)",
-    backgroundSize: "24px 24px",
+interface PostcardCardProps {
+  name: string;
+  image: string;
+  isGateway?: boolean;
+  gatewayText?: string;
+  onClick: () => void;
+  onEnquire: () => void;
+  index: number;
+  destinationData?: DestinationData;
+}
+
+const defaultDestinationData: Record<string, DestinationData> = {
+  Mumbai: { duration: "2-3 Days", investment: "₹15,000", bestTime: "Oct - Mar" },
+  Pune: { duration: "2-3 Days", investment: "₹12,000", bestTime: "Oct - Feb" },
+  Goa: { duration: "4-5 Days", investment: "₹25,000", bestTime: "Nov - Feb" },
+  Japan: { duration: "7-10 Days", investment: "₹1,50,000", bestTime: "Mar - May" },
+  Bali: { duration: "5-7 Days", investment: "₹75,000", bestTime: "Apr - Oct" },
+  "South Korea": { duration: "6-8 Days", investment: "₹1,20,000", bestTime: "Mar - May" },
+};
+
+const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, onEnquire, index, destinationData }: PostcardCardProps) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  // 3D Tilt Logic
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
   };
 
-  if (isGateway) {
-    return (
-      <div className="relative w-full aspect-[3/4]">
-        <button 
-          onClick={onClick}
-          className="w-full h-full rounded-[2.5rem] border-2 border-dashed border-[#638C7D]/30 flex flex-col items-center justify-center bg-[#f4f1ea] p-8 group transition-all"
-        >
-          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 group-hover:bg-[#638C7D] transition-colors shadow-sm">
-            <ArrowRight className="text-[#638C7D] group-hover:text-white" />
-          </div>
-          <p className="font-script text-2xl italic text-[#344E41]">{gatewayText}</p>
-        </button>
-      </div>
-    );
-  }
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+    setIsFlipped(false);
+  };
+
+  const data = destinationData || defaultDestinationData[name] || {
+    duration: "5-7 Days",
+    investment: "₹45,000",
+    bestTime: "Oct - Mar",
+  };
 
   return (
-    <div 
-      className="relative w-full aspect-[3/4] cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full perspective-1000"
     >
-      <AnimatePresence mode="wait">
-        {!isHovered ? (
-          /* FRONT SIDE - Shows by default */
-          <motion.div
-            key="front"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 w-full h-full rounded-[2.5rem] overflow-hidden shadow-lg z-10"
+      {!isGateway ? (
+        <motion.div
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => setIsFlipped(true)}
+          onClick={() => setIsFlipped((prev) => !prev)}
+          style={{
+            rotateX: isFlipped ? 0 : rotateX,
+            rotateY: isFlipped ? 180 : rotateY,
+            transformStyle: "preserve-3d",
+          }}
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="relative w-full aspect-[3/4] cursor-pointer"
+        >
+          {/* FRONT */}
+          <div
+            className="absolute inset-0 rounded-[2rem] overflow-hidden shadow-xl"
+            style={{ backfaceVisibility: "hidden" }}
           >
-            <img src={image} alt={name} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-            <h3 className="absolute bottom-8 left-8 text-3xl font-script italic text-white">{name}</h3>
-          </motion.div>
-        ) : (
-          /* BACK SIDE - Physically added only on hover */
-          <motion.div
-            key="back"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute inset-0 w-full h-full rounded-[2.5rem] p-8 flex flex-col justify-between shadow-2xl z-20"
-            style={dottedBackground}
+            <motion.img
+              src={image}
+              alt={name}
+              animate={{ scale: isFlipped ? 1.2 : 1 }}
+              transition={{ duration: 0.6 }}
+              className="w-full h-full object-cover"
+            />
+            {/* Gloss Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10 opacity-60" />
+            <div className="absolute bottom-0 p-8 w-full">
+              <motion.h3 
+                layoutId={`title-${name}`}
+                className="text-3xl font-script italic text-white drop-shadow-lg"
+              >
+                {name}
+              </motion.h3>
+            </div>
+          </div>
+
+          {/* BACK */}
+          <div
+            className="absolute inset-0 rounded-[2rem] shadow-2xl"
+            style={{
+              backfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+              backgroundColor: "#FDFCF9",
+              backgroundImage: "radial-gradient(circle, #D4AF37 0.4px, transparent 0.4px)",
+              backgroundSize: "24px 24px",
+            }}
           >
-            <div className="text-left">
-              <h3 className="font-script text-4xl italic text-[#344E41] border-b border-[#D4AF37]/20 pb-2 mb-6">{name}</h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Clock className="w-4 h-4 text-[#D4AF37]" />
-                  <span className="text-sm font-medium text-[#344E41]">5-7 Days</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Coins className="w-4 h-4 text-[#D4AF37]" />
-                  <span className="text-sm font-medium text-[#344E41]">From ₹45,000</span>
+            <div className="w-full h-full p-8 flex flex-col justify-between">
+              <div>
+                <h3 className="font-script text-4xl italic text-[#344E41] mb-8 border-b border-[#D4AF37]/20 pb-2">
+                  {name}
+                </h3>
+
+                <div className="space-y-6">
+                  {[
+                    { Icon: Clock, label: "Duration", val: data.duration },
+                    { Icon: Coins, label: "Ideal Budget", val: `From ${data.investment}` },
+                    { Icon: Sun, label: "Best Time", val: data.bestTime },
+                  ].map(({ Icon, label, val }, i) => (
+                    <motion.div 
+                      key={label}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={isFlipped ? { opacity: 1, x: 0 } : {}}
+                      transition={{ delay: 0.3 + i * 0.1 }}
+                      className="flex items-center gap-4"
+                    >
+                      <div className="p-2 rounded-full bg-[#638C7D]/10">
+                        <Icon className="w-5 h-5 text-[#D4AF37]" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase tracking-tighter text-[#344E41]/60 font-bold">{label}</p>
+                        <p className="text-sm font-medium text-[#344E41]">{val}</p>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
-            </div>
 
-            <MagneticButton 
-              className="w-full py-4 bg-[#638C7D] text-white rounded-2xl text-[10px] font-bold tracking-widest"
-              onClick={(e: any) => {
-                e.stopPropagation();
-                onEnquire();
-              }}
-            >
-              ENQUIRE NOW
-            </MagneticButton>
+              <MagneticButton
+                className="w-full py-4 bg-[#638C7D] hover:bg-[#344E41] text-white rounded-xl text-xs font-bold tracking-[0.2em] transition-colors shadow-lg shadow-[#638C7D]/20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEnquire();
+                }}
+              >
+                ENQUIRE NOW
+              </MagneticButton>
+            </div>
+          </div>
+        </motion.div>
+      ) : (
+        /* GATEWAY CARD - AESTHETIC VERSION */
+        <motion.button
+          whileHover={{ scale: 0.98 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onClick}
+          className="w-full aspect-[3/4] rounded-[2rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group"
+        >
+          <motion.div 
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors"
+          >
+            <ArrowRight className="w-8 h-8 text-[#638C7D] group-hover:text-white transition-colors" />
           </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          <p className="text-2xl font-script italic text-[#344E41]">{gatewayText}</p>
+          <div className="h-[1px] w-12 bg-[#D4AF37] my-4" />
+          <p className="text-xs uppercase tracking-widest text-[#344E41]/50 font-bold">
+            View all destinations
+          </p>
+        </motion.button>
+      )}
+    </motion.div>
   );
 };
 
