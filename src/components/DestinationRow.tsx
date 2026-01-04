@@ -32,7 +32,7 @@ const DestinationRow = ({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15, // Delay between each card
+        staggerChildren: 0.15,
         delayChildren: 0.1,
       },
     },
@@ -49,8 +49,8 @@ const DestinationRow = ({
   };
 
   return (
-    <section className="py-24 px-6 bg-[#FDFCF9]">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-24 px-6 bg-[#FDFCF9] relative overflow-hidden">
+      <div className="max-w-7xl mx-auto relative z-10">
         
         {/* Section Header */}
         <motion.div
@@ -74,7 +74,6 @@ const DestinationRow = ({
               {title}
             </motion.h2>
             
-            {/* Animated Decorative Line */}
             <motion.div 
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
@@ -84,35 +83,38 @@ const DestinationRow = ({
           </div>
         </motion.div>
 
-        {/* Cards Grid with Stagger logic */}
+        {/* Cards Grid - Each child wrapped in a relative div to anchor the 3D content */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative"
         >
           {destinations.map((destination, index) => (
-            <PostcardCard
-              key={destination.name}
-              name={destination.name}
-              image={destination.image}
-              index={index}
-              onClick={() => onDestinationClick(destination.name)}
-              onEnquire={() => onEnquire(destination.name)}
-            />
+            <div key={destination.name} className="relative w-full h-full">
+              <PostcardCard
+                name={destination.name}
+                image={destination.image}
+                index={index}
+                onClick={() => onDestinationClick(destination.name)}
+                onEnquire={() => onEnquire(destination.name)}
+              />
+            </div>
           ))}
           
-          {/* Gateway Card (the last one in the stagger) */}
-          <PostcardCard
-            name="Gateway"
-            image=""
-            isGateway
-            gatewayText={gatewayText}
-            index={destinations.length}
-            onClick={onGatewayClick}
-            onEnquire={() => {}}
-          />
+          {/* Gateway Card Wrapper */}
+          <div className="relative w-full h-full">
+            <PostcardCard
+              name="Gateway"
+              image=""
+              isGateway
+              gatewayText={gatewayText}
+              index={destinations.length}
+              onClick={onGatewayClick}
+              onEnquire={() => {}}
+            />
+          </div>
         </motion.div>
       </div>
     </section>
