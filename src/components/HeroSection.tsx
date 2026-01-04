@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import heroVideo from "@/assets/hero-train-video.mp4";
-import Floating3DElements from "./Floating3DElements";
 
 const HeroSection = () => {
   return (
@@ -28,9 +27,6 @@ const HeroSection = () => {
           background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.3) 100%)"
         }} />
       </div>
-
-      {/* Floating 3D Elements with Parallax */}
-      <Floating3DElements />
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto text-center">
@@ -65,7 +61,6 @@ const HeroSection = () => {
         >
           Your Vision, Our Plan. Custom-built itineraries tailored to your unique needs.
         </motion.p>
-
       </div>
     </section>
   );

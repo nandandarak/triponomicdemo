@@ -5,7 +5,7 @@ import DestinationRow from "@/components/DestinationRow";
 import SelectionModal from "@/components/SelectionModal";
 import EnquiryModal from "@/components/EnquiryModal";
 import Footer from "@/components/Footer";
-import CustomCursor from "@/components/CustomCursor";
+import FlyingAirplanes from "@/components/FlyingAirplanes";
 import SmoothScroll from "@/components/SmoothScroll";
 
 const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform?usp=pp_url";
@@ -88,8 +88,8 @@ const Index = () => {
   return (
     <SmoothScroll>
       <div className="min-h-screen bg-background">
-        {/* Custom Cursor */}
-        <CustomCursor />
+        {/* Flying Airplanes */}
+        <FlyingAirplanes />
         
         <Header />
         
