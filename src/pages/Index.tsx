@@ -3,9 +3,11 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import DestinationRow from "@/components/DestinationRow";
 import SelectionModal from "@/components/SelectionModal";
+import EnquiryModal from "@/components/EnquiryModal";
 import Footer from "@/components/Footer";
+import CustomCursor from "@/components/CustomCursor";
+import SmoothScroll from "@/components/SmoothScroll";
 
-// WIRING COMPLETED: Your actual Google Form URL and Entry ID added here
 const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform?usp=pp_url";
 const ENTRY_ID = "entry.396208505";
 
@@ -58,10 +60,21 @@ const Index = () => {
     type: "domestic",
   });
 
-  // This handles the automatic pre-filling wiring
+  const [enquiryModal, setEnquiryModal] = useState<{
+    isOpen: boolean;
+    destination: string;
+  }>({
+    isOpen: false,
+    destination: "",
+  });
+
   const handleDestinationClick = (destination: string) => {
     const finalUrl = `${GOOGLE_FORM_BASE_URL}&${ENTRY_ID}=${encodeURIComponent(destination)}`;
     window.open(finalUrl, '_blank');
+  };
+
+  const handleEnquire = (destination: string) => {
+    setEnquiryModal({ isOpen: true, destination });
   };
 
   const openModal = (type: "domestic" | "international") => {
@@ -73,44 +86,58 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main>
-        <HeroSection />
+    <SmoothScroll>
+      <div className="min-h-screen bg-background">
+        {/* Custom Cursor */}
+        <CustomCursor />
         
-        {/* Domestic Section */}
-        <DestinationRow
-          title="Discover India"
-          subtitle="Domestic Journeys"
-          destinations={domesticCards}
-          gatewayText="Discover More"
-          onGatewayClick={() => openModal("domestic")}
-          onDestinationClick={handleDestinationClick}
+        <Header />
+        
+        <main>
+          <HeroSection />
+          
+          {/* Domestic Section */}
+          <DestinationRow
+            title="Discover India"
+            subtitle="Domestic Journeys"
+            destinations={domesticCards}
+            gatewayText="Discover More"
+            onGatewayClick={() => openModal("domestic")}
+            onDestinationClick={handleDestinationClick}
+            onEnquire={handleEnquire}
+          />
+
+          {/* International Section */}
+          <DestinationRow
+            title="Beyond Borders"
+            subtitle="International Adventures"
+            destinations={internationalCards}
+            gatewayText="Explore Global"
+            onGatewayClick={() => openModal("international")}
+            onDestinationClick={handleDestinationClick}
+            onEnquire={handleEnquire}
+          />
+        </main>
+
+        <Footer />
+
+        {/* Selection Modal */}
+        <SelectionModal
+          isOpen={modalState.isOpen}
+          onClose={closeModal}
+          title={modalState.type === "domestic" ? "Domestic Destinations" : "International Destinations"}
+          destinations={modalState.type === "domestic" ? domesticDestinations : internationalDestinations}
+          onSelect={handleDestinationClick}
         />
 
-        {/* International Section */}
-        <DestinationRow
-          title="Beyond Borders"
-          subtitle="International Adventures"
-          destinations={internationalCards}
-          gatewayText="Explore Global"
-          onGatewayClick={() => openModal("international")}
-          onDestinationClick={handleDestinationClick}
+        {/* Enquiry Modal with Embedded Form */}
+        <EnquiryModal
+          isOpen={enquiryModal.isOpen}
+          onClose={() => setEnquiryModal({ isOpen: false, destination: "" })}
+          destination={enquiryModal.destination}
         />
-      </main>
-
-      <Footer />
-
-      {/* Selection Modal */}
-      <SelectionModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        title={modalState.type === "domestic" ? "Domestic Destinations" : "International Destinations"}
-        destinations={modalState.type === "domestic" ? domesticDestinations : internationalDestinations}
-        onSelect={handleDestinationClick}
-      />
-    </div>
+      </div>
+    </SmoothScroll>
   );
 };
 
