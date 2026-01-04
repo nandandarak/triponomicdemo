@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================
+   BASE THEME VARIABLES
+========================= */
 @layer base {
   :root {
     --background: 40 33% 97%;
@@ -39,9 +42,11 @@
     --logo-color: 30 25% 35%;
     --glass-bg: 40 40% 99% / 0.8;
     --glass-border: 35 25% 88% / 0.5;
+
     --shadow-soft: 0 4px 30px rgba(139, 125, 107, 0.1);
     --shadow-card: 0 10px 40px rgba(139, 125, 107, 0.12);
     --shadow-hover: 0 20px 60px rgba(139, 125, 107, 0.18);
+
     --radius-card: 40px;
     --radius-chip: 24px;
     --radius-button: 16px;
@@ -55,13 +60,12 @@
 
   * {
     @apply border-border;
-    cursor: auto !important;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    cursor: auto !important;
+    cursor: auto;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -69,6 +73,9 @@
   }
 }
 
+/* =========================
+   COMPONENT STYLES
+========================= */
 @layer components {
   .font-script {
     font-family: var(--font-script);
@@ -123,6 +130,9 @@
   }
 }
 
+/* =========================
+   UTILITIES
+========================= */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -136,16 +146,4 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-}
-
-/* 🔥 FINAL PLANE / CURSOR KILL SWITCH */
-svg,
-body > svg,
-body > img,
-body > div > svg,
-.cursor,
-.custom-cursor,
-.cursor-dot,
-.cursor-outline {
-  display: none !important;
 }
