@@ -5,145 +5,151 @@
 @tailwind utilities;
 
 /* =========================
-   BASE THEME VARIABLES
+   BASE THEME VARIABLES
 ========================= */
 @layer base {
-  :root {
-    --background: 40 33% 97%;
-    --foreground: 30 20% 25%;
+  :root {
+    --background: 40 33% 97%;
+    --foreground: 30 20% 25%;
 
-    --card: 40 40% 99%;
-    --card-foreground: 30 20% 25%;
+    --card: 40 40% 99%;
+    --card-foreground: 30 20% 25%;
 
-    --popover: 40 40% 99%;
-    --popover-foreground: 30 20% 25%;
+    --popover: 40 40% 99%;
+    --popover-foreground: 30 20% 25%;
 
-    --primary: 150 25% 45%;
-    --primary-foreground: 40 33% 97%;
+    --primary: 150 25% 45%;
+    --primary-foreground: 40 33% 97%;
 
-    --secondary: 35 30% 90%;
-    --secondary-foreground: 30 20% 25%;
+    --secondary: 35 30% 90%;
+    --secondary-foreground: 30 20% 25%;
 
-    --muted: 35 20% 92%;
-    --muted-foreground: 30 15% 50%;
+    --muted: 35 20% 92%;
+    --muted-foreground: 30 15% 50%;
 
-    --accent: 30 35% 88%;
-    --accent-foreground: 30 20% 25%;
+    --accent: 30 35% 88%;
+    --accent-foreground: 30 20% 25%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 40 33% 97%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 40 33% 97%;
 
-    --border: 35 25% 88%;
-    --input: 35 25% 88%;
-    --ring: 150 25% 45%;
+    --border: 35 25% 88%;
+    --input: 35 25% 88%;
+    --ring: 150 25% 45%;
 
-    --radius: 0.5rem;
+    --radius: 0.5rem;
 
-    --logo-color: 30 25% 35%;
-    --glass-bg: 40 40% 99% / 0.8;
-    --glass-border: 35 25% 88% / 0.5;
+    --logo-color: 30 25% 35%;
+    --glass-bg: 40 40% 99% / 0.8;
+    --glass-border: 35 25% 88% / 0.5;
 
-    --shadow-soft: 0 4px 30px rgba(139, 125, 107, 0.1);
-    --shadow-card: 0 10px 40px rgba(139, 125, 107, 0.12);
-    --shadow-hover: 0 20px 60px rgba(139, 125, 107, 0.18);
+    --shadow-soft: 0 4px 30px rgba(139, 125, 107, 0.1);
+    --shadow-card: 0 10px 40px rgba(139, 125, 107, 0.12);
+    --shadow-hover: 0 20px 60px rgba(139, 125, 107, 0.18);
 
-    --radius-card: 40px;
-    --radius-chip: 24px;
-    --radius-button: 16px;
+    --radius-card: 40px;
+    --radius-chip: 24px;
+    --radius-button: 16px;
 
-    --font-script: 'Cormorant Garamond', serif;
-    --font-body: 'Inter', sans-serif;
+    --font-script: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
 
-    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
 
-  * {
-    @apply border-border;
-  }
+  * {
+    @apply border-border;
+  }
 
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: var(--font-body);
-    cursor: auto;
-  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    cursor: auto;
+    overflow-x: hidden; /* IMPORTANT: prevents 3D jitter */
+  }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-medium tracking-tight;
-  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
+  }
 }
 
 /* =========================
-   COMPONENT STYLES
+   COMPONENT STYLES
 ========================= */
 @layer components {
-  .font-script {
-    font-family: var(--font-script);
-  }
+  .font-script {
+    font-family: var(--font-script);
+  }
 
-  .glass-panel {
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid hsl(var(--glass-border));
-  }
+  .glass-panel {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--glass-border));
+  }
 
-  .card-destination {
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-card);
-    transition: var(--transition-smooth);
-    overflow: hidden;
-  }
+  .card-destination {
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-smooth);
+    overflow: hidden;
+  }
 
-  .card-destination:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-8px);
-  }
+  .card-destination:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-8px);
+  }
 
-  .chip-destination {
-    border-radius: var(--radius-chip);
-    transition: var(--transition-bounce);
-  }
+  .chip-destination {
+    border-radius: var(--radius-chip);
+    transition: var(--transition-bounce);
+  }
 
-  .chip-destination:hover {
-    transform: scale(1.05);
-  }
+  .chip-destination:hover {
+    transform: scale(1.05);
+  }
 
-  .nav-link {
-    position: relative;
-    transition: var(--transition-smooth);
-  }
+  .nav-link {
+    position: relative;
+    transition: var(--transition-smooth);
+  }
 
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: hsl(var(--primary));
-    transition: width 0.3s ease;
-  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: hsl(var(--primary));
+    transition: width 0.3s ease;
+  }
 
-  .nav-link:hover::after {
-    width: 100%;
-  }
+  .nav-link:hover::after {
+    width: 100%;
+  }
 }
 
 /* =========================
-   UTILITIES
+   UTILITIES
 ========================= */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  .text-balance {
+    text-wrap: balance;
+  }
 
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 🔥 CRITICAL FIX FOR 3D FLIP CARDS */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
 }
