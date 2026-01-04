@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Clock, Coins, Sun, ArrowRight } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
@@ -26,146 +26,168 @@ const defaultDestinationData: Record<string, DestinationData> = {
   Goa: { duration: "4-5 Days", investment: "₹25,000", bestTime: "Nov - Feb" },
   Japan: { duration: "7-10 Days", investment: "₹1,50,000", bestTime: "Mar - May" },
   Bali: { duration: "5-7 Days", investment: "₹75,000", bestTime: "Apr - Oct" },
-  "South Korea": {
-    duration: "6-8 Days",
-    investment: "₹1,20,000",
-    bestTime: "Mar - May",
-  },
+  "South Korea": { duration: "6-8 Days", investment: "₹1,20,000", bestTime: "Mar - May" },
 };
 
-const PostcardCard = ({
-  name,
-  image,
-  isGateway = false,
-  gatewayText,
-  onClick,
-  onEnquire,
-  index,
-  destinationData,
-}: PostcardCardProps) => {
+const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, onEnquire, index, destinationData }: PostcardCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  const data =
-    destinationData ||
-    defaultDestinationData[name] || {
-      duration: "5-7 Days",
-      investment: "₹45,000",
-      bestTime: "Oct - Mar",
-    };
+  // 3D Tilt Logic
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+    setIsFlipped(false);
+  };
+
+  const data = destinationData || defaultDestinationData[name] || {
+    duration: "5-7 Days",
+    investment: "₹45,000",
+    bestTime: "Oct - Mar",
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
       className="w-full perspective-1000"
     >
       {!isGateway ? (
-        <div
-          className="relative w-full aspect-[3/4] cursor-pointer"
+        <motion.div
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
           onMouseEnter={() => setIsFlipped(true)}
-          onMouseLeave={() => setIsFlipped(false)}
-          onClick={() => setIsFlipped((prev) => !prev)} // mobile tap
-          style={{ transformStyle: "preserve-3d" }}
+          onClick={() => setIsFlipped((prev) => !prev)}
+          style={{
+            rotateX: isFlipped ? 0 : rotateX,
+            rotateY: isFlipped ? 180 : rotateY,
+            transformStyle: "preserve-3d",
+          }}
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="relative w-full aspect-[3/4] cursor-pointer"
         >
-          {/* FLIP CONTAINER */}
-          <motion.div
-            className="w-full h-full"
-            animate={{ rotateY: isFlipped ? 180 : 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-            style={{ transformStyle: "preserve-3d" }}
+          {/* FRONT */}
+          <div
+            className="absolute inset-0 rounded-[2rem] overflow-hidden shadow-xl"
+            style={{ backfaceVisibility: "hidden" }}
           >
-            {/* FRONT */}
-            <div
-              className="absolute inset-0 card-destination overflow-hidden"
-              style={{ backfaceVisibility: "hidden" }}
-            >
-              <img
-                src={image}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-0 p-6">
-                <h3 className="text-2xl font-medium text-white">{name}</h3>
-              </div>
-            </div>
-
-            {/* BACK */}
-            <div
-              className="absolute inset-0 card-destination"
-              style={{
-                backfaceVisibility: "hidden",
-                transform: "rotateY(180deg)",
-              }}
-            >
-              <div
-                className="w-full h-full p-6 flex flex-col overflow-y-auto md:overflow-hidden scrollbar-hide"
-                style={{
-                  backgroundColor: "#FDFCF9",
-                  backgroundImage:
-                    "radial-gradient(circle, #D4AF37 0.5px, transparent 0.5px)",
-                  backgroundSize: "20px 20px",
-                }}
+            <motion.img
+              src={image}
+              alt={name}
+              animate={{ scale: isFlipped ? 1.2 : 1 }}
+              transition={{ duration: 0.6 }}
+              className="w-full h-full object-cover"
+            />
+            {/* Gloss Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10 opacity-60" />
+            <div className="absolute bottom-0 p-8 w-full">
+              <motion.h3 
+                layoutId={`title-${name}`}
+                className="text-3xl font-script italic text-white drop-shadow-lg"
               >
-                <h3 className="font-script text-3xl italic text-[#344E41] mb-6">
+                {name}
+              </motion.h3>
+            </div>
+          </div>
+
+          {/* BACK */}
+          <div
+            className="absolute inset-0 rounded-[2rem] shadow-2xl"
+            style={{
+              backfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+              backgroundColor: "#FDFCF9",
+              backgroundImage: "radial-gradient(circle, #D4AF37 0.4px, transparent 0.4px)",
+              backgroundSize: "24px 24px",
+            }}
+          >
+            <div className="w-full h-full p-8 flex flex-col justify-between">
+              <div>
+                <h3 className="font-script text-4xl italic text-[#344E41] mb-8 border-b border-[#D4AF37]/20 pb-2">
                   {name}
                 </h3>
 
-                <div className="flex-1 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-[#D4AF37]" />
-                    <div>
-                      <p className="text-[10px] uppercase">Duration</p>
-                      <p className="text-sm">{data.duration}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Coins className="w-5 h-5 text-[#D4AF37]" />
-                    <div>
-                      <p className="text-[10px] uppercase">Ideal Budget</p>
-                      <p className="text-sm">From {data.investment}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Sun className="w-5 h-5 text-[#D4AF37]" />
-                    <div>
-                      <p className="text-[10px] uppercase">Best Time</p>
-                      <p className="text-sm">{data.bestTime}</p>
-                    </div>
-                  </div>
+                <div className="space-y-6">
+                  {[
+                    { Icon: Clock, label: "Duration", val: data.duration },
+                    { Icon: Coins, label: "Ideal Budget", val: `From ${data.investment}` },
+                    { Icon: Sun, label: "Best Time", val: data.bestTime },
+                  ].map(({ Icon, label, val }, i) => (
+                    <motion.div 
+                      key={label}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={isFlipped ? { opacity: 1, x: 0 } : {}}
+                      transition={{ delay: 0.3 + i * 0.1 }}
+                      className="flex items-center gap-4"
+                    >
+                      <div className="p-2 rounded-full bg-[#638C7D]/10">
+                        <Icon className="w-5 h-5 text-[#D4AF37]" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase tracking-tighter text-[#344E41]/60 font-bold">{label}</p>
+                        <p className="text-sm font-medium text-[#344E41]">{val}</p>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-
-                <MagneticButton
-                  className="mt-6 w-full py-3 bg-[#638C7D] hover:bg-[#4A7066] text-white rounded-full text-xs font-bold tracking-widest"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEnquire();
-                  }}
-                >
-                  ENQUIRE NOW
-                </MagneticButton>
               </div>
+
+              <MagneticButton
+                className="w-full py-4 bg-[#638C7D] hover:bg-[#344E41] text-white rounded-xl text-xs font-bold tracking-[0.2em] transition-colors shadow-lg shadow-[#638C7D]/20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEnquire();
+                }}
+              >
+                ENQUIRE NOW
+              </MagneticButton>
             </div>
-          </motion.div>
-        </div>
-      ) : (
-        /* GATEWAY CARD */
-        <button
-          onClick={onClick}
-          className="w-full aspect-[3/4] card-destination flex flex-col items-center justify-center p-8 bg-gradient-to-br from-secondary via-accent to-secondary"
-        >
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-            <ArrowRight className="w-6 h-6 text-primary" />
           </div>
-          <p className="text-xl font-medium text-center">{gatewayText}</p>
-          <p className="text-sm text-muted-foreground mt-2 text-center">
+        </motion.div>
+      ) : (
+        /* GATEWAY CARD - AESTHETIC VERSION */
+        <motion.button
+          whileHover={{ scale: 0.98 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onClick}
+          className="w-full aspect-[3/4] rounded-[2rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group"
+        >
+          <motion.div 
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors"
+          >
+            <ArrowRight className="w-8 h-8 text-[#638C7D] group-hover:text-white transition-colors" />
+          </motion.div>
+          <p className="text-2xl font-script italic text-[#344E41]">{gatewayText}</p>
+          <div className="h-[1px] w-12 bg-[#D4AF37] my-4" />
+          <p className="text-xs uppercase tracking-widest text-[#344E41]/50 font-bold">
             View all destinations
           </p>
-        </button>
+        </motion.button>
       )}
     </motion.div>
   );
