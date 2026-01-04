@@ -4,8 +4,6 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
 
-/* ---------------- DESTINATIONS ---------------- */
-
 const domesticDestinations = [
   "Mumbai", "Pune", "Goa", "Leh-Ladakh", "Jaipur",
   "Kerala", "Manali", "Rishikesh", "Udaipur", "Spiti Valley"
@@ -16,12 +14,15 @@ const internationalDestinations = [
   "Iceland", "Turkey", "Singapore", "France", "Switzerland"
 ];
 
-/* ---------------- GOOGLE FORM CONFIG ---------------- */
-
-// 🔴 CHANGE THESE TWO
+/* 
+  🔥 GOOGLE FORM CONFIG
+  - GOOGLE_FORM_BASE: your main form link
+  - DESTINATION_ENTRY_ID: the dynamic param from your prefilled link
+*/
 const GOOGLE_FORM_BASE =
-  "https://docs.google.com/forms/d/e/FORM_ID/viewform";
-const DESTINATION_ENTRY_ID = "entry.123456789";
+  "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform";
+
+const DESTINATION_ENTRY_ID = "entry.396208505";
 
 const openGoogleForm = (destination: string) => {
   const url = `${GOOGLE_FORM_BASE}?${DESTINATION_ENTRY_ID}=${encodeURIComponent(
@@ -29,8 +30,6 @@ const openGoogleForm = (destination: string) => {
   )}`;
   window.open(url, "_blank");
 };
-
-/* ---------------- DROPDOWN ---------------- */
 
 interface DropdownProps {
   title: string;
@@ -51,7 +50,7 @@ const NavigationDropdown = ({
     <div className="relative">
       <button
         onClick={onToggle}
-        className="nav-link flex items-center gap-1.5 text-sm font-medium"
+        className="nav-link flex items-center gap-1.5 text-foreground/80 hover:text-foreground text-sm font-medium"
       >
         {title}
         <ChevronDown
@@ -67,6 +66,9 @@ const NavigationDropdown = ({
             <motion.div
               className="fixed inset-0 z-40"
               onClick={onClose}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             />
 
             <motion.div
@@ -102,8 +104,6 @@ const NavigationDropdown = ({
     </div>
   );
 };
-
-/* ---------------- HEADER ---------------- */
 
 const Header = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -142,7 +142,7 @@ const Header = () => {
               onClose={closeAll}
             />
 
-            {/* CONTACT US → CONTACT PAGE */}
+            {/* CONTACT US → Contact Page */}
             <Link to="/enquire">
               <MagneticButton className="px-6 py-2 bg-[#638C7D] text-white rounded-full text-xs font-bold tracking-widest">
                 CONTACT US
@@ -151,10 +151,7 @@ const Header = () => {
           </nav>
 
           {/* Mobile Toggle */}
-          <button
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
+          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -162,25 +159,48 @@ const Header = () => {
         {/* Mobile Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div className="md:hidden mt-4 bg-[#F8F7F2] rounded-2xl p-6 shadow-xl">
-              {[...domesticDestinations, ...internationalDestinations].map(
-                (dest) => (
+            <motion.div
+              className="md:hidden mt-4 bg-[#F8F7F2] rounded-2xl p-6 shadow-xl"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <p className="text-xs font-bold mb-2">Domestic</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {domesticDestinations.map((d) => (
                   <button
-                    key={dest}
+                    key={d}
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      openGoogleForm(dest);
+                      openGoogleForm(d);
                     }}
-                    className="block w-full text-left py-2 text-sm"
+                    className="px-3 py-1 bg-white/70 rounded-full text-xs"
                   >
-                    {dest}
+                    {d}
                   </button>
-                )
-              )}
+                ))}
+              </div>
 
+              <p className="text-xs font-bold mb-2">International</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {internationalDestinations.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      openGoogleForm(d);
+                    }}
+                    className="px-3 py-1 bg-white/70 rounded-full text-xs"
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+
+              {/* CONTACT US → Contact Page */}
               <Link
                 to="/enquire"
-                className="block w-full py-3 mt-4 bg-[#638C7D] text-white rounded-full text-xs font-bold text-center"
+                className="block w-full py-3 bg-[#638C7D] text-white rounded-full text-xs font-bold text-center"
               >
                 CONTACT US
               </Link>
