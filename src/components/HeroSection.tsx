@@ -12,28 +12,30 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          className="w-full h-full object-cover scale-125 object-bottom"
+          className="
+            w-full h-full 
+            object-cover object-center 
+            scale-110 
+            brightness-110 contrast-105 saturate-105
+          "
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
 
-        {/* Strong sage green overlay */}
-        <div className="absolute inset-0 bg-[#4F7668]/40" />
+        {/* Light dark overlay for readability (reduced) */}
+        <div className="absolute inset-0 bg-black/25" />
 
-        {/* Dark gradient to hide sky elements */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/70" />
+        {/* Soft teal cinematic tint (lighter than before) */}
+        <div className="absolute inset-0 bg-[#2f6f73]/20" />
 
-        {/* Heavy vignette effect */}
+        {/* Gentle vignette (not too heavy) */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%)",
+              "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.45) 100%)",
           }}
         />
-
-        {/* Subtle blur to reduce background details */}
-        <div className="absolute inset-0 backdrop-blur-[2px]" />
       </div>
 
       {/* Content */}
