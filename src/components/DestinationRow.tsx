@@ -25,72 +25,81 @@ const DestinationRow = ({
   onDestinationClick,
   onEnquire,
 }: DestinationRowProps) => {
-  
-  // Parent container variants for staggering children
+  /* Softer stagger for premium feel */
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15, // Delay between each card
-        delayChildren: 0.1,
+        staggerChildren: 0.12,
+        delayChildren: 0.15,
       },
     },
   };
 
-  // Header text variants
   const headerVariants = {
     hidden: { opacity: 0, x: -20 },
-    visible: { 
-      opacity: 1, 
-      x: 0, 
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
-    }
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
   };
 
   return (
-    <section className="py-24 px-6 bg-[#FDFCF9]">
+    <section className="py-28 px-6 bg-[#FDFCF9]">
       <div className="max-w-7xl mx-auto">
-        
         {/* Section Header */}
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="mb-16 relative"
+          viewport={{ once: true, margin: "-120px" }}
+          className="mb-20 relative"
         >
-          <motion.p 
+          <motion.p
             variants={headerVariants}
-            className="text-xs uppercase tracking-[0.4em] text-[#638C7D] font-bold mb-3"
+            className="text-xs uppercase tracking-[0.4em] text-[#638C7D] font-bold mb-4"
           >
             {subtitle}
           </motion.p>
-          
+
           <div className="flex items-center gap-8">
-            <motion.h2 
+            <motion.h2
               variants={headerVariants}
               className="font-script text-5xl md:text-6xl text-[#344E41] italic leading-tight"
             >
               {title}
             </motion.h2>
-            
-            {/* Animated Decorative Line */}
-            <motion.div 
+
+            {/* Decorative Line */}
+            <motion.div
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
-              transition={{ duration: 1.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 1.4,
+                delay: 0.6,
+                ease: [0.16, 1, 0.3, 1],
+              }}
               className="hidden md:block h-[1px] flex-1 bg-gradient-to-r from-[#D4AF37]/40 to-transparent origin-left"
             />
           </div>
         </motion.div>
 
-        {/* Cards Grid with Stagger logic */}
-        <motion.div 
+        {/* Cards Grid */}
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+          viewport={{ once: true, margin: "-80px" }}
+          className="
+            relative
+            grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
+            gap-10
+            perspective-1000
+          "
         >
           {destinations.map((destination, index) => (
             <PostcardCard
@@ -102,8 +111,8 @@ const DestinationRow = ({
               onEnquire={() => onEnquire(destination.name)}
             />
           ))}
-          
-          {/* Gateway Card (the last one in the stagger) */}
+
+          {/* Gateway Card */}
           <PostcardCard
             name="Gateway"
             image=""
