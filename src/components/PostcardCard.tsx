@@ -59,17 +59,27 @@ const PostcardCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="w-full"
+      className="w-full perspective-1000"
     >
       {!isGateway ? (
         <div
-          className="relative w-full aspect-[3/4] card-destination cursor-pointer"
+          className="relative w-full aspect-[3/4] cursor-pointer"
           onMouseEnter={() => setIsFlipped(true)}
           onMouseLeave={() => setIsFlipped(false)}
+          style={{ transformStyle: "preserve-3d" }}
         >
-          {!isFlipped ? (
-            /* FRONT */
-            <div className="absolute inset-0 overflow-hidden">
+          {/* FLIP CONTAINER */}
+          <motion.div
+            className="w-full h-full"
+            animate={{ rotateY: isFlipped ? 180 : 0 }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            {/* FRONT */}
+            <div
+              className="absolute inset-0 card-destination overflow-hidden"
+              style={{ backfaceVisibility: "hidden" }}
+            >
               <img
                 src={image}
                 alt={name}
@@ -80,11 +90,13 @@ const PostcardCard = ({
                 <h3 className="text-2xl font-medium text-white">{name}</h3>
               </div>
             </div>
-          ) : (
-            /* BACK */
+
+            {/* BACK */}
             <div
-              className="absolute inset-0 p-6 flex flex-col"
+              className="absolute inset-0 card-destination p-6 flex flex-col"
               style={{
+                backfaceVisibility: "hidden",
+                transform: "rotateY(180deg)",
                 backgroundColor: "#FDFCF9",
                 backgroundImage:
                   "radial-gradient(circle, #D4AF37 0.5px, transparent 0.5px)",
@@ -128,7 +140,7 @@ const PostcardCard = ({
                 ENQUIRE NOW
               </MagneticButton>
             </div>
-          )}
+          </motion.div>
         </div>
       ) : (
         /* GATEWAY CARD */
