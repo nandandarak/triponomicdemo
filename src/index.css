@@ -88,16 +88,11 @@
     border: 1px solid hsl(var(--glass-border));
   }
 
+  /* Note: Removed transition/transform from base class to prevent conflicts with Framer Motion */
   .card-destination {
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
-    transition: var(--transition-smooth);
     overflow: hidden;
-  }
-
-  .card-destination:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-8px);
   }
 
   .chip-destination {
@@ -131,9 +126,24 @@
 }
 
 /* =========================
-   UTILITIES
+   UTILITIES (3D & Visuals)
 ========================= */
 @layer utilities {
+  /* 3D Flip Essentials */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Text & Layout */
   .text-balance {
     text-wrap: balance;
   }
