@@ -21,12 +21,12 @@ interface PostcardCardProps {
 }
 
 const defaultDestinationData: Record<string, DestinationData> = {
-  Mumbai: { duration: "2-3 Days", investment: "15,000", bestTime: "Oct - Mar" },
-  Pune: { duration: "2-3 Days", investment: "12,000", bestTime: "Oct - Feb" },
-  Goa: { duration: "4-5 Days", investment: "25,000", bestTime: "Nov - Feb" },
-  Japan: { duration: "7-10 Days", investment: "1,50,000", bestTime: "Mar - May" },
-  Bali: { duration: "5-7 Days", investment: "75,000", bestTime: "Apr - Oct" },
-  "South Korea": { duration: "6-8 Days", investment: "1,20,000", bestTime: "Mar - May" },
+  Mumbai: { duration: "2-3 Days", investment: "₹15,000", bestTime: "Oct - Mar" },
+  Pune: { duration: "2-3 Days", investment: "₹12,000", bestTime: "Oct - Feb" },
+  Goa: { duration: "4-5 Days", investment: "₹25,000", bestTime: "Nov - Feb" },
+  Japan: { duration: "7-10 Days", investment: "₹1,50,000", bestTime: "Mar - May" },
+  Bali: { duration: "5-7 Days", investment: "₹75,000", bestTime: "Apr - Oct" },
+  "South Korea": { duration: "6-8 Days", investment: "₹1,20,000", bestTime: "Mar - May" },
 };
 
 const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, onEnquire, index, destinationData }: PostcardCardProps) => {
@@ -35,118 +35,161 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
   // 3D Tilt Logic
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+
   const mouseXSpring = useSpring(x);
   const mouseYSpring = useSpring(y);
-  
-  // These only apply when NOT flipped to avoid math conflicts
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
 
-  const data = destinationData || defaultDestinationData[name] || {
-    duration: "5-7 Days", investment: "45,000", bestTime: "Oct - Mar",
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
   };
 
-  if (isGateway) {
-    return (
-      <div className="w-full aspect-[3/4] perspective-1000">
-        <motion.button
-          whileHover={{ y: -8 }}
-          onClick={onClick}
-          className="w-full h-full rounded-[2.5rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group"
-        >
-          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors">
-            <ArrowRight className="w-6 h-6 text-[#638C7D] group-hover:text-white transition-colors" />
-          </div>
-          <p className="text-2xl font-script italic text-[#344E41]">{gatewayText}</p>
-        </motion.button>
-      </div>
-    );
-  }
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+    setIsFlipped(false);
+  };
+
+  const data = destinationData || defaultDestinationData[name] || {
+    duration: "5-7 Days",
+    investment: "₹45,000",
+    bestTime: "Oct - Mar",
+  };
 
   return (
-    <div 
-      className="w-full aspect-[3/4] perspective-1000"
-      onMouseEnter={() => setIsFlipped(true)}
-      onMouseLeave={() => setIsFlipped(false)}
-      style={{ cursor: 'pointer' }}
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full perspective-1000"
     >
-      <motion.div
-        className="relative w-full h-full preserve-3d"
-        style={{
-          rotateX: isFlipped ? 0 : rotateX,
-          rotateY: isFlipped ? 180 : rotateY,
-          transformStyle: "preserve-3d",
-        }}
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ type: "spring", stiffness: 60, damping: 15 }}
-      >
-        {/* FRONT SIDE */}
-        <div 
-          className="absolute inset-0 w-full h-full rounded-[2.5rem] overflow-hidden shadow-xl bg-white"
-          style={{ 
-            backfaceVisibility: "hidden", 
-            WebkitBackfaceVisibility: "hidden",
-            transform: "translateZ(50px)", // Increased Z-gap
-            zIndex: isFlipped ? 1 : 2,
-            visibility: isFlipped ? 'hidden' : 'visible' // Force hide logic
-          }}
-        >
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-          <div className="absolute bottom-0 p-10 w-full text-left">
-            <h3 className="text-3xl font-script italic text-white drop-shadow-md">{name}</h3>
-          </div>
-        </div>
-
-        {/* BACK SIDE */}
-        <div
-          className="absolute inset-0 w-full h-full rounded-[2.5rem] shadow-2xl p-10 flex flex-col justify-between border border-[#D4AF37]/10"
+      {!isGateway ? (
+        <motion.div
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => setIsFlipped(true)}
+          onClick={() => setIsFlipped((prev) => !prev)}
           style={{
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg) translateZ(50px)", // Match Z-gap
-            backgroundColor: "#FDFCF9",
-            backgroundImage: "radial-gradient(circle, #D4AF37 0.7px, transparent 0.7px)",
-            backgroundSize: "28px 28px",
-            zIndex: isFlipped ? 2 : 1,
-            pointerEvents: isFlipped ? 'auto' : 'none' // Prevent accidental clicks through the card
+            rotateX: isFlipped ? 0 : rotateX,
+            rotateY: isFlipped ? 180 : rotateY,
+            transformStyle: "preserve-3d",
           }}
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="relative w-full aspect-[3/4] cursor-pointer"
         >
-          <div className="text-left">
-            <h3 className="font-script text-4xl italic text-[#344E41] mb-8 border-b border-[#D4AF37]/30 pb-3">
-              {name}
-            </h3>
-            <div className="space-y-6">
-              {[
-                { Icon: Clock, label: "Duration", val: data.duration },
-                { Icon: Coins, label: "Investment", val: `₹${data.investment}` },
-                { Icon: Sun, label: "Best Time", val: data.bestTime },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-5">
-                  <div className="w-9 h-9 rounded-full bg-[#638C7D]/10 flex items-center justify-center">
-                    <item.Icon className="w-4 h-4 text-[#D4AF37]" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-[#638C7D] font-bold leading-none mb-1.5">{item.label}</p>
-                    <p className="text-[15px] font-semibold text-[#344E41]">{item.val}</p>
-                  </div>
-                </div>
-              ))}
+          {/* FRONT */}
+          <div
+            className="absolute inset-0 rounded-[2rem] overflow-hidden shadow-xl"
+            style={{ backfaceVisibility: "hidden" }}
+          >
+            <motion.img
+              src={image}
+              alt={name}
+              animate={{ scale: isFlipped ? 1.2 : 1 }}
+              transition={{ duration: 0.6 }}
+              className="w-full h-full object-cover"
+            />
+            {/* Gloss Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10 opacity-60" />
+            <div className="absolute bottom-0 p-8 w-full">
+              <motion.h3 
+                layoutId={`title-${name}`}
+                className="text-3xl font-script italic text-white drop-shadow-lg"
+              >
+                {name}
+              </motion.h3>
             </div>
           </div>
 
-          <MagneticButton
-            className="w-full py-4.5 bg-[#638C7D] text-white rounded-2xl text-[10px] font-bold tracking-[0.25em] shadow-lg shadow-[#638C7D]/25 hover:bg-[#344E41] transition-all"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEnquire();
+          {/* BACK */}
+          <div
+            className="absolute inset-0 rounded-[2rem] shadow-2xl"
+            style={{
+              backfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+              backgroundColor: "#FDFCF9",
+              backgroundImage: "radial-gradient(circle, #D4AF37 0.4px, transparent 0.4px)",
+              backgroundSize: "24px 24px",
             }}
           >
-            ENQUIRE NOW
-          </MagneticButton>
-        </div>
-      </motion.div>
-    </div>
+            <div className="w-full h-full p-8 flex flex-col justify-between">
+              <div>
+                <h3 className="font-script text-4xl italic text-[#344E41] mb-8 border-b border-[#D4AF37]/20 pb-2">
+                  {name}
+                </h3>
+
+                <div className="space-y-6">
+                  {[
+                    { Icon: Clock, label: "Duration", val: data.duration },
+                    { Icon: Coins, label: "Ideal Budget", val: `From ${data.investment}` },
+                    { Icon: Sun, label: "Best Time", val: data.bestTime },
+                  ].map(({ Icon, label, val }, i) => (
+                    <motion.div 
+                      key={label}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={isFlipped ? { opacity: 1, x: 0 } : {}}
+                      transition={{ delay: 0.3 + i * 0.1 }}
+                      className="flex items-center gap-4"
+                    >
+                      <div className="p-2 rounded-full bg-[#638C7D]/10">
+                        <Icon className="w-5 h-5 text-[#D4AF37]" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase tracking-tighter text-[#344E41]/60 font-bold">{label}</p>
+                        <p className="text-sm font-medium text-[#344E41]">{val}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              <MagneticButton
+                className="w-full py-4 bg-[#638C7D] hover:bg-[#344E41] text-white rounded-xl text-xs font-bold tracking-[0.2em] transition-colors shadow-lg shadow-[#638C7D]/20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEnquire();
+                }}
+              >
+                ENQUIRE NOW
+              </MagneticButton>
+            </div>
+          </div>
+        </motion.div>
+      ) : (
+        /* GATEWAY CARD - AESTHETIC VERSION */
+        <motion.button
+          whileHover={{ scale: 0.98 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onClick}
+          className="w-full aspect-[3/4] rounded-[2rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group"
+        >
+          <motion.div 
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors"
+          >
+            <ArrowRight className="w-8 h-8 text-[#638C7D] group-hover:text-white transition-colors" />
+          </motion.div>
+          <p className="text-2xl font-script italic text-[#344E41]">{gatewayText}</p>
+          <div className="h-[1px] w-12 bg-[#D4AF37] my-4" />
+          <p className="text-xs uppercase tracking-widest text-[#344E41]/50 font-bold">
+            View all destinations
+          </p>
+        </motion.button>
+      )}
+    </motion.div>
   );
 };
 
