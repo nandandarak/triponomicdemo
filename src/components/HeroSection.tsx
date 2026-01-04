@@ -4,6 +4,7 @@ import heroVideo from "@/assets/hero-train-video.mp4";
 const HeroSection = () => {
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center px-6 pt-32 pb-16 overflow-hidden">
+      
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
         <video
@@ -11,21 +12,28 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          className="w-full h-full object-cover scale-110"
+          className="w-full h-full object-cover scale-125 object-bottom"
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
-        
-        {/* Sage Green Overlay */}
-        <div className="absolute inset-0 bg-[#638C7D]/25" />
-        
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/80" />
-        
-        {/* Vignette effect */}
-        <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.3) 100%)"
-        }} />
+
+        {/* Strong sage green overlay */}
+        <div className="absolute inset-0 bg-[#4F7668]/40" />
+
+        {/* Dark gradient to hide sky elements */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/70" />
+
+        {/* Heavy vignette effect */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%)",
+          }}
+        />
+
+        {/* Subtle blur to reduce background details */}
+        <div className="absolute inset-0 backdrop-blur-[2px]" />
       </div>
 
       {/* Content */}
@@ -43,7 +51,7 @@ const HeroSection = () => {
             </h1>
           </div>
         </motion.div>
-        
+
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
