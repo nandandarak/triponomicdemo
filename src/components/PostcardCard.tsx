@@ -3,98 +3,48 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Clock, Coins, Sun, ArrowRight } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
-interface DestinationData {
-  duration: string;
-  investment: string;
-  bestTime: string;
-}
-
-interface PostcardCardProps {
-  name: string;
-  image: string;
-  isGateway?: boolean;
-  gatewayText?: string;
-  onClick: () => void;
-  onEnquire: () => void;
-  index: number;
-  destinationData?: DestinationData;
-}
-
-const defaultDestinationData: Record<string, DestinationData> = {
-  Mumbai: { duration: "2-3 Days", investment: "₹15,000", bestTime: "Oct - Mar" },
-  Pune: { duration: "2-3 Days", investment: "₹12,000", bestTime: "Oct - Feb" },
-  Goa: { duration: "4-5 Days", investment: "₹25,000", bestTime: "Nov - Feb" },
-  Japan: { duration: "7-10 Days", investment: "₹1,50,000", bestTime: "Mar - May" },
-  Bali: { duration: "5-7 Days", investment: "₹75,000", bestTime: "Apr - Oct" },
-  "South Korea": { duration: "6-8 Days", investment: "₹1,20,000", bestTime: "Mar - May" },
-};
+// ... (keep the interfaces and defaultDestinationData same as before)
 
 const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, onEnquire, index, destinationData }: PostcardCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  // 3D Tilt Logic (Only active when NOT flipped)
+  // 3D Tilt Logic
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseXSpring = useSpring(x);
   const mouseYSpring = useSpring(y);
-
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    setIsFlipped(false);
-  };
-
   const data = destinationData || defaultDestinationData[name] || {
-    duration: "5-7 Days",
-    investment: "₹45,000",
-    bestTime: "Oct - Mar",
+    duration: "5-7 Days", investment: "₹45,000", bestTime: "Oct - Mar",
   };
 
   if (isGateway) {
     return (
-      <motion.div 
-        className="w-full h-full perspective-1000"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: index * 0.1 }}
-      >
+      <div className="w-full aspect-[3/4]">
         <motion.button
-          whileHover={{ y: -8, backgroundColor: "#efece3" }}
+          whileHover={{ y: -8 }}
           onClick={onClick}
-          className="w-full h-full aspect-[3/4] rounded-[2.5rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group transition-all duration-300"
+          className="w-full h-full rounded-[2.5rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group"
         >
-          <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors">
+          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors">
             <ArrowRight className="w-6 h-6 text-[#638C7D] group-hover:text-white transition-colors" />
           </div>
           <p className="text-2xl font-script italic text-[#344E41]">{gatewayText}</p>
-          <p className="text-[10px] uppercase tracking-[0.25em] text-[#344E41]/50 font-bold mt-4">Discover More</p>
         </motion.button>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+    <div 
       className="w-full aspect-[3/4] perspective-1000"
+      onMouseEnter={() => setIsFlipped(true)}
+      onMouseLeave={() => setIsFlipped(false)}
     >
       <motion.div
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        onMouseEnter={() => setIsFlipped(true)}
-        onClick={() => setIsFlipped(!isFlipped)}
+        className="relative w-full h-full preserve-3d"
         style={{
           rotateX: isFlipped ? 0 : rotateX,
           rotateY: isFlipped ? 180 : rotateY,
@@ -102,34 +52,35 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
         }}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 18 }}
-        className="relative w-full h-full cursor-pointer preserve-3d"
       >
-        {/* FRONT SIDE */}
+        {/* FRONT SIDE - Forced to be on top and solid */}
         <div 
           className="absolute inset-0 w-full h-full backface-hidden rounded-[2.5rem] overflow-hidden shadow-xl bg-white"
           style={{ 
             backfaceVisibility: "hidden", 
             WebkitBackfaceVisibility: "hidden",
-            transform: "translateZ(1px)" 
+            zIndex: isFlipped ? 1 : 2, // Drops priority when flipped
+            transform: "translateZ(1px)"
           }}
         >
           <img src={image} alt={name} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
           <div className="absolute bottom-0 p-10 w-full text-left">
-            <h3 className="text-3xl font-script italic text-white drop-shadow-md">{name}</h3>
+            <h3 className="text-3xl font-script italic text-white">{name}</h3>
           </div>
         </div>
 
-        {/* BACK SIDE */}
+        {/* BACK SIDE - Forced to be hidden until needed */}
         <div
-          className="absolute inset-0 w-full h-full backface-hidden rounded-[2.5rem] shadow-2xl p-10 flex flex-col justify-between border border-[#D4AF37]/10"
+          className="absolute inset-0 w-full h-full backface-hidden rounded-[2.5rem] shadow-2xl p-10 flex flex-col justify-between border border-[#D4AF37]/10 bg-[#FDFCF9]"
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
             transform: "rotateY(180deg) translateZ(1px)",
-            backgroundColor: "#FDFCF9",
             backgroundImage: "radial-gradient(circle, #D4AF37 0.7px, transparent 0.7px)",
             backgroundSize: "28px 28px",
+            opacity: isFlipped ? 1 : 0, // <--- THIS PREVENTS GHOSTING ON FRONT
+            zIndex: isFlipped ? 2 : 1,
           }}
         >
           <div className="text-left">
@@ -156,17 +107,14 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           </div>
 
           <MagneticButton
-            className="w-full py-4.5 bg-[#638C7D] text-white rounded-2xl text-[10px] font-bold tracking-[0.25em] shadow-lg shadow-[#638C7D]/25 hover:bg-[#344E41] transition-all duration-500"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEnquire();
-            }}
+            className="w-full py-4 bg-[#638C7D] text-white rounded-2xl text-[10px] font-bold tracking-[0.25em]"
+            onClick={(e) => { e.stopPropagation(); onEnquire(); }}
           >
             ENQUIRE NOW
           </MagneticButton>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 
