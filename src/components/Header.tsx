@@ -15,13 +15,13 @@ const internationalDestinations = [
 ];
 
 const services = [
-  { icon: Plane, label: "Flight & Hotel", color: "#638C7D" },
-  { icon: Shield, label: "Insurance & eSIM", color: "#638C7D" },
+  { icon: Plane, label: "Flight & Hotel Bookings", color: "#638C7D" },
+  { icon: Shield, label: "Travel Insurance & International eSIM", color: "#638C7D" },
   { icon: Map, label: "Customized Experiences", color: "#638C7D" },
   { icon: FileCheck, label: "Visa Assistance", color: "#638C7D" },
-  { icon: Car, label: "Transfers", color: "#638C7D" },
-  { icon: CarFront, label: "Self-Drive", color: "#638C7D" },
-  { icon: Ship, label: "Cruises", color: "#638C7D" },
+  { icon: Car, label: "Outstation Cabs & Airport Transfers", color: "#638C7D" },
+  { icon: CarFront, label: "Self-Drive Cars (International)", color: "#638C7D" },
+  { icon: Ship, label: "Cruise Holidays", color: "#638C7D" },
 ];
 
 const GOOGLE_FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform?usp=pp_url";
