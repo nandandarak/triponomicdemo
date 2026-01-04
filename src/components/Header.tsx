@@ -4,6 +4,8 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
 
+/* ---------------- DESTINATIONS ---------------- */
+
 const domesticDestinations = [
   "Mumbai", "Pune", "Goa", "Leh-Ladakh", "Jaipur",
   "Kerala", "Manali", "Rishikesh", "Udaipur", "Spiti Valley"
@@ -14,9 +16,21 @@ const internationalDestinations = [
   "Iceland", "Turkey", "Singapore", "France", "Switzerland"
 ];
 
-interface HeaderProps {
-  onEnquire: (destination: string) => void;
-}
+/* ---------------- GOOGLE FORM CONFIG ---------------- */
+
+// 🔴 CHANGE THESE TWO
+const GOOGLE_FORM_BASE =
+  "https://docs.google.com/forms/d/e/FORM_ID/viewform";
+const DESTINATION_ENTRY_ID = "entry.123456789";
+
+const openGoogleForm = (destination: string) => {
+  const url = `${GOOGLE_FORM_BASE}?${DESTINATION_ENTRY_ID}=${encodeURIComponent(
+    destination
+  )}`;
+  window.open(url, "_blank");
+};
+
+/* ---------------- DROPDOWN ---------------- */
 
 interface DropdownProps {
   title: string;
@@ -24,7 +38,6 @@ interface DropdownProps {
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
-  onSelect: (destination: string) => void;
 }
 
 const NavigationDropdown = ({
@@ -33,16 +46,19 @@ const NavigationDropdown = ({
   isOpen,
   onToggle,
   onClose,
-  onSelect,
 }: DropdownProps) => {
   return (
     <div className="relative">
       <button
         onClick={onToggle}
-        className="nav-link flex items-center gap-1.5 text-foreground/80 hover:text-foreground text-sm font-medium"
+        className="nav-link flex items-center gap-1.5 text-sm font-medium"
       >
         {title}
-        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`w-4 h-4 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       <AnimatePresence>
@@ -51,9 +67,6 @@ const NavigationDropdown = ({
             <motion.div
               className="fixed inset-0 z-40"
               onClick={onClose}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
             />
 
             <motion.div
@@ -68,11 +81,11 @@ const NavigationDropdown = ({
                 </p>
 
                 <div className="grid grid-cols-2 gap-2">
-                  {destinations.map(dest => (
+                  {destinations.map((dest) => (
                     <button
                       key={dest}
                       onClick={() => {
-                        onSelect(dest);   // 🔥 opens modal
+                        openGoogleForm(dest);
                         onClose();
                       }}
                       className="px-4 py-2 rounded-xl bg-white/60 hover:bg-[#638C7D] hover:text-white text-xs font-medium transition"
@@ -90,7 +103,9 @@ const NavigationDropdown = ({
   );
 };
 
-const Header = ({ onEnquire }: HeaderProps) => {
+/* ---------------- HEADER ---------------- */
+
+const Header = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -117,7 +132,6 @@ const Header = ({ onEnquire }: HeaderProps) => {
               isOpen={openDropdown === "domestic"}
               onToggle={() => toggle("domestic")}
               onClose={closeAll}
-              onSelect={onEnquire}
             />
 
             <NavigationDropdown
@@ -126,10 +140,9 @@ const Header = ({ onEnquire }: HeaderProps) => {
               isOpen={openDropdown === "international"}
               onToggle={() => toggle("international")}
               onClose={closeAll}
-              onSelect={onEnquire}
             />
 
-            {/* ✅ CONTACT US → PAGE */}
+            {/* CONTACT US → CONTACT PAGE */}
             <Link to="/enquire">
               <MagneticButton className="px-6 py-2 bg-[#638C7D] text-white rounded-full text-xs font-bold tracking-widest">
                 CONTACT US
@@ -138,7 +151,10 @@ const Header = ({ onEnquire }: HeaderProps) => {
           </nav>
 
           {/* Mobile Toggle */}
-          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <button
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -146,48 +162,25 @@ const Header = ({ onEnquire }: HeaderProps) => {
         {/* Mobile Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div
-              className="md:hidden mt-4 bg-[#F8F7F2] rounded-2xl p-6 shadow-xl"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <p className="text-xs font-bold mb-2">Domestic</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {domesticDestinations.map(d => (
+            <motion.div className="md:hidden mt-4 bg-[#F8F7F2] rounded-2xl p-6 shadow-xl">
+              {[...domesticDestinations, ...internationalDestinations].map(
+                (dest) => (
                   <button
-                    key={d}
+                    key={dest}
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      onEnquire(d);   // 🔥 modal
+                      openGoogleForm(dest);
                     }}
-                    className="px-3 py-1 bg-white/70 rounded-full text-xs"
+                    className="block w-full text-left py-2 text-sm"
                   >
-                    {d}
+                    {dest}
                   </button>
-                ))}
-              </div>
+                )
+              )}
 
-              <p className="text-xs font-bold mb-2">International</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {internationalDestinations.map(d => (
-                  <button
-                    key={d}
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      onEnquire(d);   // 🔥 modal
-                    }}
-                    className="px-3 py-1 bg-white/70 rounded-full text-xs"
-                  >
-                    {d}
-                  </button>
-                ))}
-              </div>
-
-              {/* ✅ CONTACT US → PAGE */}
               <Link
                 to="/enquire"
-                className="block w-full py-3 bg-[#638C7D] text-white rounded-full text-xs font-bold text-center"
+                className="block w-full py-3 mt-4 bg-[#638C7D] text-white rounded-full text-xs font-bold text-center"
               >
                 CONTACT US
               </Link>
@@ -200,4 +193,3 @@ const Header = ({ onEnquire }: HeaderProps) => {
 };
 
 export default Header;
-
