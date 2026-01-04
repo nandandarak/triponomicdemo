@@ -30,7 +30,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <p className="text-sm text-muted-foreground">
-            © 2024 Triponomic. All rights reserved.
+            © 2026 Triponomic. All rights reserved.
           </p>
         </div>
       </div>
