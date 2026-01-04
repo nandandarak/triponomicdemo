@@ -66,6 +66,7 @@ const PostcardCard = ({
           className="relative w-full aspect-[3/4] cursor-pointer"
           onMouseEnter={() => setIsFlipped(true)}
           onMouseLeave={() => setIsFlipped(false)}
+          onClick={() => setIsFlipped((prev) => !prev)} // mobile tap
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* FLIP CONTAINER */}
@@ -93,52 +94,61 @@ const PostcardCard = ({
 
             {/* BACK */}
             <div
-              className="absolute inset-0 card-destination p-6 flex flex-col"
+              className="absolute inset-0 card-destination"
               style={{
                 backfaceVisibility: "hidden",
                 transform: "rotateY(180deg)",
-                backgroundColor: "#FDFCF9",
-                backgroundImage:
-                  "radial-gradient(circle, #D4AF37 0.5px, transparent 0.5px)",
-                backgroundSize: "20px 20px",
               }}
             >
-              <h3 className="font-script text-3xl italic text-[#344E41] mb-6">
-                {name}
-              </h3>
-
-              <div className="flex-1 space-y-4">
-                <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-[#D4AF37]" />
-                  <div>
-                    <p className="text-[10px] uppercase">Duration</p>
-                    <p className="text-sm">{data.duration}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Coins className="w-5 h-5 text-[#D4AF37]" />
-                  <div>
-                    <p className="text-[10px] uppercase">Ideal Budget</p>
-                    <p className="text-sm">From {data.investment}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Sun className="w-5 h-5 text-[#D4AF37]" />
-                  <div>
-                    <p className="text-[10px] uppercase">Best Time</p>
-                    <p className="text-sm">{data.bestTime}</p>
-                  </div>
-                </div>
-              </div>
-
-              <MagneticButton
-                className="mt-4 w-full py-3 bg-[#638C7D] hover:bg-[#4A7066] text-white rounded-full text-xs font-bold tracking-widest"
-                onClick={onEnquire}
+              <div
+                className="w-full h-full p-6 flex flex-col overflow-y-auto md:overflow-hidden scrollbar-hide"
+                style={{
+                  backgroundColor: "#FDFCF9",
+                  backgroundImage:
+                    "radial-gradient(circle, #D4AF37 0.5px, transparent 0.5px)",
+                  backgroundSize: "20px 20px",
+                }}
               >
-                ENQUIRE NOW
-              </MagneticButton>
+                <h3 className="font-script text-3xl italic text-[#344E41] mb-6">
+                  {name}
+                </h3>
+
+                <div className="flex-1 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-[#D4AF37]" />
+                    <div>
+                      <p className="text-[10px] uppercase">Duration</p>
+                      <p className="text-sm">{data.duration}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Coins className="w-5 h-5 text-[#D4AF37]" />
+                    <div>
+                      <p className="text-[10px] uppercase">Ideal Budget</p>
+                      <p className="text-sm">From {data.investment}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Sun className="w-5 h-5 text-[#D4AF37]" />
+                    <div>
+                      <p className="text-[10px] uppercase">Best Time</p>
+                      <p className="text-sm">{data.bestTime}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <MagneticButton
+                  className="mt-6 w-full py-3 bg-[#638C7D] hover:bg-[#4A7066] text-white rounded-full text-xs font-bold tracking-widest"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEnquire();
+                  }}
+                >
+                  ENQUIRE NOW
+                </MagneticButton>
+              </div>
             </div>
           </motion.div>
         </div>
