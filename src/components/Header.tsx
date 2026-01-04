@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
+import GoogleFormModal from "./GoogleFormModal";
+
+/* ---------------- DESTINATIONS ---------------- */
 
 const domesticDestinations = [
   "Mumbai", "Pune", "Goa", "Leh-Ladakh", "Jaipur",
@@ -14,22 +17,7 @@ const internationalDestinations = [
   "Iceland", "Turkey", "Singapore", "France", "Switzerland"
 ];
 
-/* 
-  🔥 GOOGLE FORM CONFIG
-  - GOOGLE_FORM_BASE: your main form link
-  - DESTINATION_ENTRY_ID: the dynamic param from your prefilled link
-*/
-const GOOGLE_FORM_BASE =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform";
-
-const DESTINATION_ENTRY_ID = "entry.396208505";
-
-const openGoogleForm = (destination: string) => {
-  const url = `${GOOGLE_FORM_BASE}?${DESTINATION_ENTRY_ID}=${encodeURIComponent(
-    destination
-  )}`;
-  window.open(url, "_blank");
-};
+/* ---------------- DROPDOWN ---------------- */
 
 interface DropdownProps {
   title: string;
@@ -37,6 +25,7 @@ interface DropdownProps {
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
+  onSelect: (destination: string) => void;
 }
 
 const NavigationDropdown = ({
@@ -45,6 +34,7 @@ const NavigationDropdown = ({
   isOpen,
   onToggle,
   onClose,
+  onSelect,
 }: DropdownProps) => {
   return (
     <div className="relative">
@@ -87,7 +77,7 @@ const NavigationDropdown = ({
                     <button
                       key={dest}
                       onClick={() => {
-                        openGoogleForm(dest);
+                        onSelect(dest);
                         onClose();
                       }}
                       className="px-4 py-2 rounded-xl bg-white/60 hover:bg-[#638C7D] hover:text-white text-xs font-medium transition"
@@ -105,9 +95,12 @@ const NavigationDropdown = ({
   );
 };
 
+/* ---------------- HEADER ---------------- */
+
 const Header = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
 
   const toggle = (key: string) =>
     setOpenDropdown(openDropdown === key ? null : key);
@@ -132,6 +125,7 @@ const Header = () => {
               isOpen={openDropdown === "domestic"}
               onToggle={() => toggle("domestic")}
               onClose={closeAll}
+              onSelect={setSelectedDestination}
             />
 
             <NavigationDropdown
@@ -140,6 +134,7 @@ const Header = () => {
               isOpen={openDropdown === "international"}
               onToggle={() => toggle("international")}
               onClose={closeAll}
+              onSelect={setSelectedDestination}
             />
 
             {/* CONTACT US → Contact Page */}
@@ -151,7 +146,10 @@ const Header = () => {
           </nav>
 
           {/* Mobile Toggle */}
-          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <button
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -172,7 +170,7 @@ const Header = () => {
                     key={d}
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      openGoogleForm(d);
+                      setSelectedDestination(d);
                     }}
                     className="px-3 py-1 bg-white/70 rounded-full text-xs"
                   >
@@ -188,7 +186,7 @@ const Header = () => {
                     key={d}
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      openGoogleForm(d);
+                      setSelectedDestination(d);
                     }}
                     className="px-3 py-1 bg-white/70 rounded-full text-xs"
                   >
@@ -208,6 +206,14 @@ const Header = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* GOOGLE FORM MODAL */}
+      {selectedDestination && (
+        <GoogleFormModal
+          destination={selectedDestination}
+          onClose={() => setSelectedDestination(null)}
+        />
+      )}
     </header>
   );
 };
