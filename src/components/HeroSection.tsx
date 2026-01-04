@@ -39,7 +39,7 @@ const HeroSection = () => {
   };
 
   return (
-    /* OUTER WRAPPER — reserves layout space (IMPORTANT) */
+    /* OUTER WRAPPER — reserves layout space */
     <div className="relative min-h-screen w-full">
       <section
         ref={containerRef}
@@ -114,8 +114,8 @@ const HeroSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* Bottom Fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-20 pointer-events-none" />
+        {/* ✅ IMPROVED BOTTOM FADE */}
+        <div className="absolute bottom-0 left-0 right-0 h-56 md:h-80 bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none" />
       </section>
     </div>
   );
