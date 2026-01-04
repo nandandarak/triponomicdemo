@@ -21,71 +21,50 @@ interface PostcardCardProps {
 }
 
 const defaultDestinationData: Record<string, DestinationData> = {
-  Mumbai: { duration: "2-3 Days", investment: "₹15,000", bestTime: "Oct - Mar" },
-  Pune: { duration: "2-3 Days", investment: "₹12,000", bestTime: "Oct - Feb" },
-  Goa: { duration: "4-5 Days", investment: "₹25,000", bestTime: "Nov - Feb" },
-  Japan: { duration: "7-10 Days", investment: "₹1,50,000", bestTime: "Mar - May" },
-  Bali: { duration: "5-7 Days", investment: "₹75,000", bestTime: "Apr - Oct" },
-  "South Korea": { duration: "6-8 Days", investment: "₹1,20,000", bestTime: "Mar - May" },
+  Mumbai: { duration: "2-3 Days", investment: "15,000", bestTime: "Oct - Mar" },
+  Pune: { duration: "2-3 Days", investment: "12,000", bestTime: "Oct - Feb" },
+  Goa: { duration: "4-5 Days", investment: "25,000", bestTime: "Nov - Feb" },
+  Japan: { duration: "7-10 Days", investment: "1,50,000", bestTime: "Mar - May" },
+  Bali: { duration: "5-7 Days", investment: "75,000", bestTime: "Apr - Oct" },
+  "South Korea": { duration: "6-8 Days", investment: "1,20,000", bestTime: "Mar - May" },
 };
 
 const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, onEnquire, index, destinationData }: PostcardCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  // 3D Tilt Logic
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseXSpring = useSpring(x);
   const mouseYSpring = useSpring(y);
-
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    setIsFlipped(false);
-  };
-
   const data = destinationData || defaultDestinationData[name] || {
-    duration: "5-7 Days", investment: "₹45,000", bestTime: "Oct - Mar",
+    duration: "5-7 Days", investment: "45,000", bestTime: "Oct - Mar",
   };
 
   if (isGateway) {
     return (
-      <motion.div 
-        className="w-full aspect-[3/4] perspective-1000"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-      >
+      <div className="w-full aspect-[3/4] perspective-1000">
         <motion.button
-          whileHover={{ y: -10, backgroundColor: "#efece3" }}
+          whileHover={{ y: -8 }}
           onClick={onClick}
-          className="w-full h-full rounded-[2.5rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group transition-all"
+          className="w-full h-full rounded-[2.5rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group"
         >
-          <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors">
-            <ArrowRight className="w-6 h-6 text-[#638C7D] group-hover:text-white" />
+          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors">
+            <ArrowRight className="w-6 h-6 text-[#638C7D] group-hover:text-white transition-colors" />
           </div>
           <p className="text-2xl font-script italic text-[#344E41]">{gatewayText}</p>
         </motion.button>
-      </motion.div>
+      </div>
     );
   }
 
   return (
     <div 
       className="w-full aspect-[3/4] perspective-1000"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       onMouseEnter={() => setIsFlipped(true)}
-      onClick={() => setIsFlipped(!isFlipped)}
+      onMouseLeave={() => setIsFlipped(false)}
     >
       <motion.div
         className="relative w-full h-full preserve-3d"
@@ -95,15 +74,15 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           transformStyle: "preserve-3d",
         }}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ type: "spring", stiffness: 80, damping: 15 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
       >
         {/* FRONT SIDE */}
         <div 
-          className="absolute inset-0 w-full h-full backface-hidden rounded-[2.5rem] overflow-hidden shadow-xl bg-white"
+          className="absolute inset-0 w-full h-full rounded-[2.5rem] overflow-hidden shadow-xl bg-white"
           style={{ 
             backfaceVisibility: "hidden", 
             WebkitBackfaceVisibility: "hidden",
-            transform: "translateZ(2px)", // Physically sits in front
+            transform: "translateZ(2px)", // Physically pushes the front forward
             zIndex: isFlipped ? 1 : 2 
           }}
         >
@@ -116,11 +95,11 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
 
         {/* BACK SIDE */}
         <div
-          className="absolute inset-0 w-full h-full backface-hidden rounded-[2.5rem] shadow-2xl p-10 flex flex-col justify-between border border-[#D4AF37]/10"
+          className="absolute inset-0 w-full h-full rounded-[2.5rem] shadow-2xl p-10 flex flex-col justify-between border border-[#D4AF37]/10"
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg) translateZ(1px)", // Sits slightly behind the front plane
+            transform: "rotateY(180deg) translateZ(1px)", // Sits 1px behind the front face
             backgroundColor: "#FDFCF9",
             backgroundImage: "radial-gradient(circle, #D4AF37 0.7px, transparent 0.7px)",
             backgroundSize: "28px 28px",
@@ -134,7 +113,7 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
             <div className="space-y-6">
               {[
                 { Icon: Clock, label: "Duration", val: data.duration },
-                { Icon: Coins, label: "Investment", val: data.investment },
+                { Icon: Coins, label: "Investment", val: `₹${data.investment}` },
                 { Icon: Sun, label: "Best Time", val: data.bestTime },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-5">
@@ -151,7 +130,7 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           </div>
 
           <MagneticButton
-            className="w-full py-4.5 bg-[#638C7D] text-white rounded-2xl text-[10px] font-bold tracking-[0.25em] shadow-lg shadow-[#638C7D]/25"
+            className="w-full py-4.5 bg-[#638C7D] text-white rounded-2xl text-[10px] font-bold tracking-[0.25em] shadow-lg shadow-[#638C7D]/25 hover:bg-[#344E41] transition-all"
             onClick={(e) => {
               e.stopPropagation();
               onEnquire();
