@@ -4,6 +4,7 @@ import { ChevronDown, Menu, X, Plane, Shield, Map, FileCheck, Car, CarFront, Shi
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
 
+
 const domesticDestinations = [
   "Mumbai", "Pune", "Goa", "Leh-Ladakh", "Jaipur",
   "Kerala", "Manali", "Rishikesh", "Udaipur", "Spiti Valley"
