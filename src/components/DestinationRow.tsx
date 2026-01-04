@@ -26,17 +26,19 @@ const DestinationRow = ({
   onEnquire,
 }: DestinationRowProps) => {
   
+  // Parent container variants for staggering children
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
+        staggerChildren: 0.15, // Delay between each card
         delayChildren: 0.1,
       },
     },
   };
 
+  // Header text variants
   const headerVariants = {
     hidden: { opacity: 0, x: -20 },
     visible: { 
@@ -47,8 +49,7 @@ const DestinationRow = ({
   };
 
   return (
-    // Added isolate to prevent z-index bleed between sections
-    <section className="py-24 px-6 bg-[#FDFCF9] isolate">
+    <section className="py-24 px-6 bg-[#FDFCF9]">
       <div className="max-w-7xl mx-auto">
         
         {/* Section Header */}
@@ -73,6 +74,7 @@ const DestinationRow = ({
               {title}
             </motion.h2>
             
+            {/* Animated Decorative Line */}
             <motion.div 
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
@@ -82,40 +84,35 @@ const DestinationRow = ({
           </div>
         </motion.div>
 
-        {/* Cards Grid */}
+        {/* Cards Grid with Stagger logic */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          // CRITICAL: perspective-1000 here ensures the children 
-          // have enough "room" to flip without flattening
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 perspective-1000"
-          style={{ transformStyle: 'flat' }} 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {destinations.map((destination, index) => (
-            <div key={destination.name} className="relative z-10">
-              <PostcardCard
-                name={destination.name}
-                image={destination.image}
-                index={index}
-                onClick={() => onDestinationClick(destination.name)}
-                onEnquire={() => onEnquire(destination.name)}
-              />
-            </div>
+            <PostcardCard
+              key={destination.name}
+              name={destination.name}
+              image={destination.image}
+              index={index}
+              onClick={() => onDestinationClick(destination.name)}
+              onEnquire={() => onEnquire(destination.name)}
+            />
           ))}
           
-          <div className="relative z-10">
-            <PostcardCard
-              name="Gateway"
-              image=""
-              isGateway
-              gatewayText={gatewayText}
-              index={destinations.length}
-              onClick={onGatewayClick}
-              onEnquire={() => {}}
-            />
-          </div>
+          {/* Gateway Card (the last one in the stagger) */}
+          <PostcardCard
+            name="Gateway"
+            image=""
+            isGateway
+            gatewayText={gatewayText}
+            index={destinations.length}
+            onClick={onGatewayClick}
+            onEnquire={() => {}}
+          />
         </motion.div>
       </div>
     </section>
