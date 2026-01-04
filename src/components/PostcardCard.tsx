@@ -29,27 +29,32 @@ const defaultDestinationData: Record<string, DestinationData> = {
   "South Korea": { duration: "6-8 Days", investment: "₹1,20,000", bestTime: "Mar - May" },
 };
 
-const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, onEnquire, index, destinationData }: PostcardCardProps) => {
+const PostcardCard = ({
+  name,
+  image,
+  isGateway = false,
+  gatewayText,
+  onClick,
+  onEnquire,
+  index,
+  destinationData,
+}: PostcardCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  // 3D Tilt Logic
+  // 3D Tilt Motion Values
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const mouseXSpring = useSpring(x);
-  const mouseYSpring = useSpring(y);
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
 
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
+    const xPct = (e.clientX - rect.left) / rect.width - 0.5;
+    const yPct = (e.clientY - rect.top) / rect.height - 0.5;
     x.set(xPct);
     y.set(yPct);
   };
@@ -60,19 +65,26 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
     setIsFlipped(false);
   };
 
-  const data = destinationData || defaultDestinationData[name] || {
-    duration: "5-7 Days",
-    investment: "₹45,000",
-    bestTime: "Oct - Mar",
-  };
+  const data =
+    destinationData ||
+    defaultDestinationData[name] || {
+      duration: "5-7 Days",
+      investment: "₹45,000",
+      bestTime: "Oct - Mar",
+    };
 
   return (
+    /* IMPORTANT: z-0 locks stacking order */
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full perspective-1000"
+      transition={{
+        duration: 0.8,
+        delay: index * 0.1,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className="relative z-0 w-full perspective-1000"
     >
       {!isGateway ? (
         <motion.div
@@ -86,8 +98,8 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
             transformStyle: "preserve-3d",
           }}
           animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="relative w-full aspect-[3/4] cursor-pointer"
+          transition={{ type: "spring", stiffness: 260, damping: 22 }}
+          className="relative w-full aspect-[3/4] cursor-pointer will-change-transform"
         >
           {/* FRONT */}
           <div
@@ -97,19 +109,17 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
             <motion.img
               src={image}
               alt={name}
-              animate={{ scale: isFlipped ? 1.2 : 1 }}
+              animate={{ scale: isFlipped ? 1.15 : 1 }}
               transition={{ duration: 0.6 }}
               className="w-full h-full object-cover"
             />
-            {/* Gloss Overlay */}
+
             <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10 opacity-60" />
+
             <div className="absolute bottom-0 p-8 w-full">
-              <motion.h3 
-                layoutId={`title-${name}`}
-                className="text-3xl font-script italic text-white drop-shadow-lg"
-              >
+              <h3 className="text-3xl font-script italic text-white drop-shadow-lg">
                 {name}
-              </motion.h3>
+              </h3>
             </div>
           </div>
 
@@ -120,7 +130,8 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
               backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
               backgroundColor: "#FDFCF9",
-              backgroundImage: "radial-gradient(circle, #D4AF37 0.4px, transparent 0.4px)",
+              backgroundImage:
+                "radial-gradient(circle, #D4AF37 0.4px, transparent 0.4px)",
               backgroundSize: "24px 24px",
             }}
           >
@@ -133,10 +144,14 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
                 <div className="space-y-6">
                   {[
                     { Icon: Clock, label: "Duration", val: data.duration },
-                    { Icon: Coins, label: "Ideal Budget", val: `From ${data.investment}` },
+                    {
+                      Icon: Coins,
+                      label: "Ideal Budget",
+                      val: `From ${data.investment}`,
+                    },
                     { Icon: Sun, label: "Best Time", val: data.bestTime },
                   ].map(({ Icon, label, val }, i) => (
-                    <motion.div 
+                    <motion.div
                       key={label}
                       initial={{ opacity: 0, x: -10 }}
                       animate={isFlipped ? { opacity: 1, x: 0 } : {}}
@@ -147,8 +162,12 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
                         <Icon className="w-5 h-5 text-[#D4AF37]" />
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase tracking-tighter text-[#344E41]/60 font-bold">{label}</p>
-                        <p className="text-sm font-medium text-[#344E41]">{val}</p>
+                        <p className="text-[10px] uppercase tracking-tighter text-[#344E41]/60 font-bold">
+                          {label}
+                        </p>
+                        <p className="text-sm font-medium text-[#344E41]">
+                          {val}
+                        </p>
                       </div>
                     </motion.div>
                   ))}
@@ -168,22 +187,27 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           </div>
         </motion.div>
       ) : (
-        /* GATEWAY CARD - AESTHETIC VERSION */
+        /* GATEWAY CARD */
         <motion.button
           whileHover={{ scale: 0.98 }}
           whileTap={{ scale: 0.95 }}
           onClick={onClick}
           className="w-full aspect-[3/4] rounded-[2rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group"
         >
-          <motion.div 
+          <motion.div
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors"
           >
             <ArrowRight className="w-8 h-8 text-[#638C7D] group-hover:text-white transition-colors" />
           </motion.div>
-          <p className="text-2xl font-script italic text-[#344E41]">{gatewayText}</p>
+
+          <p className="text-2xl font-script italic text-[#344E41]">
+            {gatewayText}
+          </p>
+
           <div className="h-[1px] w-12 bg-[#D4AF37] my-4" />
+
           <p className="text-xs uppercase tracking-widest text-[#344E41]/50 font-bold">
             View all destinations
           </p>
