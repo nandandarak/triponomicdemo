@@ -44,12 +44,10 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
+    const xPct = mouseX / rect.width - 0.5;
+    const yPct = mouseY / rect.height - 0.5;
     x.set(xPct);
     y.set(yPct);
   };
@@ -72,7 +70,7 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full perspective-1000"
+      className="w-full aspect-[3/4] relative perspective-1000"
     >
       {!isGateway ? (
         <motion.div
@@ -87,12 +85,16 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           }}
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="relative w-full aspect-[3/4] cursor-pointer"
+          className="relative w-full h-full cursor-pointer preserve-3d"
         >
-          {/* FRONT */}
+          {/* FRONT SIDE */}
           <div
-            className="absolute inset-0 rounded-[2rem] overflow-hidden shadow-xl"
-            style={{ backfaceVisibility: "hidden" }}
+            className="absolute inset-0 rounded-[2rem] overflow-hidden shadow-xl z-20"
+            style={{ 
+              backfaceVisibility: "hidden", 
+              WebkitBackfaceVisibility: "hidden",
+              transform: "translateZ(1px)" 
+            }}
           >
             <motion.img
               src={image}
@@ -101,63 +103,56 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
               transition={{ duration: 0.6 }}
               className="w-full h-full object-cover"
             />
-            {/* Gloss Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10 opacity-60" />
-            <div className="absolute bottom-0 p-8 w-full">
-              <motion.h3 
-                layoutId={`title-${name}`}
-                className="text-3xl font-script italic text-white drop-shadow-lg"
-              >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
+            <div className="absolute bottom-0 p-8 w-full text-left">
+              <h3 className="text-3xl font-script italic text-white drop-shadow-lg">
                 {name}
-              </motion.h3>
+              </h3>
             </div>
           </div>
 
-          {/* BACK */}
+          {/* BACK SIDE */}
           <div
-            className="absolute inset-0 rounded-[2rem] shadow-2xl"
+            className="absolute inset-0 rounded-[2rem] shadow-2xl z-10"
             style={{
               backfaceVisibility: "hidden",
-              transform: "rotateY(180deg)",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg) translateZ(1px)",
               backgroundColor: "#FDFCF9",
-              backgroundImage: "radial-gradient(circle, #D4AF37 0.4px, transparent 0.4px)",
+              backgroundImage: "radial-gradient(circle, #D4AF37 0.6px, transparent 0.6px)",
               backgroundSize: "24px 24px",
+              // Safety switch: hide back contents if not flipped
+              display: isFlipped ? "block" : "none"
             }}
           >
-            <div className="w-full h-full p-8 flex flex-col justify-between">
+            <div className="w-full h-full p-8 flex flex-col justify-between text-left">
               <div>
-                <h3 className="font-script text-4xl italic text-[#344E41] mb-8 border-b border-[#D4AF37]/20 pb-2">
+                <h3 className="font-script text-4xl italic text-[#344E41] mb-8 border-b border-[#D4AF37]/20 pb-3">
                   {name}
                 </h3>
 
                 <div className="space-y-6">
                   {[
                     { Icon: Clock, label: "Duration", val: data.duration },
-                    { Icon: Coins, label: "Ideal Budget", val: `From ${data.investment}` },
+                    { Icon: Coins, label: "Investment", val: data.investment },
                     { Icon: Sun, label: "Best Time", val: data.bestTime },
                   ].map(({ Icon, label, val }, i) => (
-                    <motion.div 
-                      key={label}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={isFlipped ? { opacity: 1, x: 0 } : {}}
-                      transition={{ delay: 0.3 + i * 0.1 }}
-                      className="flex items-center gap-4"
-                    >
-                      <div className="p-2 rounded-full bg-[#638C7D]/10">
+                    <div key={label} className="flex items-center gap-4">
+                      <div className="p-2.5 rounded-full bg-[#638C7D]/10">
                         <Icon className="w-5 h-5 text-[#D4AF37]" />
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase tracking-tighter text-[#344E41]/60 font-bold">{label}</p>
-                        <p className="text-sm font-medium text-[#344E41]">{val}</p>
+                        <p className="text-[10px] uppercase tracking-widest text-[#638C7D] font-bold mb-0.5">{label}</p>
+                        <p className="text-sm font-semibold text-[#344E41]">{val}</p>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
 
               <MagneticButton
-                className="w-full py-4 bg-[#638C7D] hover:bg-[#344E41] text-white rounded-xl text-xs font-bold tracking-[0.2em] transition-colors shadow-lg shadow-[#638C7D]/20"
-                onClick={(e) => {
+                className="w-full py-4 bg-[#638C7D] hover:bg-[#344E41] text-white rounded-2xl text-[10px] font-bold tracking-[0.2em] transition-all shadow-lg shadow-[#638C7D]/20"
+                onClick={(e: any) => {
                   e.stopPropagation();
                   onEnquire();
                 }}
@@ -168,24 +163,20 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           </div>
         </motion.div>
       ) : (
-        /* GATEWAY CARD - AESTHETIC VERSION */
+        /* GATEWAY CARD */
         <motion.button
-          whileHover={{ scale: 0.98 }}
+          whileHover={{ y: -10 }}
           whileTap={{ scale: 0.95 }}
           onClick={onClick}
-          className="w-full aspect-[3/4] rounded-[2rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group"
+          className="w-full h-full rounded-[2rem] flex flex-col items-center justify-center p-8 bg-[#f4f1ea] border-2 border-dashed border-[#638C7D]/30 group transition-all"
         >
-          <motion.div 
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors"
-          >
+          <div className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:bg-[#638C7D] transition-colors">
             <ArrowRight className="w-8 h-8 text-[#638C7D] group-hover:text-white transition-colors" />
-          </motion.div>
+          </div>
           <p className="text-2xl font-script italic text-[#344E41]">{gatewayText}</p>
           <div className="h-[1px] w-12 bg-[#D4AF37] my-4" />
-          <p className="text-xs uppercase tracking-widest text-[#344E41]/50 font-bold">
-            View all destinations
+          <p className="text-[10px] uppercase tracking-widest text-[#344E41]/50 font-bold">
+            Explore More
           </p>
         </motion.button>
       )}
