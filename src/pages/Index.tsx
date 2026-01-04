@@ -7,10 +7,7 @@ import EnquiryModal from "@/components/EnquiryModal";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 
-const GOOGLE_FORM_BASE_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform?usp=pp_url";
-const ENTRY_ID = "entry.396208505";
-
+/* Destination Lists */
 const domesticDestinations = [
   "Mumbai",
   "Pune",
@@ -37,6 +34,7 @@ const internationalDestinations = [
   "Switzerland",
 ];
 
+/* Cards */
 const domesticCards = [
   {
     name: "Mumbai",
@@ -74,7 +72,8 @@ const internationalCards = [
 ];
 
 const Index = () => {
-  const [modalState, setModalState] = useState<{
+  /* Selection Modal (Discover / Explore More) */
+  const [selectionModal, setSelectionModal] = useState<{
     isOpen: boolean;
     type: "domestic" | "international";
   }>({
@@ -82,6 +81,7 @@ const Index = () => {
     type: "domestic",
   });
 
+  /* Enquiry Modal (Google Form UI) */
   const [enquiryModal, setEnquiryModal] = useState<{
     isOpen: boolean;
     destination: string;
@@ -90,23 +90,19 @@ const Index = () => {
     destination: "",
   });
 
-  const handleDestinationClick = (destination: string) => {
-    const finalUrl = `${GOOGLE_FORM_BASE_URL}&${ENTRY_ID}=${encodeURIComponent(
-      destination
-    )}`;
-    window.open(finalUrl, "_blank");
+  /* ONE SINGLE FUNCTION TO OPEN FORM */
+  const openEnquiry = (destination: string) => {
+    setEnquiryModal({
+      isOpen: true,
+      destination,
+    });
   };
 
-  const handleEnquire = (destination: string) => {
-    setEnquiryModal({ isOpen: true, destination });
-  };
-
-  const openModal = (type: "domestic" | "international") => {
-    setModalState({ isOpen: true, type });
-  };
-
-  const closeModal = () => {
-    setModalState((prev) => ({ ...prev, isOpen: false }));
+  const closeEnquiry = () => {
+    setEnquiryModal({
+      isOpen: false,
+      destination: "",
+    });
   };
 
   return (
@@ -123,9 +119,11 @@ const Index = () => {
             subtitle="Domestic Journeys"
             destinations={domesticCards}
             gatewayText="Discover More"
-            onGatewayClick={() => openModal("domestic")}
-            onDestinationClick={handleDestinationClick}
-            onEnquire={handleEnquire}
+            onGatewayClick={() =>
+              setSelectionModal({ isOpen: true, type: "domestic" })
+            }
+            onDestinationClick={openEnquiry}
+            onEnquire={openEnquiry}
           />
 
           {/* International Section */}
@@ -134,9 +132,11 @@ const Index = () => {
             subtitle="International Adventures"
             destinations={internationalCards}
             gatewayText="Explore Global"
-            onGatewayClick={() => openModal("international")}
-            onDestinationClick={handleDestinationClick}
-            onEnquire={handleEnquire}
+            onGatewayClick={() =>
+              setSelectionModal({ isOpen: true, type: "international" })
+            }
+            onDestinationClick={openEnquiry}
+            onEnquire={openEnquiry}
           />
         </main>
 
@@ -144,27 +144,30 @@ const Index = () => {
 
         {/* Selection Modal */}
         <SelectionModal
-          isOpen={modalState.isOpen}
-          onClose={closeModal}
+          isOpen={selectionModal.isOpen}
+          onClose={() =>
+            setSelectionModal((prev) => ({ ...prev, isOpen: false }))
+          }
           title={
-            modalState.type === "domestic"
+            selectionModal.type === "domestic"
               ? "Domestic Destinations"
               : "International Destinations"
           }
           destinations={
-            modalState.type === "domestic"
+            selectionModal.type === "domestic"
               ? domesticDestinations
               : internationalDestinations
           }
-          onSelect={handleDestinationClick}
+          onSelect={(destination) => {
+            setSelectionModal((prev) => ({ ...prev, isOpen: false }));
+            openEnquiry(destination);
+          }}
         />
 
-        {/* Enquiry Modal */}
+        {/* Enquiry Modal (SINGLE SOURCE) */}
         <EnquiryModal
           isOpen={enquiryModal.isOpen}
-          onClose={() =>
-            setEnquiryModal({ isOpen: false, destination: "" })
-          }
+          onClose={closeEnquiry}
           destination={enquiryModal.destination}
         />
       </div>
