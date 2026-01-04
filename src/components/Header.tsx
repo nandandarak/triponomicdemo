@@ -1,54 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ChevronDown,
-  Menu,
-  X,
-  Plane,
-  Shield,
-  Map,
-  FileCheck,
-  Car,
-  CarFront,
-  Ship,
-} from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
 
 const domesticDestinations = [
-  "Mumbai",
-  "Pune",
-  "Goa",
-  "Leh-Ladakh",
-  "Jaipur",
-  "Kerala",
-  "Manali",
-  "Rishikesh",
-  "Udaipur",
-  "Spiti Valley",
+  "Mumbai", "Pune", "Goa", "Leh-Ladakh", "Jaipur",
+  "Kerala", "Manali", "Rishikesh", "Udaipur", "Spiti Valley"
 ];
 
 const internationalDestinations = [
-  "Japan",
-  "Bali",
-  "South Korea",
-  "Thailand",
-  "Vietnam",
-  "Iceland",
-  "Turkey",
-  "Singapore",
-  "France",
-  "Switzerland",
-];
-
-const services = [
-  { icon: Plane, label: "Flight & Hotel Bookings" },
-  { icon: Shield, label: "Travel Insurance & International eSIM" },
-  { icon: Map, label: "Customized Experiences" },
-  { icon: FileCheck, label: "Visa Assistance" },
-  { icon: Car, label: "Outstation Cabs & Airport Transfers" },
-  { icon: CarFront, label: "Self-Drive Cars (International)" },
-  { icon: Ship, label: "Cruise Holidays" },
+  "Japan", "Bali", "South Korea", "Thailand", "Vietnam",
+  "Iceland", "Turkey", "Singapore", "France", "Switzerland"
 ];
 
 interface HeaderProps {
@@ -76,14 +39,10 @@ const NavigationDropdown = ({
     <div className="relative">
       <button
         onClick={onToggle}
-        className="nav-link flex items-center gap-1.5 text-foreground/80 hover:text-foreground font-medium text-sm"
+        className="nav-link flex items-center gap-1.5 text-foreground/80 hover:text-foreground text-sm font-medium"
       >
         {title}
-        <ChevronDown
-          className={`w-4 h-4 transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        />
+        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       <AnimatePresence>
@@ -103,22 +62,22 @@ const NavigationDropdown = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
             >
-              <div className="bg-[#F8F7F2] rounded-[24px] p-6 min-w-[320px] shadow-xl">
+              <div className="bg-[#F8F7F2] rounded-2xl p-6 min-w-[320px] shadow-xl">
                 <p className="text-[10px] uppercase tracking-widest text-[#638C7D] mb-4 font-bold">
                   Select Destination
                 </p>
 
                 <div className="grid grid-cols-2 gap-2">
-                  {destinations.map((destination) => (
+                  {destinations.map(dest => (
                     <button
-                      key={destination}
+                      key={dest}
                       onClick={() => {
-                        onSelect(destination);
+                        onSelect(dest);   // 🔥 opens modal
                         onClose();
                       }}
                       className="px-4 py-2 rounded-xl bg-white/60 hover:bg-[#638C7D] hover:text-white text-xs font-medium transition"
                     >
-                      {destination}
+                      {dest}
                     </button>
                   ))}
                 </div>
@@ -144,11 +103,13 @@ const Header = ({ onEnquire }: HeaderProps) => {
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-7xl mx-auto">
         <div className="bg-[#F8F7F2]/90 backdrop-blur-lg rounded-full px-8 py-3 flex items-center justify-between">
+
+          {/* Logo */}
           <Link to="/" className="font-script text-2xl italic text-[#344E41]">
             Triponomic
           </Link>
 
-          {/* Desktop */}
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
             <NavigationDropdown
               title="Domestic"
@@ -168,19 +129,16 @@ const Header = ({ onEnquire }: HeaderProps) => {
               onSelect={onEnquire}
             />
 
-            <MagneticButton
-              className="px-6 py-2 bg-[#638C7D] text-white rounded-full text-xs font-bold"
-              onClick={() => onEnquire("Custom Trip")}
-            >
-              CONTACT US
-            </MagneticButton>
+            {/* ✅ CONTACT US → PAGE */}
+            <Link to="/enquire">
+              <MagneticButton className="px-6 py-2 bg-[#638C7D] text-white rounded-full text-xs font-bold tracking-widest">
+                CONTACT US
+              </MagneticButton>
+            </Link>
           </nav>
 
-          {/* Mobile */}
-          <button
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
+          {/* Mobile Toggle */}
+          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -189,19 +147,19 @@ const Header = ({ onEnquire }: HeaderProps) => {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              className="md:hidden mt-4 bg-[#F8F7F2] rounded-[24px] p-6"
+              className="md:hidden mt-4 bg-[#F8F7F2] rounded-2xl p-6 shadow-xl"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
               <p className="text-xs font-bold mb-2">Domestic</p>
               <div className="flex flex-wrap gap-2 mb-4">
-                {domesticDestinations.map((d) => (
+                {domesticDestinations.map(d => (
                   <button
                     key={d}
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      onEnquire(d);
+                      onEnquire(d);   // 🔥 modal
                     }}
                     className="px-3 py-1 bg-white/70 rounded-full text-xs"
                   >
@@ -212,12 +170,12 @@ const Header = ({ onEnquire }: HeaderProps) => {
 
               <p className="text-xs font-bold mb-2">International</p>
               <div className="flex flex-wrap gap-2 mb-4">
-                {internationalDestinations.map((d) => (
+                {internationalDestinations.map(d => (
                   <button
                     key={d}
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      onEnquire(d);
+                      onEnquire(d);   // 🔥 modal
                     }}
                     className="px-3 py-1 bg-white/70 rounded-full text-xs"
                   >
@@ -226,15 +184,13 @@ const Header = ({ onEnquire }: HeaderProps) => {
                 ))}
               </div>
 
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onEnquire("Custom Trip");
-                }}
-                className="w-full py-3 bg-[#638C7D] text-white rounded-full text-xs font-bold"
+              {/* ✅ CONTACT US → PAGE */}
+              <Link
+                to="/enquire"
+                className="block w-full py-3 bg-[#638C7D] text-white rounded-full text-xs font-bold text-center"
               >
                 CONTACT US
-              </button>
+              </Link>
             </motion.div>
           )}
         </AnimatePresence>
