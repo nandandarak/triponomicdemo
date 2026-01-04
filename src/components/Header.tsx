@@ -124,9 +124,11 @@ const NavigationDropdown = ({
                         onSelect(label);
                         onClose();
                       }}
-                      className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/60 hover:bg-[#638C7D] hover:text-white text-xs font-medium transition text-left"
+                      className="flex items-start gap-3 px-4 py-2 rounded-xl bg-white/60 hover:bg-[#638C7D] hover:text-white text-xs font-medium transition text-left leading-snug"
                     >
-                      {Icon && <Icon className="w-4 h-4 opacity-80" />}
+                      {Icon && (
+                        <Icon className="w-4 h-4 opacity-80 mt-0.5 shrink-0" />
+                      )}
                       <span>{label}</span>
                     </button>
                   ))}
@@ -218,6 +220,7 @@ const Header = () => {
               exit={{ opacity: 0, y: -20 }}
             >
               <p className="text-xs font-bold mb-2">Services</p>
+
               <div className="flex flex-col gap-2 mb-4">
                 {servicesList.map(({ label, icon: Icon }) => (
                   <button
@@ -226,9 +229,9 @@ const Header = () => {
                       setMobileMenuOpen(false);
                       setSelectedDestination(label);
                     }}
-                    className="flex items-center gap-3 px-4 py-2 bg-white/70 rounded-xl text-xs"
+                    className="flex items-start gap-3 px-4 py-3 bg-white/70 rounded-xl text-xs leading-snug text-left"
                   >
-                    <Icon className="w-4 h-4 text-[#638C7D]" />
+                    <Icon className="w-4 h-4 text-[#638C7D] mt-0.5 shrink-0" />
                     <span>{label}</span>
                   </button>
                 ))}
