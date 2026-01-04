@@ -80,15 +80,16 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
 
               {/* GOOGLE FORM */}
               <div className="flex-1 overflow-hidden bg-[#FDFCF9]">
-                <iframe
-                  src={formUrl}
-                  className="w-full h-full border-0"
-                  style={{
-                    marginTop: "-70px",        // hides Google title bar
-                    height: "calc(100% + 70px)"
-                  }}
-                  title="Enquiry Form"
-                />
+               <iframe
+  src={formUrl}
+  title="Enquiry Form"
+  className="w-full h-full border-0"
+  style={{
+    marginTop: "-190px",
+    height: "calc(100% + 190px)",
+  }}
+/>
+
               </div>
             </div>
           </motion.div>
