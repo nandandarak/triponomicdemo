@@ -32,10 +32,13 @@ const defaultDestinationData: Record<string, DestinationData> = {
 const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, onEnquire, index, destinationData }: PostcardCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  // 3D Tilt Logic
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseXSpring = useSpring(x);
   const mouseYSpring = useSpring(y);
+  
+  // These only apply when NOT flipped to avoid math conflicts
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
 
@@ -65,6 +68,7 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
       className="w-full aspect-[3/4] perspective-1000"
       onMouseEnter={() => setIsFlipped(true)}
       onMouseLeave={() => setIsFlipped(false)}
+      style={{ cursor: 'pointer' }}
     >
       <motion.div
         className="relative w-full h-full preserve-3d"
@@ -74,7 +78,7 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           transformStyle: "preserve-3d",
         }}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        transition={{ type: "spring", stiffness: 60, damping: 15 }}
       >
         {/* FRONT SIDE */}
         <div 
@@ -82,8 +86,9 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           style={{ 
             backfaceVisibility: "hidden", 
             WebkitBackfaceVisibility: "hidden",
-            transform: "translateZ(2px)", // Physically pushes the front forward
-            zIndex: isFlipped ? 1 : 2 
+            transform: "translateZ(50px)", // Increased Z-gap
+            zIndex: isFlipped ? 1 : 2,
+            visibility: isFlipped ? 'hidden' : 'visible' // Force hide logic
           }}
         >
           <img src={image} alt={name} className="w-full h-full object-cover" />
@@ -99,11 +104,12 @@ const PostcardCard = ({ name, image, isGateway = false, gatewayText, onClick, on
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg) translateZ(1px)", // Sits 1px behind the front face
+            transform: "rotateY(180deg) translateZ(50px)", // Match Z-gap
             backgroundColor: "#FDFCF9",
             backgroundImage: "radial-gradient(circle, #D4AF37 0.7px, transparent 0.7px)",
             backgroundSize: "28px 28px",
-            zIndex: isFlipped ? 2 : 1
+            zIndex: isFlipped ? 2 : 1,
+            pointerEvents: isFlipped ? 'auto' : 'none' // Prevent accidental clicks through the card
           }}
         >
           <div className="text-left">
