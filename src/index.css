@@ -21,11 +21,19 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    /* Prevents horizontal scroll during 3D animations */
+    /* Prevents horizontal scroll during 3D tilt animations */
     overflow-x: hidden; 
+    width: 100%;
+    position: relative;
   }
 }
 
@@ -59,26 +67,31 @@
 }
 
 /* =========================
-   3D ENGINE UTILITIES
+   3D ENGINE UTILITIES (CRITICAL FIXES)
 ========================= */
 @layer utilities {
   /* Perspective creates the 3D depth field */
   .perspective-1000 {
     perspective: 1000px;
+    -webkit-perspective: 1000px;
   }
 
   /* Preserve-3d ensures children exist in 3D space, not flattened */
   .preserve-3d {
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
   }
 
-  /* Backface-hidden stops the "bleeding" of the front side to the back */
+  /* Stops the "bleeding" of the front side to the back */
   .backface-hidden {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    /* Prevents flickering in webkit browsers */
+    -webkit-perspective: 0;
+    -webkit-backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
   }
 
-  /* Utility for the initial state of the back side */
   .rotate-y-180 {
     transform: rotateY(180deg);
   }
@@ -90,5 +103,11 @@
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Force GPU acceleration for smooth card flips */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
   }
 }
