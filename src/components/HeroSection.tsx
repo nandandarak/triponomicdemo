@@ -5,7 +5,7 @@ import heroVideo from "@/assets/hero-train-video.mp4";
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Parallax effect (safe & layout-stable)
+  // Parallax effect
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
@@ -14,7 +14,7 @@ const HeroSection = () => {
   const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const videoScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
 
-  // Text animation variants
+  // Text animations
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -39,7 +39,6 @@ const HeroSection = () => {
   };
 
   return (
-    /* OUTER WRAPPER — reserves layout space */
     <div className="relative min-h-screen w-full">
       <section
         ref={containerRef}
@@ -114,8 +113,8 @@ const HeroSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* ✅ IMPROVED BOTTOM FADE */}
-        <div className="absolute bottom-0 left-0 right-0 h-56 md:h-80 bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none" />
+        {/* 🔥 TIGHTER BOTTOM BLEND (WHITE GAP REDUCED) */}
+        <div className="absolute bottom-0 left-0 right-0 h-28 md:h-40 bg-gradient-to-t from-white via-white/60 to-transparent z-20 pointer-events-none" />
       </section>
     </div>
   );
