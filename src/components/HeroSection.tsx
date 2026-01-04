@@ -3,32 +3,37 @@ import heroVideo from "@/assets/hero-train-video.mp4";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center px-6 pt-32 pb-16 overflow-hidden">
+    <section className="relative h-screen flex items-center justify-center px-6 pt-28 overflow-hidden">
       
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
         <video
           autoPlay
           muted
-          loop
           playsInline
+          preload="auto"
           className="
-            w-full h-full 
-            object-cover object-center 
-            scale-110 
+            w-full h-full
+            object-cover object-center
+            scale-110
             brightness-110 contrast-105 saturate-105
           "
+          onEnded={(e) => {
+            const video = e.currentTarget;
+            video.currentTime = 0;
+            video.play();
+          }}
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
 
-        {/* Light dark overlay for readability (reduced) */}
+        {/* Soft dark overlay for readability */}
         <div className="absolute inset-0 bg-black/25" />
 
-        {/* Soft teal cinematic tint (lighter than before) */}
+        {/* Cinematic teal tint */}
         <div className="absolute inset-0 bg-[#2f6f73]/20" />
 
-        {/* Gentle vignette (not too heavy) */}
+        {/* Gentle vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
