@@ -82,13 +82,14 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
               <div className="flex-1 overflow-hidden bg-[#FDFCF9]">
                <iframe
   src={formUrl}
-  title="Enquiry Form"
   className="w-full h-full border-0"
   style={{
-    marginTop: "-190px",
-    height: "calc(100% + 190px)",
+    marginTop: "-230px",
+    height: "calc(100% + 230px)",
   }}
+  title="Enquiry Form"
 />
+
 
               </div>
             </div>
