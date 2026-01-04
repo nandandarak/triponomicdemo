@@ -8,22 +8,37 @@ import Index from "./pages/Index";
 import EnquireNow from "./pages/EnquireNow";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider delayDuration={0}>
+        {/* Global UI */}
+        <Toaster />
+        <Sonner />
 
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/enquire" element={<EnquireNow />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+        {/* App Routes */}
+        <Routes>
+          {/* Home */}
+          <Route path="/" element={<Index />} />
 
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+          {/* Enquiry Page */}
+          <Route path="/enquire" element={<EnquireNow />} />
+
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
