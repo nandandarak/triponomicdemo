@@ -84,7 +84,7 @@ const PostcardCard = ({
         onMouseLeave={handleLeave}
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Plane hover animation (card only) */}
+        {/* Plane hover animation */}
         {showPlane && !isGateway && (
           <motion.div
             className="absolute -top-8 -right-8 z-30 pointer-events-none"
@@ -148,4 +148,57 @@ const PostcardCard = ({
                 </h3>
 
                 <div className="flex-1 space-y-4">
-                  <div className="flex item
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-[#D4AF37]" />
+                    <div>
+                      <p className="text-[10px] uppercase">Duration</p>
+                      <p className="text-sm">{data.duration}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Coins className="w-5 h-5 text-[#D4AF37]" />
+                    <div>
+                      <p className="text-[10px] uppercase">Ideal Budget</p>
+                      <p className="text-sm">From {data.investment}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Sun className="w-5 h-5 text-[#D4AF37]" />
+                    <div>
+                      <p className="text-[10px] uppercase">Best Time</p>
+                      <p className="text-sm">{data.bestTime}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <MagneticButton
+                  className="mt-4 w-full py-3 bg-[#638C7D] hover:bg-[#4A7066] text-white rounded-full text-xs font-bold tracking-widest"
+                  onClick={onEnquire}
+                >
+                  ENQUIRE NOW
+                </MagneticButton>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <button
+            onClick={onClick}
+            className="w-full h-full card-destination flex flex-col items-center justify-center p-8 bg-gradient-to-br from-secondary via-accent to-secondary"
+          >
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <ArrowRight className="w-6 h-6 text-primary" />
+            </div>
+            <p className="text-xl font-medium text-center">{gatewayText}</p>
+            <p className="text-sm text-muted-foreground mt-2 text-center">
+              View all destinations
+            </p>
+          </button>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+export default PostcardCard;
