@@ -44,7 +44,6 @@ const PostcardCard = ({
   destinationData,
 }: PostcardCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [showPlane, setShowPlane] = useState(false);
 
   const data =
     destinationData ||
@@ -54,149 +53,98 @@ const PostcardCard = ({
       bestTime: "Oct - Mar",
     };
 
-  const handleHover = () => {
-    if (!isGateway) {
-      setShowPlane(true);
-      setTimeout(() => setIsFlipped(true), 300);
-    }
-  };
-
-  const handleLeave = () => {
-    setIsFlipped(false);
-    setShowPlane(false);
-  };
-
   return (
     <motion.div
-      initial={{ opacity: 0, rotateX: -10, y: 40 }}
-      whileInView={{ opacity: 1, rotateX: 0, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{
-        duration: 0.7,
-        delay: index * 0.1,
-        ease: [0.4, 0, 0.2, 1],
-      }}
-      className="w-full perspective-1000"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      className="w-full"
     >
-      <div
-        className="relative w-full aspect-[3/4] cursor-pointer"
-        onMouseEnter={handleHover}
-        onMouseLeave={handleLeave}
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {/* Plane hover animation */}
-        {showPlane && !isGateway && (
-          <motion.div
-            className="absolute -top-8 -right-8 z-30 pointer-events-none"
-            initial={{ x: 100, y: -50, opacity: 0 }}
-            animate={{ x: 20, y: 20, opacity: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              <path
-                d="M28 8L4 16L12 18L14 28L18 22L24 26L28 8Z"
-                fill="#638C7D"
-                stroke="#4A7066"
-                strokeWidth="1.5"
-              />
-            </svg>
-          </motion.div>
-        )}
-
-        {!isGateway ? (
-          <motion.div
-            className="w-full h-full"
-            animate={{ rotateY: isFlipped ? 180 : 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            {/* FRONT */}
-            <div
-              className="absolute inset-0 card-destination bg-card overflow-hidden"
-              style={{ backfaceVisibility: "hidden" }}
-            >
+      {!isGateway ? (
+        <div
+          className="relative w-full aspect-[3/4] card-destination cursor-pointer"
+          onMouseEnter={() => setIsFlipped(true)}
+          onMouseLeave={() => setIsFlipped(false)}
+        >
+          {!isFlipped ? (
+            /* FRONT */
+            <div className="absolute inset-0 overflow-hidden">
               <img
                 src={image}
                 alt={name}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-0 p-6">
                 <h3 className="text-2xl font-medium text-white">{name}</h3>
               </div>
             </div>
-
-            {/* BACK */}
+          ) : (
+            /* BACK */
             <div
-              className="absolute inset-0 rounded-card overflow-hidden"
+              className="absolute inset-0 p-6 flex flex-col"
               style={{
-                backfaceVisibility: "hidden",
-                transform: "rotateY(180deg)",
+                backgroundColor: "#FDFCF9",
+                backgroundImage:
+                  "radial-gradient(circle, #D4AF37 0.5px, transparent 0.5px)",
+                backgroundSize: "20px 20px",
               }}
             >
-              <div
-                className="w-full h-full p-6 flex flex-col"
-                style={{
-                  backgroundColor: "#FDFCF9",
-                  backgroundImage:
-                    "radial-gradient(circle, #D4AF37 0.5px, transparent 0.5px)",
-                  backgroundSize: "20px 20px",
-                }}
-              >
-                <h3 className="font-script text-3xl italic text-[#344E41] mb-6">
-                  {name}
-                </h3>
+              <h3 className="font-script text-3xl italic text-[#344E41] mb-6">
+                {name}
+              </h3>
 
-                <div className="flex-1 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-[#D4AF37]" />
-                    <div>
-                      <p className="text-[10px] uppercase">Duration</p>
-                      <p className="text-sm">{data.duration}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Coins className="w-5 h-5 text-[#D4AF37]" />
-                    <div>
-                      <p className="text-[10px] uppercase">Ideal Budget</p>
-                      <p className="text-sm">From {data.investment}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Sun className="w-5 h-5 text-[#D4AF37]" />
-                    <div>
-                      <p className="text-[10px] uppercase">Best Time</p>
-                      <p className="text-sm">{data.bestTime}</p>
-                    </div>
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-[#D4AF37]" />
+                  <div>
+                    <p className="text-[10px] uppercase">Duration</p>
+                    <p className="text-sm">{data.duration}</p>
                   </div>
                 </div>
 
-                <MagneticButton
-                  className="mt-4 w-full py-3 bg-[#638C7D] hover:bg-[#4A7066] text-white rounded-full text-xs font-bold tracking-widest"
-                  onClick={onEnquire}
-                >
-                  ENQUIRE NOW
-                </MagneticButton>
+                <div className="flex items-center gap-3">
+                  <Coins className="w-5 h-5 text-[#D4AF37]" />
+                  <div>
+                    <p className="text-[10px] uppercase">Ideal Budget</p>
+                    <p className="text-sm">From {data.investment}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Sun className="w-5 h-5 text-[#D4AF37]" />
+                  <div>
+                    <p className="text-[10px] uppercase">Best Time</p>
+                    <p className="text-sm">{data.bestTime}</p>
+                  </div>
+                </div>
               </div>
+
+              <MagneticButton
+                className="mt-4 w-full py-3 bg-[#638C7D] hover:bg-[#4A7066] text-white rounded-full text-xs font-bold tracking-widest"
+                onClick={onEnquire}
+              >
+                ENQUIRE NOW
+              </MagneticButton>
             </div>
-          </motion.div>
-        ) : (
-          <button
-            onClick={onClick}
-            className="w-full h-full card-destination flex flex-col items-center justify-center p-8 bg-gradient-to-br from-secondary via-accent to-secondary"
-          >
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-              <ArrowRight className="w-6 h-6 text-primary" />
-            </div>
-            <p className="text-xl font-medium text-center">{gatewayText}</p>
-            <p className="text-sm text-muted-foreground mt-2 text-center">
-              View all destinations
-            </p>
-          </button>
-        )}
-      </div>
+          )}
+        </div>
+      ) : (
+        /* GATEWAY CARD */
+        <button
+          onClick={onClick}
+          className="w-full aspect-[3/4] card-destination flex flex-col items-center justify-center p-8 bg-gradient-to-br from-secondary via-accent to-secondary"
+        >
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+            <ArrowRight className="w-6 h-6 text-primary" />
+          </div>
+          <p className="text-xl font-medium text-center">{gatewayText}</p>
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            View all destinations
+          </p>
+        </button>
+      )}
     </motion.div>
   );
 };
