@@ -84,8 +84,8 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
   src={formUrl}
   className="w-full h-full border-0"
   style={{
-    marginTop: "-280px",
-    height: "calc(100% + 280px)",
+    marginTop: "-270px",
+    height: "calc(100% + 270px)",
   }}
   title="Enquiry Form"
 />
