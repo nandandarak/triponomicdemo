@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  ChevronDown,
   Menu,
   X,
   Plane,
@@ -20,12 +19,11 @@ import logo from "@/assets/logo.png";
 /* ---------------- DATA ---------------- */
 
 const domesticDestinations = [
-  "Mumbai",
-  "Pune",
+  "Kashmir",
+  "Kerala",
   "Goa",
   "Leh-Ladakh",
   "Jaipur",
-  "Kerala",
   "Manali",
   "Rishikesh",
   "Udaipur",
@@ -64,6 +62,7 @@ const Header = () => {
   );
   const [isScrolled, setIsScrolled] = useState(false);
 
+  /* Scroll effect */
   useEffect(() => {
     const onScroll = () =>
       setIsScrolled(window.scrollY > window.innerHeight * 0.6);
@@ -71,17 +70,22 @@ const Header = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* Lock body scroll on mobile menu */
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <>
       {/* HEADER BAR */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 py-4">
-        <motion.div
-          className="mx-auto max-w-7xl rounded-full px-6 py-3 flex items-center justify-between glass-header"
-          animate={{
-            backgroundColor: isScrolled
-              ? "hsl(40 40% 99% / 0.95)"
-              : "hsl(40 40% 99% / 0.85)",
-          }}
+        <div
+          className={`mx-auto max-w-7xl rounded-full px-6 py-3 flex items-center justify-between transition-all duration-300 ${
+            isScrolled ? "glass-header-scrolled" : "glass-header"
+          }`}
         >
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
@@ -107,22 +111,22 @@ const Header = () => {
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden"
+            className="md:hidden text-foreground"
             onClick={() => setMobileMenuOpen((p) => !p)}
           >
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
-        </motion.div>
+        </div>
 
-        {/* MOBILE DROPDOWN MENU */}
+        {/* MOBILE MENU — OLD STYLE SLIDE */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="md:hidden mt-4 bg-card rounded-2xl p-6 shadow-xl border border-border/50 max-h-[80vh] overflow-y-auto"
+              className="md:hidden absolute left-4 right-4 top-[88px] bg-card rounded-2xl p-6 shadow-xl border border-border/50 max-h-[75vh] overflow-y-auto z-50"
             >
               {/* Domestic */}
               <p className="text-xs font-bold mb-3 tracking-wide">Domestic</p>
@@ -160,7 +164,7 @@ const Header = () => {
                 ))}
               </div>
 
-              {/* Services (NO FORM OPEN) */}
+              {/* Services — NO FORM */}
               <p className="text-xs font-bold mb-3 tracking-wide">Services</p>
               <div className="space-y-2 mb-6">
                 {servicesList.map(({ label, icon: Icon }) => (
