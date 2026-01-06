@@ -73,10 +73,10 @@ const HeroSection = () => {
           animate="visible"
           className="relative z-20 max-w-5xl mx-auto text-center"
         >
-          {/* LOGO – BIGGER */}
+          {/* LOGO (WHITE, BIG, SLIGHT OVERLAP) */}
           <motion.div
             variants={itemVariants}
-            className="mb-4 flex justify-center"
+            className="-mb-8 flex justify-center"
           >
             <img
               src={logo}
@@ -90,8 +90,8 @@ const HeroSection = () => {
             />
           </motion.div>
 
-          {/* Title */}
-          <div className="overflow-hidden mb-6">
+          {/* TITLE */}
+          <div className="overflow-hidden mb-8">
             <motion.div variants={itemVariants} className="relative inline-block">
               {/* Ambient glow */}
               <motion.div
@@ -109,7 +109,7 @@ const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* Tagline */}
+          {/* TAGLINE */}
           <motion.div
             variants={itemVariants}
             animate={{ y: [0, -4, 0] }}
@@ -120,7 +120,7 @@ const HeroSection = () => {
             </p>
           </motion.div>
 
-          {/* Subtext */}
+          {/* SUBTEXT */}
           <motion.p
             variants={itemVariants}
             className="mt-5 text-sm md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-xl mx-auto leading-relaxed"
