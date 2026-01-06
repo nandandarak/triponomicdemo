@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { useEffect } from "react";
 import TripEnquiryForm from "./TripEnquiryForm";
 
 interface EnquiryModalProps {
@@ -9,6 +10,22 @@ interface EnquiryModalProps {
 }
 
 const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
+  // 🔒 Lock body scroll + hide header
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -19,19 +36,19 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[99999]"
             onClick={onClose}
           />
 
-          {/* MODAL */}
+          {/* MODAL WRAPPER */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 40 }}
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed inset-4 md:inset-8 lg:inset-12 z-50 flex items-center justify-center"
+            className="fixed inset-0 z-[100000] flex items-center justify-center px-4"
           >
-          <div className="w-full max-w-4xl h-[90vh] bg-[#FDFCF9] rounded-[28px] shadow-2xl overflow-hidden flex flex-col">
+            <div className="w-full max-w-4xl h-[90vh] bg-[#FDFCF9] rounded-[28px] shadow-2xl overflow-hidden flex flex-col">
 
               {/* HEADER */}
               <div className="bg-gradient-to-r from-[#638C7D] to-[#4A7066] px-8 py-6 flex items-center justify-between">
