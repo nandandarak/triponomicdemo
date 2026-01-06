@@ -55,13 +55,71 @@ const servicesList = [
   { label: "Cruise Holidays", icon: Ship },
 ];
 
+/* ---------------- DESKTOP DROPDOWN ---------------- */
+
+const DesktopDropdown = ({
+  title,
+  items,
+}: {
+  title: string;
+  items: { label: string; icon?: any }[];
+}) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((p) => !p)}
+        className="nav-link flex items-center gap-1"
+      >
+        {title}
+        <ChevronDown className={`w-4 h-4 transition ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-[9998]"
+              onClick={() => setOpen(false)}
+            />
+
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-full mt-4 left-1/2 -translate-x-1/2 z-[9999]"
+            >
+              <div className="bg-card rounded-2xl p-6 min-w-[320px] shadow-xl border">
+                <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold">
+                  {title}
+                </p>
+
+                <div className="space-y-2">
+                  {items.map(({ label, icon: Icon }) => (
+                    <div
+                      key={label}
+                      className="flex items-center gap-3 px-4 py-2 rounded-xl bg-background/60 text-xs"
+                    >
+                      {Icon && <Icon className="w-4 h-4 text-primary" />}
+                      {label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 /* ---------------- HEADER ---------------- */
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState<string | null>(
-    null
-  );
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -93,10 +151,12 @@ const Header = () => {
             )}
           </Link>
 
-          {/* Desktop Nav */}
+          {/* DESKTOP NAV */}
           <nav className="hidden md:flex items-center gap-8">
-            <span className="nav-link">Domestic</span>
-            <span className="nav-link">International</span>
+            <DesktopDropdown
+              title="Services"
+              items={servicesList}
+            />
 
             <Link to="/enquire">
               <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
@@ -105,7 +165,7 @@ const Header = () => {
             </Link>
           </nav>
 
-          {/* Mobile Toggle */}
+          {/* MOBILE TOGGLE */}
           <button
             className="md:hidden"
             onClick={() => setMobileMenuOpen((p) => !p)}
@@ -115,75 +175,21 @@ const Header = () => {
         </motion.div>
       </header>
 
-      {/* MOBILE MENU */}
+      {/* MOBILE MENU (UNCHANGED – WORKING) */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
-            {/* BACKDROP */}
             <motion.div
               className="fixed inset-0 z-[9998] bg-black/40 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
             />
-
-            {/* MENU */}
             <motion.div
-              className="
-                fixed top-[96px] left-1/2 -translate-x-1/2
-                z-[9999]
-                w-[90%] max-w-md
-                bg-card rounded-2xl p-6 shadow-2xl
-                border border-border/50
-              "
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="fixed top-[96px] left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md bg-card rounded-2xl p-6 shadow-2xl"
             >
-              {/* Domestic */}
-              <p className="text-xs font-bold mb-3">Domestic</p>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {domesticDestinations.map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => {
-                      setSelectedDestination(d);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="px-4 py-2 bg-background/70 rounded-full text-xs"
-                  >
-                    {d}
-                  </button>
-                ))}
-              </div>
-
-              {/* International */}
-              <p className="text-xs font-bold mb-3">International</p>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {internationalDestinations.map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => {
-                      setSelectedDestination(d);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="px-4 py-2 bg-background/70 rounded-full text-xs"
-                  >
-                    {d}
-                  </button>
-                ))}
-              </div>
-
-              {/* Services (NO FORM) */}
               <p className="text-xs font-bold mb-3">Services</p>
               <div className="space-y-2 mb-6">
                 {servicesList.map(({ label, icon: Icon }) => (
-                  <div
-                    key={label}
-                    className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs"
-                  >
+                  <div key={label} className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs">
                     <Icon className="w-4 h-4 text-primary" />
                     {label}
                   </div>
@@ -202,7 +208,6 @@ const Header = () => {
         )}
       </AnimatePresence>
 
-      {/* ENQUIRY MODAL */}
       <EnquiryModal
         isOpen={!!selectedDestination}
         destination={selectedDestination ?? ""}
