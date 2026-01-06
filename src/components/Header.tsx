@@ -205,9 +205,8 @@ const Header = () => {
               exit={{ opacity: 0, y: -10 }}
               className="
                 fixed top-[96px]
-                left-1/2 -translate-x-1/2
+                left-4 right-4
                 z-[9999]
-                w-[90%] max-w-md
                 bg-card
                 rounded-2xl
                 p-6
