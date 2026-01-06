@@ -5,6 +5,7 @@ import DestinationRow from "@/components/DestinationRow";
 import SelectionModal from "@/components/SelectionModal";
 import EnquiryModal from "@/components/EnquiryModal";
 import Footer from "@/components/Footer";
+import kashmirImg from "@/assets/kashmir.jpg";
 
 /* Destination Lists */
 const domesticDestinations = [
@@ -35,10 +36,8 @@ const internationalDestinations = [
 /* Cards */
 const domesticCards = [
   {
-  name: "Kashmir",
-  image:
-    "https://images.unsplash.com/photo-1602109123486-79532a2e2a1d?auto=format&fit=crop&w=900&q=80
-",
+   name: "Kashmir",
+  image: kashmirImg,
 },
   {
     name: "Kerala",
