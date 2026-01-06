@@ -15,7 +15,8 @@ export default {
     extend: {
       fontFamily: {
         script: ['Cormorant Garamond', 'serif'],
-        body: ['Inter', 'sans-serif'],
+        body: ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        secondary: ['Poppins', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
