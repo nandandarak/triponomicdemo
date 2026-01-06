@@ -197,26 +197,19 @@ const EnquireNow = () => {
 
                   {/* DESTINATION */}
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-800">
-                      Preferred Destination
-                    </label>
-                    <select
-                      name="destination"
-                      value={formData.destination}
-                      onChange={handleChange}
-                      className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
-                        text-gray-900 outline-none
-                        focus:ring-2 focus:ring-primary"
-                    >
-                      <option value="">Select a destination</option>
-                      <option>Kashmir</option>
-                      <option>Kerala</option>
-                      <option>Goa</option>
-                      <option>Japan</option>
-                      <option>Bali</option>
-                    </select>
-                  </div>
-                </div>
+  <label className="text-sm font-medium text-gray-800">
+    Preferred Destination
+  </label>
+  <input
+    name="destination"
+    placeholder="Eg. Kashmir, Japan, Europe, Bali..."
+    value={formData.destination}
+    onChange={handleChange}
+    className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
+      text-gray-900 placeholder:text-gray-500
+      outline-none focus:ring-2 focus:ring-primary"
+  />
+</div>
 
                 {/* MESSAGE */}
                 <div className="flex flex-col gap-2 mt-6">
