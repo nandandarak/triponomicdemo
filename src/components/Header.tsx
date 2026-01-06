@@ -14,17 +14,18 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
-import EnquiryModal from "./EnquiryModal";
+import EnquiryModal from "./EnquiryModal"; // ✅ CUSTOM UI MODAL
 import logo from "@/assets/logo.png";
 
 /* ---------------- DATA ---------------- */
 
 const domesticDestinations = [
-  "Kashmir",
-  "Kerala",
+  "Mumbai",
+  "Pune",
   "Goa",
   "Leh-Ladakh",
   "Jaipur",
+  "Kerala",
   "Manali",
   "Rishikesh",
   "Udaipur",
@@ -54,183 +55,241 @@ const servicesList = [
   { label: "Cruise Holidays", icon: Ship },
 ];
 
+/* ---------------- DROPDOWN ---------------- */
+
+interface DropdownItem {
+  label: string;
+  icon?: any;
+}
+
+interface DropdownProps {
+  title: string;
+  items: DropdownItem[];
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+  onSelect: (item: string) => void;
+}
+
+const NavigationDropdown = ({
+  title,
+  items,
+  isOpen,
+  onToggle,
+  onClose,
+  onSelect,
+}: DropdownProps) => {
+  return (
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        className="nav-link flex items-center gap-1.5 text-foreground/80 hover:text-foreground text-sm font-medium font-secondary"
+      >
+        {title}
+        <ChevronDown
+          className={`w-4 h-4 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-40"
+              onClick={onClose}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+
+            <motion.div
+              className="absolute top-full left-1/2 -translate-x-1/2 mt-4 z-50"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <div className="bg-card rounded-2xl p-6 min-w-[340px] shadow-xl border border-border/50">
+                <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold font-secondary">
+                  {title}
+                </p>
+
+                <div className="grid grid-cols-1 gap-2">
+                  {items.map(({ label, icon: Icon }) => (
+                    <button
+                      key={label}
+                      onClick={() => {
+                        onSelect(label);
+                        onClose();
+                      }}
+                      className="flex items-start gap-3 px-4 py-2 rounded-xl bg-background/60 hover:bg-primary hover:text-primary-foreground text-xs font-medium transition text-left leading-snug font-secondary"
+                    >
+                      {Icon && (
+                        <Icon className="w-4 h-4 opacity-80 mt-0.5 shrink-0" />
+                      )}
+                      <span>{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 /* ---------------- HEADER ---------------- */
 
 const Header = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(
+    null
+  );
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () =>
+    const handleScroll = () =>
       setIsScrolled(window.scrollY > window.innerHeight * 0.6);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const toggle = (key: string) =>
+    setOpenDropdown(openDropdown === key ? null : key);
+
+  const closeAll = () => setOpenDropdown(null);
 
   return (
     <>
-      {/* HEADER BAR */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-4">
-        <motion.div
-          className="mx-auto max-w-7xl rounded-full px-6 py-3 flex items-center justify-between glass-header"
-          animate={{
-            backgroundColor: isScrolled
-              ? "hsl(40 40% 99% / 0.95)"
-              : "hsl(40 40% 99% / 0.85)",
-          }}
-        >
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <img src={logo} alt="Triponomic" className="h-9 w-auto" />
-            {isScrolled && (
-              <span className="hidden sm:block font-semibold text-lg">
-                Triponomic
-              </span>
-            )}
-          </Link>
-
-          {/* DESKTOP NAV */}
-          <nav className="hidden md:flex items-center gap-8">
-            {/* Domestic */}
-            <div className="relative">
-              <button
-                onClick={() =>
-                  setOpenDropdown(openDropdown === "domestic" ? null : "domestic")
-                }
-                className="nav-link flex items-center gap-1"
-              >
-                Domestic <ChevronDown size={16} />
-              </button>
-
-              <AnimatePresence>
-                {openDropdown === "domestic" && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute mt-4 bg-card rounded-2xl p-4 shadow-xl border w-56"
-                  >
-                    {domesticDestinations.map((d) => (
-                      <button
-                        key={d}
-                        className="block w-full text-left px-4 py-2 rounded-lg hover:bg-primary hover:text-white text-sm"
-                        onClick={() => {
-                          setSelectedDestination(d);
-                          setOpenDropdown(null);
-                        }}
-                      >
-                        {d}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* International */}
-            <div className="relative">
-              <button
-                onClick={() =>
-                  setOpenDropdown(openDropdown === "international" ? null : "international")
-                }
-                className="nav-link flex items-center gap-1"
-              >
-                International <ChevronDown size={16} />
-              </button>
-
-              <AnimatePresence>
-                {openDropdown === "international" && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute mt-4 bg-card rounded-2xl p-4 shadow-xl border w-56"
-                  >
-                    {internationalDestinations.map((d) => (
-                      <button
-                        key={d}
-                        className="block w-full text-left px-4 py-2 rounded-lg hover:bg-primary hover:text-white text-sm"
-                        onClick={() => {
-                          setSelectedDestination(d);
-                          setOpenDropdown(null);
-                        }}
-                      >
-                        {d}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <Link to="/enquire">
-              <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
-                CONTACT US
-              </MagneticButton>
-            </Link>
-          </nav>
-
-          {/* MOBILE TOGGLE */}
-          <button
-            className="md:hidden"
-            onClick={() => setMobileOpen((p) => !p)}
+      <header className="fixed top-0 left-0 right-0 z-[10000] px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            className={`rounded-full px-8 py-3 flex items-center justify-between transition-all duration-300 ${
+              isScrolled ? "glass-header-scrolled" : "glass-header"
+            }`}
+            animate={{
+              backgroundColor: isScrolled
+                ? "hsl(40 40% 99% / 0.95)"
+                : "hsl(40 40% 99% / 0.85)",
+            }}
           >
-            {mobileOpen ? <X /> : <Menu />}
-          </button>
-        </motion.div>
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3">
+              <img src={logo} alt="Triponomic Logo" className="h-10 w-auto" />
+              <AnimatePresence>
+                {isScrolled && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -20, width: 0 }}
+                    animate={{ opacity: 1, x: 0, width: "auto" }}
+                    exit={{ opacity: 0, x: -20, width: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="font-primary text-xl font-semibold text-foreground"
+                  >
+                    Triponomic
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Link>
 
-        {/* MOBILE MENU – OLD STYLE */}
-        <AnimatePresence>
-          {mobileOpen && (
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-              className="fixed inset-0 z-40 bg-background px-4 pt-24 pb-10 overflow-y-auto"
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex items-center gap-8">
+              <NavigationDropdown
+                title="Domestic"
+                items={domesticDestinations.map((d) => ({ label: d }))}
+                isOpen={openDropdown === "domestic"}
+                onToggle={() => toggle("domestic")}
+                onClose={closeAll}
+                onSelect={setSelectedDestination}
+              />
+
+              <NavigationDropdown
+                title="International"
+                items={internationalDestinations.map((d) => ({ label: d }))}
+                isOpen={openDropdown === "international"}
+                onToggle={() => toggle("international")}
+                onClose={closeAll}
+                onSelect={setSelectedDestination}
+              />
+
+              <NavigationDropdown
+                title="Services"
+                items={servicesList}
+                isOpen={openDropdown === "services"}
+                onToggle={() => toggle("services")}
+                onClose={closeAll}
+                onSelect={() => {}} // ❌ NO FORM
+              />
+
+              <Link to="/enquire">
+                <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
+                  CONTACT US
+                </MagneticButton>
+              </Link>
+            </nav>
+
+            {/* Mobile Toggle */}
+            <button
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              <div className="bg-card rounded-3xl p-6 shadow-xl">
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          </motion.div>
 
-                <h3 className="text-sm font-bold mb-4">Domestic</h3>
+          {/* MOBILE MENU */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                className="fixed inset-0 z-[9999] bg-background px-6 pt-28 pb-10 overflow-y-auto md:hidden"
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -30 }}
+              >
+                {/* Domestic */}
+                <p className="text-xs font-bold mb-3">Domestic</p>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {domesticDestinations.map((d) => (
                     <button
                       key={d}
-                      className="px-4 py-2 bg-background rounded-full text-xs"
                       onClick={() => {
                         setSelectedDestination(d);
-                        setMobileOpen(false);
+                        setMobileMenuOpen(false);
                       }}
+                      className="px-4 py-2 rounded-full bg-card text-xs"
                     >
                       {d}
                     </button>
                   ))}
                 </div>
 
-                <h3 className="text-sm font-bold mb-4">International</h3>
+                {/* International */}
+                <p className="text-xs font-bold mb-3">International</p>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {internationalDestinations.map((d) => (
                     <button
                       key={d}
-                      className="px-4 py-2 bg-background rounded-full text-xs"
                       onClick={() => {
                         setSelectedDestination(d);
-                        setMobileOpen(false);
+                        setMobileMenuOpen(false);
                       }}
+                      className="px-4 py-2 rounded-full bg-card text-xs"
                     >
                       {d}
                     </button>
                   ))}
                 </div>
 
-                <h3 className="text-sm font-bold mb-4">Services</h3>
+                {/* Services */}
+                <p className="text-xs font-bold mb-3">Services</p>
                 <div className="space-y-2 mb-6">
                   {servicesList.map(({ label, icon: Icon }) => (
                     <div
                       key={label}
-                      className="flex items-center gap-3 px-4 py-3 bg-background rounded-xl text-sm"
+                      className="flex items-center gap-3 px-4 py-3 bg-card rounded-xl text-xs"
                     >
                       <Icon className="w-4 h-4 text-primary" />
                       {label}
@@ -240,18 +299,17 @@ const Header = () => {
 
                 <Link
                   to="/enquire"
-                  onClick={() => setMobileOpen(false)}
-                  className="block w-full py-3 text-center bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-wider"
+                  className="block w-full py-3 text-center bg-primary text-primary-foreground rounded-full text-xs font-bold"
                 >
                   CONTACT US
                 </Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </header>
 
-      {/* ENQUIRY MODAL */}
+      {/* ✅ CUSTOM ENQUIRY MODAL */}
       <EnquiryModal
         isOpen={!!selectedDestination}
         destination={selectedDestination ?? ""}
