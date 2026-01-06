@@ -5,12 +5,15 @@ import {
   Menu,
   X,
   Plane,
+  Hotel,
   ShieldCheck,
-  Sparkles,
+  Smartphone,
   Stamp,
   Car,
   Key,
   Ship,
+  MapPin,
+  Globe,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
@@ -45,10 +48,17 @@ const internationalDestinations = [
   "Switzerland",
 ];
 
+/* ✅ UPDATED SERVICES (ONLY CHANGE) */
 const servicesList = [
-  { label: "Flight & Hotel Bookings", icon: Plane },
-  { label: "Travel Insurance & International eSIM", icon: ShieldCheck },
-  { label: "Customized Experiences", icon: Sparkles },
+  { label: "Flight Bookings", icon: Plane },
+  { label: "Hotel Bookings", icon: Hotel },
+
+  { label: "Travel Insurance", icon: ShieldCheck },
+  { label: "International eSIM", icon: Smartphone },
+
+  { label: "Customized Domestic Experiences", icon: MapPin },
+  { label: "Customized International Experiences", icon: Globe },
+
   { label: "Visa Assistance", icon: Stamp },
   { label: "Outstation Cabs & Transfers", icon: Car },
   { label: "Self-Drive Cars (International)", icon: Key },
@@ -75,9 +85,7 @@ const DesktopDropdown = ({
         className="nav-link flex items-center gap-1"
       >
         {title}
-        <ChevronDown
-          className={`w-4 h-4 transition ${open ? "rotate-180" : ""}`}
-        />
+        <ChevronDown className={`w-4 h-4 transition ${open ? "rotate-180" : ""}`} />
       </button>
 
       <AnimatePresence>
