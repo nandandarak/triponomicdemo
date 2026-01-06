@@ -1,3 +1,6 @@
+console.log("ENQUIRE PAGE VERSION — UPDATED CONTACTS");
+
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Send } from "lucide-react";
@@ -60,7 +63,7 @@ const EnquireNow = () => {
             className="text-center mb-16"
           >
             <h1 className="text-4xl md:text-5xl font-medium mb-4">
-              Plan Your Journey
+              Plan Your Journey (Updated)
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Tell us about your destination and we’ll design a perfect trip.
