@@ -10,7 +10,6 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     const lenis = new Lenis({
       duration: 1.1,
       smoothWheel: true,
-      smoothTouch: false,
     });
 
     const raf = (time: number) => {
