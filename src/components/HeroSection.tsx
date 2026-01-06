@@ -21,19 +21,19 @@ const HeroSection = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.18,
-        delayChildren: 0.3,
+        staggerChildren: 0.16,
+        delayChildren: 0.25,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 70, opacity: 0 },
+    hidden: { y: 40, opacity: 0 }, // reduced from 70 → fixes big gap
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 1.1,
+        duration: 1,
         ease: "easeOut" as const,
       },
     },
@@ -73,16 +73,16 @@ const HeroSection = () => {
           animate="visible"
           className="relative z-20 max-w-4xl mx-auto text-center"
         >
-          {/* Logo (LARGER, NO BOX) */}
+          {/* Logo (bigger + closer to title) */}
           <motion.div
             variants={itemVariants}
-            className="mb-12 flex justify-center"
+            className="mb-4 flex justify-center"
           >
             <img
               src={logo}
               alt="Triponomic"
               className="
-                h-28 md:h-32 lg:h-36
+                h-36 md:h-40 lg:h-44
                 w-auto object-contain
                 drop-shadow-[0_14px_40px_rgba(0,0,0,0.45)]
               "
@@ -90,19 +90,19 @@ const HeroSection = () => {
           </motion.div>
 
           {/* Title */}
-          <div className="overflow-hidden mb-6">
+          <div className="overflow-hidden mb-5">
             <motion.div variants={itemVariants} className="relative inline-block">
               {/* Ambient glow */}
               <motion.div
                 animate={{
-                  opacity: [0.15, 0.35, 0.15],
-                  scale: [1, 1.05, 1],
+                  opacity: [0.12, 0.3, 0.12],
+                  scale: [1, 1.04, 1],
                 }}
                 transition={{ duration: 4.5, repeat: Infinity }}
                 className="absolute inset-0 blur-3xl bg-primary/20 scale-150"
               />
 
-              <h1 className="relative font-primary text-6xl md:text-7xl lg:text-8xl font-bold text-primary-foreground drop-shadow-2xl tracking-tight">
+              <h1 className="relative font-primary text-5xl md:text-6xl lg:text-7xl font-bold text-primary-foreground drop-shadow-2xl tracking-tight">
                 Triponomic
               </h1>
             </motion.div>
@@ -111,10 +111,10 @@ const HeroSection = () => {
           {/* Tagline */}
           <motion.div
             variants={itemVariants}
-            animate={{ y: [0, -6, 0] }}
+            animate={{ y: [0, -5, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <p className="text-xl md:text-2xl text-primary-foreground font-secondary font-light tracking-[0.2em] uppercase drop-shadow-lg opacity-90">
+            <p className="text-lg md:text-xl text-primary-foreground font-secondary font-light tracking-[0.18em] uppercase drop-shadow-lg opacity-90">
               Your Customized Travel Partner
             </p>
           </motion.div>
@@ -122,7 +122,7 @@ const HeroSection = () => {
           {/* Subtext */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 text-sm md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-lg mx-auto leading-relaxed"
+            className="mt-5 text-sm md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-lg mx-auto leading-relaxed"
           >
             Your Vision, Our Plan. Custom-built itineraries
             <br className="hidden md:block" />
