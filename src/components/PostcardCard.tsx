@@ -21,17 +21,43 @@ interface PostcardCardProps {
 }
 
 const defaultDestinationData: Record<string, DestinationData> = {
-  Mumbai: { duration: "2–3 Days", investment: "₹15,000", bestTime: "Oct – Mar" },
-  Pune: { duration: "2–3 Days", investment: "₹12,000", bestTime: "Oct – Feb" },
-  Goa: { duration: "4–5 Days", investment: "₹25,000", bestTime: "Nov – Feb" },
-  Japan: { duration: "7–10 Days", investment: "₹1,50,000", bestTime: "Mar – May" },
-  Bali: { duration: "5–7 Days", investment: "₹75,000", bestTime: "Apr – Oct" },
+  Kashmir: {
+    duration: "5–7 Days",
+    investment: "₹35,000*",
+    bestTime: "Mar – Oct",
+  },
+
+  Kerala: {
+    duration: "4–6 Days",
+    investment: "₹30,000*",
+    bestTime: "Sep – Mar",
+  },
+
+  Goa: {
+    duration: "4–5 Days",
+    investment: "₹25,000*",
+    bestTime: "Nov – Feb",
+  },
+
+  Japan: {
+    duration: "7–10 Days",
+    investment: "₹1,50,000*",
+    bestTime: "Mar – May",
+  },
+
+  Bali: {
+    duration: "5–7 Days",
+    investment: "₹75,000*",
+    bestTime: "Apr – Oct",
+  },
+
   "South Korea": {
     duration: "6–8 Days",
-    investment: "₹1,20,000",
+    investment: "₹1,20,000*",
     bestTime: "Mar – May",
   },
 };
+
 
 const PostcardCard = ({
   name,
