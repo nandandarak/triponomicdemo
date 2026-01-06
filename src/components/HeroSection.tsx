@@ -73,7 +73,7 @@ const HeroSection = () => {
           animate="visible"
           className="relative z-20 max-w-5xl mx-auto text-center"
         >
-          {/* Logo */}
+          {/* Logo (WHITE – HERO ONLY) */}
           <motion.div
             variants={itemVariants}
             className="mb-4 flex justify-center"
@@ -84,7 +84,8 @@ const HeroSection = () => {
               className="
                 h-44 md:h-48 lg:h-52
                 w-auto object-contain
-                drop-shadow-[0_16px_45px_rgba(0,0,0,0.5)]
+                brightness-0 invert opacity-95
+                drop-shadow-[0_18px_50px_rgba(0,0,0,0.65)]
               "
             />
           </motion.div>
