@@ -31,7 +31,7 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
             className="fixed inset-4 md:inset-8 lg:inset-12 z-50 flex items-center justify-center"
           >
-            <div className="w-full max-w-4xl bg-[#FDFCF9] rounded-[28px] shadow-2xl overflow-hidden flex flex-col">
+          <div className="w-full max-w-4xl h-[90vh] bg-[#FDFCF9] rounded-[28px] shadow-2xl overflow-hidden flex flex-col">
 
               {/* HEADER */}
               <div className="bg-gradient-to-r from-[#638C7D] to-[#4A7066] px-8 py-6 flex items-center justify-between">
