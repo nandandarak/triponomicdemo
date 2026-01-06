@@ -15,20 +15,20 @@ const HeroSection = () => {
   const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const videoScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
 
-  // Text animation variants
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.18,
         delayChildren: 0.3,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 80, opacity: 0 },
+    hidden: { y: 70, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
@@ -61,7 +61,7 @@ const HeroSection = () => {
             <source src={heroVideo} type="video/mp4" />
           </video>
 
-          {/* Clean overlay - no dotted patterns or radial gradients */}
+          {/* Clean cinematic overlay */}
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
         </motion.div>
@@ -73,16 +73,33 @@ const HeroSection = () => {
           animate="visible"
           className="relative z-20 max-w-4xl mx-auto text-center"
         >
-          {/* Logo with Glassmorphism Container */}
-          <motion.div 
+          {/* Logo */}
+          <motion.div
             variants={itemVariants}
             className="mb-8 flex justify-center"
           >
-            <div className="glass-logo-container rounded-3xl p-6 md:p-8">
-              <img 
-                src={logo} 
-                alt="Triponomic" 
-                className="h-24 md:h-32 lg:h-40 w-auto object-contain"
+            <div
+              className="
+                relative rounded-[28px]
+                p-6 md:p-7
+                bg-white/15
+                backdrop-blur-xl
+                border border-white/20
+                shadow-[0_20px_60px_rgba(0,0,0,0.35)]
+              "
+            >
+              {/* soft edge highlight */}
+              <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-gradient-to-br from-white/30 via-transparent to-transparent" />
+
+              <img
+                src={logo}
+                alt="Triponomic"
+                className="
+                  relative
+                  h-20 md:h-24 lg:h-28
+                  w-auto object-contain
+                  drop-shadow-[0_10px_25px_rgba(0,0,0,0.35)]
+                "
               />
             </div>
           </motion.div>
@@ -90,13 +107,13 @@ const HeroSection = () => {
           {/* Title */}
           <div className="overflow-hidden mb-6">
             <motion.div variants={itemVariants} className="relative inline-block">
-              {/* Subtle Glow */}
+              {/* subtle ambient glow */}
               <motion.div
                 animate={{
-                  opacity: [0.2, 0.4, 0.2],
+                  opacity: [0.15, 0.35, 0.15],
                   scale: [1, 1.05, 1],
                 }}
-                transition={{ duration: 4, repeat: Infinity }}
+                transition={{ duration: 4.5, repeat: Infinity }}
                 className="absolute inset-0 blur-3xl bg-primary/20 scale-150"
               />
 
@@ -109,7 +126,7 @@ const HeroSection = () => {
           {/* Tagline */}
           <motion.div
             variants={itemVariants}
-            animate={{ y: [0, -8, 0] }}
+            animate={{ y: [0, -6, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
             <p className="text-xl md:text-2xl text-primary-foreground font-secondary font-light tracking-[0.2em] uppercase drop-shadow-lg opacity-90">
@@ -117,7 +134,7 @@ const HeroSection = () => {
             </p>
           </motion.div>
 
-          {/* Sub text */}
+          {/* Subtext */}
           <motion.p
             variants={itemVariants}
             className="mt-6 text-sm md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-lg mx-auto leading-relaxed"
@@ -128,7 +145,7 @@ const HeroSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* Bottom Fade - clean solid color transition */}
+        {/* Bottom fade (natural section blend) */}
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background via-background/80 to-transparent z-20 pointer-events-none" />
       </section>
     </div>
