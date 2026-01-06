@@ -212,8 +212,27 @@ const EnquireNow = () => {
                       <option>Kashmir</option>
                       <option>Kerala</option>
                       <option>Goa</option>
+                      <option>Leh-Ladakh</option>
+                      <option>Jaipur</option>
+                      <option>Manali</option>
+                      <option>Rishikesh</option>
+                      <option>Udaipur</option>
+                      <option>Spiti Valley</option>
+                      
                       <option>Japan</option>
                       <option>Bali</option>
+                      <option>South Korea</option>
+                      <option>Thailand</option>
+                      <option>Vietnam</option>
+                      <option>Iceland</option>
+                      <option>Turkey</option>
+                      <option>Singapore</option>
+                      <option>Switzerland</option>
+                      <option>France</option>
+                      
+                      
+                      
+                      
                     </select>
                   </div>
                 </div>
