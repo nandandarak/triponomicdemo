@@ -112,8 +112,8 @@ const NavigationDropdown = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
             >
-              <div className="bg-[#F8F7F2] rounded-2xl p-6 min-w-[340px] shadow-xl">
-                <p className="text-[10px] uppercase tracking-widest text-[#638C7D] mb-4 font-bold font-secondary">
+              <div className="bg-card rounded-2xl p-6 min-w-[340px] shadow-xl border border-border/50">
+                <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold font-secondary">
                   {title}
                 </p>
 
@@ -125,7 +125,7 @@ const NavigationDropdown = ({
                         onSelect(label);
                         onClose();
                       }}
-                      className="flex items-start gap-3 px-4 py-2 rounded-xl bg-white/60 hover:bg-[#638C7D] hover:text-white text-xs font-medium transition text-left leading-snug font-secondary"
+                      className="flex items-start gap-3 px-4 py-2 rounded-xl bg-background/60 hover:bg-primary hover:text-primary-foreground text-xs font-medium transition text-left leading-snug font-secondary"
                     >
                       {Icon && (
                         <Icon className="w-4 h-4 opacity-80 mt-0.5 shrink-0" />
@@ -155,8 +155,8 @@ const Header = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show text after scrolling past 100px
-      setIsScrolled(window.scrollY > 100);
+      // Show text after scrolling past hero section (~80vh)
+      setIsScrolled(window.scrollY > window.innerHeight * 0.6);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -171,7 +171,15 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-[#F8F7F2]/90 backdrop-blur-lg rounded-full px-8 py-3 flex items-center justify-between">
+        <motion.div 
+          className={`rounded-full px-8 py-3 flex items-center justify-between transition-all duration-300 ${
+            isScrolled ? 'glass-header-scrolled' : 'glass-header'
+          }`}
+          initial={false}
+          animate={{
+            backgroundColor: isScrolled ? 'hsl(40 40% 99% / 0.95)' : 'hsl(40 40% 99% / 0.85)',
+          }}
+        >
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <img 
@@ -185,8 +193,8 @@ const Header = () => {
                   initial={{ opacity: 0, x: -20, width: 0 }}
                   animate={{ opacity: 1, x: 0, width: "auto" }}
                   exit={{ opacity: 0, x: -20, width: 0 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="font-script text-2xl italic text-[#344E41] overflow-hidden whitespace-nowrap"
+                  transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                  className="font-primary text-xl font-semibold text-foreground overflow-hidden whitespace-nowrap"
                 >
                   Triponomic
                 </motion.span>
@@ -224,7 +232,7 @@ const Header = () => {
             />
 
             <Link to="/enquire">
-              <MagneticButton className="px-6 py-2 bg-[#638C7D] text-white rounded-full text-xs font-bold tracking-widest font-secondary">
+              <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest font-secondary">
                 CONTACT US
               </MagneticButton>
             </Link>
@@ -232,37 +240,37 @@ const Header = () => {
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden"
+            className="md:hidden text-foreground"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
-        </div>
+        </motion.div>
 
         {/* MOBILE MENU */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              className="md:hidden mt-4 bg-[#F8F7F2] rounded-2xl p-6 shadow-xl max-h-[80vh] overflow-y-auto"
+              className="md:hidden mt-4 bg-card rounded-2xl p-6 shadow-xl max-h-[80vh] overflow-y-auto border border-border/50"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              {/* Logo at top of mobile menu */}
-              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#344E41]/10">
+              {/* Logo at top of mobile menu - centered */}
+              <div className="flex flex-col items-center gap-2 mb-6 pb-4 border-b border-border/30">
                 <img 
                   src={logo} 
                   alt="Triponomic Logo" 
-                  className="h-10 w-auto"
+                  className="h-14 w-auto"
                 />
-                <span className="font-script text-2xl italic text-[#344E41]">
+                <span className="font-primary text-xl font-semibold text-foreground">
                   Triponomic
                 </span>
               </div>
 
               {/* Domestic */}
-              <p className="text-xs font-bold mb-2 font-secondary">Domestic</p>
-              <div className="flex flex-wrap gap-2 mb-4">
+              <p className="text-xs font-bold mb-3 text-foreground font-secondary tracking-wide">Domestic</p>
+              <div className="flex flex-wrap gap-2 mb-5">
                 {domesticDestinations.map((d) => (
                   <button
                     key={d}
@@ -270,7 +278,7 @@ const Header = () => {
                       setMobileMenuOpen(false);
                       setSelectedDestination(d);
                     }}
-                    className="px-4 py-2 bg-white/70 rounded-full text-xs font-secondary"
+                    className="px-4 py-2.5 bg-background/70 rounded-full text-xs font-secondary hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
                     {d}
                   </button>
@@ -278,8 +286,8 @@ const Header = () => {
               </div>
 
               {/* International */}
-              <p className="text-xs font-bold mb-2 font-secondary">International</p>
-              <div className="flex flex-wrap gap-2 mb-4">
+              <p className="text-xs font-bold mb-3 text-foreground font-secondary tracking-wide">International</p>
+              <div className="flex flex-wrap gap-2 mb-5">
                 {internationalDestinations.map((d) => (
                   <button
                     key={d}
@@ -287,7 +295,7 @@ const Header = () => {
                       setMobileMenuOpen(false);
                       setSelectedDestination(d);
                     }}
-                    className="px-4 py-2 bg-white/70 rounded-full text-xs font-secondary"
+                    className="px-4 py-2.5 bg-background/70 rounded-full text-xs font-secondary hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
                     {d}
                   </button>
@@ -295,8 +303,8 @@ const Header = () => {
               </div>
 
               {/* Services */}
-              <p className="text-xs font-bold mb-2 font-secondary">Services</p>
-              <div className="flex flex-col gap-2 mb-4">
+              <p className="text-xs font-bold mb-3 text-foreground font-secondary tracking-wide">Services</p>
+              <div className="flex flex-col gap-2 mb-5">
                 {servicesList.map(({ label, icon: Icon }) => (
                   <button
                     key={label}
@@ -304,9 +312,9 @@ const Header = () => {
                       setMobileMenuOpen(false);
                       setSelectedDestination(label);
                     }}
-                    className="flex items-start gap-3 px-4 py-3 bg-white/70 rounded-xl text-xs leading-snug text-left font-secondary"
+                    className="flex items-start gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs leading-snug text-left font-secondary hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
-                    <Icon className="w-4 h-4 text-[#638C7D] mt-0.5 shrink-0" />
+                    <Icon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                     <span>{label}</span>
                   </button>
                 ))}
@@ -314,7 +322,7 @@ const Header = () => {
 
               <Link
                 to="/enquire"
-                className="block w-full py-3 bg-[#638C7D] text-white rounded-full text-xs font-bold text-center font-secondary"
+                className="block w-full py-3 bg-primary text-primary-foreground rounded-full text-xs font-bold text-center font-secondary tracking-wider"
               >
                 CONTACT US
               </Link>
