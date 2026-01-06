@@ -73,18 +73,18 @@ const HeroSection = () => {
           animate="visible"
           className="relative z-20 max-w-4xl mx-auto text-center"
         >
-          {/* Logo (NO BOX) */}
+          {/* Logo (LARGER, NO BOX) */}
           <motion.div
             variants={itemVariants}
-            className="mb-10 flex justify-center"
+            className="mb-12 flex justify-center"
           >
             <img
               src={logo}
               alt="Triponomic"
               className="
-                h-20 md:h-24 lg:h-28
+                h-28 md:h-32 lg:h-36
                 w-auto object-contain
-                drop-shadow-[0_12px_30px_rgba(0,0,0,0.45)]
+                drop-shadow-[0_14px_40px_rgba(0,0,0,0.45)]
               "
             />
           </motion.div>
