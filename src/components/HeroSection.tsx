@@ -26,14 +26,14 @@ const HeroSection = () => {
     },
   };
 
-const itemVariants = {
+  const itemVariants = {
     hidden: { y: 80, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
         duration: 1.1,
-        ease: [0.16, 1, 0.3, 1] as const,
+        ease: [0.16, 1, 0.3, 1],
       },
     },
   };

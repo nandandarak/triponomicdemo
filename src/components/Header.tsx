@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ChevronDown,
@@ -150,17 +150,6 @@ const Header = () => {
   const [selectedDestination, setSelectedDestination] = useState<string | null>(
     null
   );
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      // Show text after scrolling past ~100px (adjustable threshold)
-      setIsScrolled(window.scrollY > 100);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const toggle = (key: string) =>
     setOpenDropdown(openDropdown === key ? null : key);
@@ -171,28 +160,9 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-7xl mx-auto">
         <div className="bg-[#F8F7F2]/90 backdrop-blur-lg rounded-full px-8 py-3 flex items-center justify-between">
-          {/* Logo + Text */}
-          <Link to="/" className="flex items-center gap-2 overflow-hidden">
-            {/* Logo icon placeholder - always visible */}
-            <span className="font-script text-2xl italic text-[#344E41] shrink-0">T</span>
-            
-            {/* Animated text that slides in on scroll */}
-            <AnimatePresence>
-              {isScrolled && (
-                <motion.span
-                  initial={{ opacity: 0, x: -20, width: 0 }}
-                  animate={{ opacity: 1, x: 0, width: "auto" }}
-                  exit={{ opacity: 0, x: -20, width: 0 }}
-                  transition={{ 
-                    duration: 0.4, 
-                    ease: [0.16, 1, 0.3, 1] as const 
-                  }}
-                  className="font-script text-2xl italic text-[#344E41] whitespace-nowrap overflow-hidden"
-                >
-                  riponomic
-                </motion.span>
-              )}
-            </AnimatePresence>
+          {/* Logo */}
+          <Link to="/" className="font-script text-2xl italic text-[#344E41]">
+            Triponomic
           </Link>
 
           {/* Desktop Nav */}
