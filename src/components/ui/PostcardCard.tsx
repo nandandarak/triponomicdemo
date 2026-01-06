@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Clock, Coins, Sun, ArrowRight } from "lucide-react";
-import MagneticButton from "./MagneticButton";
+import MagneticButton from "../MagneticButton";
 
 interface DestinationData {
   duration: string;
