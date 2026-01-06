@@ -19,9 +19,7 @@ const EnquireNow = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -52,10 +50,9 @@ const EnquireNow = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Page Content */}
-      <main className="pt-[140px] pb-20 px-6">
+      <main className="pt-[140px] pb-16 px-6">
         <div className="max-w-6xl mx-auto">
-          {/* Page Header */}
+          {/* PAGE TITLE */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -72,12 +69,12 @@ const EnquireNow = () => {
           <div className="grid md:grid-cols-5 gap-12">
             {/* CONTACT INFO */}
             <div className="md:col-span-2">
-              <div className="bg-card p-8 rounded-3xl shadow-sm">
-                <h2 className="text-xl font-medium mb-8">
+              <div className="bg-card p-8 rounded-2xl shadow-card">
+                <h2 className="text-xl font-medium mb-6">
                   Contact Information
                 </h2>
 
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {/* PHONE */}
                   <div className="flex gap-4">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -85,16 +82,10 @@ const EnquireNow = () => {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Phone</p>
-                      <a
-                        href="tel:+919752177088"
-                        className="block font-medium hover:text-primary"
-                      >
+                      <a href="tel:+919752177088" className="block font-medium">
                         +91 9752177088
                       </a>
-                      <a
-                        href="tel:+919611922632"
-                        className="block font-medium hover:text-primary"
-                      >
+                      <a href="tel:+919611922632" className="block font-medium">
                         +91 9611922632
                       </a>
                     </div>
@@ -109,7 +100,7 @@ const EnquireNow = () => {
                       <p className="text-sm text-muted-foreground">Email</p>
                       <a
                         href="mailto:trips@triponomic.in"
-                        className="font-medium hover:text-primary"
+                        className="font-medium"
                       >
                         trips@triponomic.in
                       </a>
@@ -124,10 +115,8 @@ const EnquireNow = () => {
                     <div>
                       <p className="text-sm text-muted-foreground">Address</p>
                       <p className="font-medium leading-relaxed">
-                        720, 7th Floor, 26, Service Rd
-                        <br />
-                        Tapeshwari Bagh Colony
-                        <br />
+                        720, 7th Floor, 26, Service Rd<br />
+                        Tapeshwari Bagh Colony<br />
                         Indore, Madhya Pradesh 452016
                       </p>
                     </div>
@@ -140,104 +129,65 @@ const EnquireNow = () => {
             <div className="md:col-span-3">
               <form
                 onSubmit={handleSubmit}
-                className="bg-[#faf7f3] p-10 rounded-3xl shadow-sm"
+                className="bg-card p-8 rounded-2xl shadow-card"
               >
                 <div className="grid md:grid-cols-2 gap-6">
-                  {/* NAME */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-800">
-                      Full Name
-                    </label>
-                    <input
-                      required
-                      name="name"
-                      placeholder="Your name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
-                        text-gray-900 placeholder:text-gray-500
-                        outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  {/* EMAIL */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-800">
-                      Email Address
-                    </label>
-                    <input
-                      required
-                      type="email"
-                      name="email"
-                      placeholder="you@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
-                        text-gray-900 placeholder:text-gray-500
-                        outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  {/* PHONE */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-800">
-                      Phone Number
-                    </label>
-                    <input
-                      required
-                      name="phone"
-                      placeholder="+91 98897 79890"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
-                        text-gray-900 placeholder:text-gray-500
-                        outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  {/* DESTINATION */}
-                  <div className="flex flex-col gap-2">
-  <label className="text-sm font-medium text-gray-800">
-    Preferred Destination
-  </label>
-  <input
-    name="destination"
-    placeholder="Eg. Kashmir, Japan, Europe, Bali..."
-    value={formData.destination}
-    onChange={handleChange}
-    className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
-      text-gray-900 placeholder:text-gray-500
-      outline-none focus:ring-2 focus:ring-primary"
-  />
-</div>
-
-                {/* MESSAGE */}
-                <div className="flex flex-col gap-2 mt-6">
-                  <label className="text-sm font-medium text-gray-800">
-                    Your Message
-                  </label>
-                  <textarea
-                    name="message"
-                    rows={5}
-                    placeholder="Tell us about your travel plans, preferences, and any special requirements..."
-                    value={formData.message}
+                  <input
+                    required
+                    name="name"
+                    placeholder="Full Name"
+                    value={formData.name}
                     onChange={handleChange}
-                    className="w-full rounded-3xl bg-[#f5efe9] px-6 py-5
-                      text-gray-900 placeholder:text-gray-500
-                      outline-none resize-none
-                      focus:ring-2 focus:ring-primary"
+                    className="input"
                   />
+
+                  <input
+                    required
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="input"
+                  />
+
+                  <input
+                    required
+                    name="phone"
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="input"
+                  />
+
+                  <select
+                    name="destination"
+                    value={formData.destination}
+                    onChange={handleChange}
+                    className="input"
+                  >
+                    <option value="">Select Destination</option>
+                    <option>Kashmir</option>
+                    <option>Kerala</option>
+                    <option>Goa</option>
+                    <option>Japan</option>
+                    <option>Bali</option>
+                  </select>
                 </div>
 
-                {/* BUTTON */}
+                <textarea
+                  name="message"
+                  rows={5}
+                  placeholder="Your travel requirements..."
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="input mt-6 resize-none"
+                />
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="mt-10 w-full py-5 rounded-full
-                    bg-primary text-primary-foreground
-                    flex items-center justify-center gap-2
-                    text-base font-medium
-                    hover:opacity-90 transition"
+                  className="mt-8 w-full py-4 bg-primary text-primary-foreground rounded-full flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     "Sending..."
