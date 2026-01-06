@@ -48,7 +48,6 @@ const internationalDestinations = [
   "Switzerland",
 ];
 
-/* ✅ UPDATED SERVICES (ONLY CHANGE) */
 const servicesList = [
   { label: "Flight Bookings", icon: Plane },
   { label: "Hotel Bookings", icon: Hotel },
@@ -96,11 +95,12 @@ const DesktopDropdown = ({
               onClick={() => setOpen(false)}
             />
 
+            {/* ✅ ONLY ALIGNMENT FIX HERE */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full mt-4 left-1/2 -translate-x-1/2 z-[9999]"
+              className="absolute top-full mt-4 right-0 z-[9999]"
             >
               <div className="bg-card rounded-2xl p-6 min-w-[320px] shadow-xl border">
                 <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold">
