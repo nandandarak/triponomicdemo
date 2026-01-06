@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 
+import ScrollToTop from "@/components/ScrollToTop"; // ✅ ADD THIS
+
 import Index from "./pages/Index";
 import EnquireNow from "./pages/EnquireNow";
 import NotFound from "./pages/NotFound";
@@ -25,15 +27,13 @@ const App = () => {
         <Toaster />
         <Sonner />
 
+        {/* ✅ SCROLL FIX (ONLY ADDITION) */}
+        <ScrollToTop />
+
         {/* App Routes */}
         <Routes>
-          {/* Home */}
           <Route path="/" element={<Index />} />
-
-          {/* Enquiry Page */}
           <Route path="/enquire" element={<EnquireNow />} />
-
-          {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>
