@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import TripEnquiryForm from "./TripEnquiryForm";
 
 interface EnquiryModalProps {
   isOpen: boolean;
@@ -7,14 +8,7 @@ interface EnquiryModalProps {
   destination: string;
 }
 
-const GOOGLE_FORM_BASE_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/viewform";
-
 const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
-  const formUrl = `${GOOGLE_FORM_BASE_URL}?embedded=true&entry.396208505=${encodeURIComponent(
-    destination
-  )}`;
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -24,23 +18,23 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
             onClick={onClose}
           />
 
           {/* MODAL */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            initial={{ opacity: 0, scale: 0.96, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 30 }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            exit={{ opacity: 0, scale: 0.96, y: 40 }}
+            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
             className="fixed inset-4 md:inset-8 lg:inset-12 z-50 flex items-center justify-center"
           >
-            <div className="w-full max-w-6xl h-[92vh] bg-[#FDFCF9] rounded-[32px] shadow-2xl overflow-hidden flex flex-col">
+            <div className="w-full max-w-4xl bg-[#FDFCF9] rounded-[28px] shadow-2xl overflow-hidden flex flex-col">
 
               {/* HEADER */}
-              <div className="bg-gradient-to-r from-[#638C7D] to-[#4A7066] px-8 py-6 flex items-center justify-between shrink-0">
+              <div className="bg-gradient-to-r from-[#638C7D] to-[#4A7066] px-8 py-6 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-medium mb-1">
                     Bespoke Journey Request
@@ -59,47 +53,17 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
               </div>
 
               {/* TRUST STRIP */}
-              <div className="relative bg-[#FDFCF9] border-b border-[#D4AF37]/20 px-8 py-4 shrink-0">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full border-2 border-[#D4AF37] flex items-center justify-center">
-                    <span className="text-[#D4AF37] text-lg">✈</span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-[#638C7D] font-medium">
-                      Triponomic Verified
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Luxury Travel Partner
-                    </p>
-                  </div>
-                </div>
-
-                <div className="absolute top-4 right-8 w-16 h-16 border-2 border-dashed border-[#D4AF37]/50 rounded-lg flex items-center justify-center rotate-6">
-                  <span className="text-[#D4AF37] text-2xl">✓</span>
-                </div>
-              </div>
-
-              {/* FAKE INTRO (MASKS GOOGLE INTRO) */}
-              <div className="px-8 py-6 bg-[#FDFCF9] border-b">
-                <h3 className="text-xl font-medium text-foreground">
-                  Tell us about your trip
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Share a few details and our travel experts will reach out with a
-                  personalized plan tailored just for you.
+              <div className="bg-[#FDFCF9] border-b border-[#D4AF37]/20 px-8 py-4">
+                <p className="text-sm text-[#638C7D] font-medium">
+                  Triponomic Verified · Luxury Travel Partner
                 </p>
               </div>
 
-              {/* GOOGLE FORM (DISGUISED) */}
-              <div className="flex-1 overflow-hidden bg-[#FDFCF9]">
-                <iframe
-                  src={formUrl}
-                  className="w-full h-full border-0"
-                  style={{
-                    marginTop: "-260px",
-                    height: "calc(100% + 260px)",
-                  }}
-                  title="Enquiry Form"
+              {/* FORM */}
+              <div className="p-8 overflow-y-auto">
+                <TripEnquiryForm
+                  destination={destination}
+                  onSuccess={onClose}
                 />
               </div>
             </div>
