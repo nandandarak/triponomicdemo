@@ -4,13 +4,20 @@ import {
   ChevronDown,
   Menu,
   X,
+  Plane,
+  ShieldCheck,
+  Sparkles,
+  Stamp,
+  Car,
+  Key,
+  Ship,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
 import EnquiryModal from "./EnquiryModal";
 import logo from "@/assets/logo.png";
 
-/* ---------------- DESTINATIONS ---------------- */
+/* ---------------- DATA ---------------- */
 
 const domesticDestinations = [
   "Mumbai",
@@ -38,26 +45,31 @@ const internationalDestinations = [
   "Switzerland",
 ];
 
+const servicesList = [
+  { label: "Flight & Hotel Bookings", icon: Plane },
+  { label: "Travel Insurance & International eSIM", icon: ShieldCheck },
+  { label: "Customized Experiences", icon: Sparkles },
+  { label: "Visa Assistance", icon: Stamp },
+  { label: "Outstation Cabs & Transfers", icon: Car },
+  { label: "Self-Drive Cars (International)", icon: Key },
+  { label: "Cruise Holidays", icon: Ship },
+];
+
 /* ---------------- HEADER ---------------- */
 
 const Header = () => {
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(
+    null
+  );
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const onScroll = () =>
       setIsScrolled(window.scrollY > window.innerHeight * 0.6);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // Lock body scroll when mobile menu open
-  useEffect(() => {
-    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
-  }, [mobileMenuOpen]);
 
   return (
     <>
@@ -83,21 +95,8 @@ const Header = () => {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <div
-              className="nav-link cursor-pointer"
-              onClick={() => setOpenDropdown(openDropdown === "domestic" ? null : "domestic")}
-            >
-              Domestic <ChevronDown className="inline w-4 h-4 ml-1" />
-            </div>
-
-            <div
-              className="nav-link cursor-pointer"
-              onClick={() =>
-                setOpenDropdown(openDropdown === "international" ? null : "international")
-              }
-            >
-              International <ChevronDown className="inline w-4 h-4 ml-1" />
-            </div>
+            <span className="nav-link">Domestic</span>
+            <span className="nav-link">International</span>
 
             <Link to="/enquire">
               <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
@@ -109,49 +108,29 @@ const Header = () => {
           {/* Mobile Toggle */}
           <button
             className="md:hidden"
-            onClick={() => setMobileMenuOpen(true)}
+            onClick={() => setMobileMenuOpen((p) => !p)}
           >
-            <Menu />
+            {mobileMenuOpen ? <X /> : <Menu />}
           </button>
         </motion.div>
-      </header>
 
-      {/* MOBILE MENU (FIXED & FULLSCREEN) */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            {/* Backdrop */}
+        {/* MOBILE DROPDOWN MENU */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
             <motion.div
-              className="fixed inset-0 bg-black/50 z-[60]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
-            />
-
-            {/* Menu Panel */}
-            <motion.div
-              className="fixed inset-0 z-[61] bg-background p-6 overflow-y-auto"
-              initial={{ y: "-100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "-100%" }}
-              transition={{ type: "spring", damping: 25 }}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="md:hidden mt-4 bg-card rounded-2xl p-6 shadow-xl border border-border/50 max-h-[80vh] overflow-y-auto"
             >
-              {/* Top Bar */}
-              <div className="flex items-center justify-between mb-6">
-                <img src={logo} alt="Triponomic" className="h-10" />
-                <button onClick={() => setMobileMenuOpen(false)}>
-                  <X />
-                </button>
-              </div>
-
               {/* Domestic */}
-              <p className="text-xs font-bold mb-3">Domestic</p>
-              <div className="space-y-2 mb-6">
+              <p className="text-xs font-bold mb-3 tracking-wide">Domestic</p>
+              <div className="flex flex-wrap gap-2 mb-6">
                 {domesticDestinations.map((d) => (
                   <button
                     key={d}
-                    className="w-full text-left px-4 py-3 rounded-xl bg-muted"
+                    className="px-4 py-2.5 bg-background/70 rounded-full text-xs"
                     onClick={() => {
                       setSelectedDestination(d);
                       setMobileMenuOpen(false);
@@ -163,12 +142,14 @@ const Header = () => {
               </div>
 
               {/* International */}
-              <p className="text-xs font-bold mb-3">International</p>
-              <div className="space-y-2 mb-8">
+              <p className="text-xs font-bold mb-3 tracking-wide">
+                International
+              </p>
+              <div className="flex flex-wrap gap-2 mb-6">
                 {internationalDestinations.map((d) => (
                   <button
                     key={d}
-                    className="w-full text-left px-4 py-3 rounded-xl bg-muted"
+                    className="px-4 py-2.5 bg-background/70 rounded-full text-xs"
                     onClick={() => {
                       setSelectedDestination(d);
                       setMobileMenuOpen(false);
@@ -179,17 +160,31 @@ const Header = () => {
                 ))}
               </div>
 
+              {/* Services (NO FORM OPEN) */}
+              <p className="text-xs font-bold mb-3 tracking-wide">Services</p>
+              <div className="space-y-2 mb-6">
+                {servicesList.map(({ label, icon: Icon }) => (
+                  <div
+                    key={label}
+                    className="flex items-start gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs"
+                  >
+                    <Icon className="w-4 h-4 text-primary mt-0.5" />
+                    <span>{label}</span>
+                  </div>
+                ))}
+              </div>
+
               <Link
                 to="/enquire"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block w-full py-3 text-center bg-primary text-primary-foreground rounded-full font-bold tracking-wide"
+                className="block w-full py-3 text-center bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-wider"
               >
                 CONTACT US
               </Link>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </header>
 
       {/* ENQUIRY MODAL */}
       <EnquiryModal
