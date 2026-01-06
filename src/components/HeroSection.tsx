@@ -44,14 +44,14 @@ const HeroSection = () => {
         ref={containerRef}
         className="
           relative w-full flex items-center justify-center px-6 overflow-hidden z-10
-          pt-24 md:pt-0
+          pt-28 md:pt-0
           min-h-[calc(100vh-96px)] md:min-h-screen
         "
       >
-        {/* Video Background */}
+        {/* VIDEO BACKGROUND (MOBILE SAFE) */}
         <motion.div
           style={{ y: videoY, scale: videoScale }}
-          className="absolute inset-0 -z-10"
+          className="absolute inset-0 -z-10 pointer-events-none"
         >
           <video
             autoPlay
@@ -64,11 +64,12 @@ const HeroSection = () => {
             <source src={heroVideo} type="video/mp4" />
           </video>
 
+          {/* Overlays */}
           <div className="absolute inset-0 bg-black/35" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/55" />
         </motion.div>
 
-        {/* Hero Content */}
+        {/* HERO CONTENT */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -76,15 +77,12 @@ const HeroSection = () => {
           className="relative z-20 max-w-5xl mx-auto text-center"
         >
           {/* LOGO */}
-          <motion.div
-            variants={itemVariants}
-            className="-mb-8 flex justify-center"
-          >
+          <motion.div variants={itemVariants} className="-mb-6 flex justify-center">
             <img
               src={logo}
               alt="Triponomic"
               className="
-                h-44 md:h-56 lg:h-60
+                h-40 md:h-56 lg:h-60
                 w-auto object-contain
                 brightness-0 invert opacity-95
                 drop-shadow-[0_20px_55px_rgba(0,0,0,0.65)]
@@ -93,7 +91,7 @@ const HeroSection = () => {
           </motion.div>
 
           {/* TITLE */}
-          <div className="overflow-hidden mb-8">
+          <div className="overflow-hidden mb-6">
             <motion.div variants={itemVariants} className="relative inline-block">
               <motion.div
                 animate={{
@@ -124,7 +122,7 @@ const HeroSection = () => {
           {/* SUBTEXT */}
           <motion.p
             variants={itemVariants}
-            className="mt-5 text-xs md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-xl mx-auto leading-relaxed"
+            className="mt-4 text-xs md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-xl mx-auto leading-relaxed"
           >
             Your Vision, Our Plan. Custom-built itineraries
             <br className="hidden md:block" />
@@ -132,7 +130,7 @@ const HeroSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* Bottom fade */}
+        {/* BOTTOM FADE */}
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background via-background/80 to-transparent z-20 pointer-events-none" />
       </section>
     </div>
