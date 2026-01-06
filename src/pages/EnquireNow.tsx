@@ -1,4 +1,4 @@
-console.log("ENQUIRE PAGE VERSION — UPDATED CONTACTS");
+
 
 
 import { useState } from "react";
@@ -63,7 +63,7 @@ const EnquireNow = () => {
             className="text-center mb-16"
           >
             <h1 className="text-4xl md:text-5xl font-medium mb-4">
-              Plan Your Journey (Updated)
+              Plan Your Journey
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Tell us about your destination and we’ll design a perfect trip.
