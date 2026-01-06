@@ -55,74 +55,6 @@ const servicesList = [
   { label: "Cruise Holidays", icon: Ship },
 ];
 
-/* ---------------- DESKTOP DROPDOWN ---------------- */
-
-const DesktopDropdown = ({
-  title,
-  items,
-  onSelect,
-}: {
-  title: string;
-  items: { label: string; icon?: any }[];
-  onSelect?: (label: string) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((p) => !p)}
-        className="nav-link flex items-center gap-1"
-      >
-        {title}
-        <ChevronDown
-          className={`w-4 h-4 transition ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-[9998]"
-              onClick={() => setOpen(false)}
-            />
-
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full mt-4 left-1/2 -translate-x-1/2 z-[9999]"
-            >
-              <div className="bg-card rounded-2xl p-6 min-w-[320px] shadow-xl border">
-                <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold">
-                  {title}
-                </p>
-
-                <div className="space-y-2">
-                  {items.map(({ label, icon: Icon }) => (
-                    <button
-                      key={label}
-                      onClick={() => {
-                        onSelect?.(label);
-                        setOpen(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-2 rounded-xl bg-background/60 hover:bg-primary hover:text-primary-foreground text-xs transition text-left"
-                    >
-                      {Icon && <Icon className="w-4 h-4" />}
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
 /* ---------------- HEADER ---------------- */
 
 const Header = () => {
@@ -154,28 +86,13 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <img src={logo} alt="Triponomic" className="h-9 w-auto" />
-            {isScrolled && (
-              <span className="hidden sm:block font-semibold text-lg">
-                Triponomic
-              </span>
-            )}
           </Link>
 
-          {/* DESKTOP NAV */}
+          {/* DESKTOP NAV (unchanged) */}
           <nav className="hidden md:flex items-center gap-8">
-            <DesktopDropdown
-              title="Domestic"
-              items={domesticDestinations.map((d) => ({ label: d }))}
-              onSelect={setSelectedDestination}
-            />
-
-            <DesktopDropdown
-              title="International"
-              items={internationalDestinations.map((d) => ({ label: d }))}
-              onSelect={setSelectedDestination}
-            />
-
-            <DesktopDropdown title="Services" items={servicesList} />
+            <Link to="/">Domestic</Link>
+            <Link to="/">International</Link>
+            <Link to="/">Services</Link>
 
             <Link to="/enquire">
               <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
@@ -198,11 +115,13 @@ const Header = () => {
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
+            {/* BACKDROP */}
             <motion.div
               className="fixed inset-0 z-[9998] bg-black/40 backdrop-blur-sm"
               onClick={() => setMobileMenuOpen(false)}
             />
 
+            {/* MENU */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -216,19 +135,51 @@ const Header = () => {
                 rounded-2xl
                 p-6
                 shadow-2xl
-
                 max-h-[calc(100vh-120px)]
                 overflow-y-auto
-                overscroll-contain
               "
             >
-              <p className="text-xs font-bold mb-3">Services</p>
+              {/* DOMESTIC */}
+              <p className="text-xs font-bold mb-2">Domestic</p>
+              <div className="space-y-2 mb-6">
+                {domesticDestinations.map((place) => (
+                  <button
+                    key={place}
+                    onClick={() => {
+                      setSelectedDestination(place);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 rounded-xl bg-background/70 text-xs"
+                  >
+                    {place}
+                  </button>
+                ))}
+              </div>
 
+              {/* INTERNATIONAL */}
+              <p className="text-xs font-bold mb-2">International</p>
+              <div className="space-y-2 mb-6">
+                {internationalDestinations.map((place) => (
+                  <button
+                    key={place}
+                    onClick={() => {
+                      setSelectedDestination(place);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 rounded-xl bg-background/70 text-xs"
+                  >
+                    {place}
+                  </button>
+                ))}
+              </div>
+
+              {/* SERVICES */}
+              <p className="text-xs font-bold mb-2">Services</p>
               <div className="space-y-2 mb-6">
                 {servicesList.map(({ label, icon: Icon }) => (
                   <div
                     key={label}
-                    className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs"
+                    className="flex items-center gap-3 px-4 py-2 bg-background/70 rounded-xl text-xs"
                   >
                     <Icon className="w-4 h-4 text-primary" />
                     {label}
@@ -236,6 +187,7 @@ const Header = () => {
                 ))}
               </div>
 
+              {/* CTA */}
               <Link
                 to="/enquire"
                 onClick={() => setMobileMenuOpen(false)}
