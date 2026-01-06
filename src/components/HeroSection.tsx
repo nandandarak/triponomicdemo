@@ -11,16 +11,15 @@ const HeroSection = () => {
     offset: ["start start", "end start"],
   });
 
-  const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
-  const videoScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
+  const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
+  const videoScale = useTransform(scrollYProgress, [0, 1], [1.03, 1.1]);
 
   return (
     <section
       ref={containerRef}
       className="
         relative w-full overflow-hidden
-        pt-24 md:pt-0
-        min-h-[calc(100vh-96px)] md:min-h-screen
+        h-[88vh]
         z-0
       "
     >
@@ -34,13 +33,14 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          className="w-full h-full object-cover brightness-90 contrast-105"
+          className="w-full h-full object-cover brightness-95 contrast-105"
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
 
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/55" />
+        {/* Softer overlay */}
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/50" />
       </motion.div>
 
       {/* CONTENT */}
@@ -48,23 +48,24 @@ const HeroSection = () => {
         <img
           src={logo}
           alt="Triponomic"
-          className="h-44 md:h-56 brightness-0 invert opacity-95 mb-6"
+          className="h-36 md:h-48 brightness-0 invert opacity-95 mb-4"
         />
 
-        <h1 className="text-5xl md:text-8xl font-bold text-white">
+        <h1 className="text-5xl md:text-7xl font-bold text-white">
           Triponomic
         </h1>
 
-        <p className="mt-4 text-sm md:text-xl tracking-[0.3em] text-white/90 uppercase">
+        <p className="mt-3 text-xs md:text-lg tracking-[0.35em] text-white/90 uppercase">
           Your Customized Travel Partner
         </p>
 
-        <p className="mt-4 text-xs md:text-base text-white/80 max-w-xl">
+        <p className="mt-3 text-xs md:text-base text-white/80 max-w-xl">
           Your Vision, Our Plan. Custom-built itineraries tailored to your needs.
         </p>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent z-10" />
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-background to-transparent z-10" />
     </section>
   );
 };
