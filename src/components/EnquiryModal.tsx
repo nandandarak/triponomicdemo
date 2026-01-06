@@ -26,6 +26,7 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
+            onClick={onClose}
           />
 
           {/* MODAL */}
@@ -34,10 +35,10 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed inset-4 md:inset-8 lg:inset-10 z-50 flex items-center justify-center"
+            className="fixed inset-4 md:inset-8 lg:inset-12 z-50 flex items-center justify-center"
           >
             <div className="w-full max-w-6xl h-[92vh] bg-[#FDFCF9] rounded-[32px] shadow-2xl overflow-hidden flex flex-col">
-              
+
               {/* HEADER */}
               <div className="bg-gradient-to-r from-[#638C7D] to-[#4A7066] px-8 py-6 flex items-center justify-between shrink-0">
                 <div>
@@ -57,7 +58,7 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
                 </button>
               </div>
 
-              {/* VERIFIED STRIP */}
+              {/* TRUST STRIP */}
               <div className="relative bg-[#FDFCF9] border-b border-[#D4AF37]/20 px-8 py-4 shrink-0">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border-2 border-[#D4AF37] flex items-center justify-center">
@@ -78,19 +79,28 @@ const EnquiryModal = ({ isOpen, onClose, destination }: EnquiryModalProps) => {
                 </div>
               </div>
 
-              {/* GOOGLE FORM */}
+              {/* FAKE INTRO (MASKS GOOGLE INTRO) */}
+              <div className="px-8 py-6 bg-[#FDFCF9] border-b">
+                <h3 className="text-xl font-medium text-foreground">
+                  Tell us about your trip
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Share a few details and our travel experts will reach out with a
+                  personalized plan tailored just for you.
+                </p>
+              </div>
+
+              {/* GOOGLE FORM (DISGUISED) */}
               <div className="flex-1 overflow-hidden bg-[#FDFCF9]">
-               <iframe
-  src={formUrl}
-  className="w-full h-full border-0"
-  style={{
-    marginTop: "-180px",
-    height: "calc(100% + 180px)",
-  }}
-  title="Enquiry Form"
-/>
-
-
+                <iframe
+                  src={formUrl}
+                  className="w-full h-full border-0"
+                  style={{
+                    marginTop: "-260px",
+                    height: "calc(100% + 260px)",
+                  }}
+                  title="Enquiry Form"
+                />
               </div>
             </div>
           </motion.div>
