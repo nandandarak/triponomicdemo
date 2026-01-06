@@ -37,7 +37,7 @@ const domesticCards = [
   {
   name: "Kashmir",
   image:
-    "https://images.unsplash.com/photo-1589556264800-08ae9e129a3b?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1609947017136-9daf32a5eb16?auto=format&fit=crop&w=900&q=80",
 },
   {
     name: "Kerala",
