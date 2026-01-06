@@ -21,19 +21,19 @@ const HeroSection = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.16,
+        staggerChildren: 0.15,
         delayChildren: 0.25,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 40, opacity: 0 }, // reduced from 70 → fixes big gap
+    hidden: { y: 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 1,
+        duration: 0.9,
         ease: "easeOut" as const,
       },
     },
@@ -62,8 +62,8 @@ const HeroSection = () => {
           </video>
 
           {/* Cinematic overlays */}
-          <div className="absolute inset-0 bg-black/30" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
+          <div className="absolute inset-0 bg-black/35" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/55" />
         </motion.div>
 
         {/* Hero Content */}
@@ -71,9 +71,9 @@ const HeroSection = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-20 max-w-4xl mx-auto text-center"
+          className="relative z-20 max-w-5xl mx-auto text-center"
         >
-          {/* Logo (bigger + closer to title) */}
+          {/* Logo */}
           <motion.div
             variants={itemVariants}
             className="mb-4 flex justify-center"
@@ -82,27 +82,27 @@ const HeroSection = () => {
               src={logo}
               alt="Triponomic"
               className="
-                h-36 md:h-40 lg:h-44
+                h-44 md:h-48 lg:h-52
                 w-auto object-contain
-                drop-shadow-[0_14px_40px_rgba(0,0,0,0.45)]
+                drop-shadow-[0_16px_45px_rgba(0,0,0,0.5)]
               "
             />
           </motion.div>
 
           {/* Title */}
-          <div className="overflow-hidden mb-5">
+          <div className="overflow-hidden mb-6">
             <motion.div variants={itemVariants} className="relative inline-block">
               {/* Ambient glow */}
               <motion.div
                 animate={{
-                  opacity: [0.12, 0.3, 0.12],
-                  scale: [1, 1.04, 1],
+                  opacity: [0.15, 0.35, 0.15],
+                  scale: [1, 1.06, 1],
                 }}
                 transition={{ duration: 4.5, repeat: Infinity }}
-                className="absolute inset-0 blur-3xl bg-primary/20 scale-150"
+                className="absolute inset-0 blur-3xl bg-primary/25 scale-150"
               />
 
-              <h1 className="relative font-primary text-5xl md:text-6xl lg:text-7xl font-bold text-primary-foreground drop-shadow-2xl tracking-tight">
+              <h1 className="relative font-primary text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-primary-foreground drop-shadow-2xl tracking-tight">
                 Triponomic
               </h1>
             </motion.div>
@@ -111,10 +111,10 @@ const HeroSection = () => {
           {/* Tagline */}
           <motion.div
             variants={itemVariants}
-            animate={{ y: [0, -5, 0] }}
+            animate={{ y: [0, -4, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <p className="text-lg md:text-xl text-primary-foreground font-secondary font-light tracking-[0.18em] uppercase drop-shadow-lg opacity-90">
+            <p className="text-xl md:text-2xl text-primary-foreground font-secondary font-light tracking-[0.2em] uppercase drop-shadow-lg opacity-90">
               Your Customized Travel Partner
             </p>
           </motion.div>
@@ -122,7 +122,7 @@ const HeroSection = () => {
           {/* Subtext */}
           <motion.p
             variants={itemVariants}
-            className="mt-5 text-sm md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-lg mx-auto leading-relaxed"
+            className="mt-5 text-sm md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-xl mx-auto leading-relaxed"
           >
             Your Vision, Our Plan. Custom-built itineraries
             <br className="hidden md:block" />
