@@ -35,10 +35,10 @@ const internationalDestinations = [
 /* Cards */
 const domesticCards = [
   {
-    name: "Kashmir",
-    image:
-      "https://images.unsplash.com/photo-1602473485900-3b9df7d0a8b8?auto=format&fit=crop&w=900&q=80",
-  },
+  name: "Kashmir",
+  image:
+    "https://images.unsplash.com/photo-1626509653291-86f6f5d2c33b?auto=format&fit=crop&w=900&q=80",
+},
   {
     name: "Kerala",
     image:
