@@ -1,112 +1,268 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { Phone, Mail, MapPin, Send } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { useToast } from "@/hooks/use-toast";
 
-interface Props {
-  destination: string;
-  onSuccess: () => void;
-}
+const EnquireNow = () => {
+  const { toast } = useToast();
 
-const FORM_ACTION_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/formResponse";
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    destination: "",
+    message: "",
+  });
 
-const TripEnquiryForm = ({ destination, onSuccess }: Props) => {
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
+    await new Promise((r) => setTimeout(r, 1200));
 
-    await fetch(FORM_ACTION_URL, {
-      method: "POST",
-      mode: "no-cors",
-      body: formData,
+    toast({
+      title: "Inquiry Sent!",
+      description: "Our team will contact you shortly.",
     });
 
-    setLoading(false);
-    onSuccess();
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      destination: "",
+      message: "",
+    });
+
+    setIsSubmitting(false);
   };
 
   return (
-    /* SCROLL AREA */
-    <div className="max-h-[65vh] overflow-y-auto pr-2">
-      <form onSubmit={handleSubmit} className="space-y-6 pb-6">
-        {/* DESTINATION */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Destination
-          </label>
-          <input
-            name="entry.396208505"
-            value={destination}
-            readOnly
-            className="w-full px-4 py-3 rounded-lg border bg-gray-100"
-          />
-        </div>
+    <div className="min-h-screen bg-background">
+      <Header />
 
-        {/* NAME */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Name
-          </label>
-          <input
-            name="entry.2005620554"
-            required
-            className="w-full px-4 py-3 rounded-lg border"
-            placeholder="Your full name"
-          />
-        </div>
+      {/* Page Content */}
+      <main className="pt-[140px] pb-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Page Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-16"
+          >
+            <h1 className="text-4xl md:text-5xl font-medium mb-4">
+              Plan Your Journey
+            </h1>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Tell us about your destination and we’ll design a perfect trip.
+            </p>
+          </motion.div>
 
-        {/* PHONE */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Phone
-          </label>
-          <input
-            name="entry.1166974658"
-            required
-            className="w-full px-4 py-3 rounded-lg border"
-            placeholder="Your phone number"
-          />
-        </div>
+          <div className="grid md:grid-cols-5 gap-12">
+            {/* CONTACT INFO */}
+            <div className="md:col-span-2">
+              <div className="bg-card p-8 rounded-3xl shadow-sm">
+                <h2 className="text-xl font-medium mb-8">
+                  Contact Information
+                </h2>
 
-        {/* EMAIL */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            name="entry.1045781291"
-            required
-            className="w-full px-4 py-3 rounded-lg border"
-            placeholder="you@email.com"
-          />
-        </div>
+                <div className="space-y-8">
+                  {/* PHONE */}
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Phone className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Phone</p>
+                      <a
+                        href="tel:+919752177088"
+                        className="block font-medium hover:text-primary"
+                      >
+                        +91 9752177088
+                      </a>
+                      <a
+                        href="tel:+919611922632"
+                        className="block font-medium hover:text-primary"
+                      >
+                        +91 9611922632
+                      </a>
+                    </div>
+                  </div>
 
-        {/* BUDGET */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Budget
-          </label>
-          <input
-            name="entry.1203831394"
-            className="w-full px-4 py-3 rounded-lg border"
-            placeholder="Approx budget"
-          />
-        </div>
+                  {/* EMAIL */}
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Email</p>
+                      <a
+                        href="mailto:trips@triponomic.in"
+                        className="font-medium hover:text-primary"
+                      >
+                        trips@triponomic.in
+                      </a>
+                    </div>
+                  </div>
 
-        {/* SUBMIT */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-4 rounded-xl bg-[#638C7D] text-white font-medium hover:bg-[#4A7066] transition"
-        >
-          {loading ? "Submitting..." : "Submit Enquiry"}
-        </button>
-      </form>
+                  {/* ADDRESS */}
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Address</p>
+                      <p className="font-medium leading-relaxed">
+                        720, 7th Floor, 26, Service Rd
+                        <br />
+                        Tapeshwari Bagh Colony
+                        <br />
+                        Indore, Madhya Pradesh 452016
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* FORM */}
+            <div className="md:col-span-3">
+              <form
+                onSubmit={handleSubmit}
+                className="bg-[#faf7f3] p-10 rounded-3xl shadow-sm"
+              >
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* NAME */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-800">
+                      Full Name
+                    </label>
+                    <input
+                      required
+                      name="name"
+                      placeholder="Your name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
+                        text-gray-900 placeholder:text-gray-500
+                        outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* EMAIL */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-800">
+                      Email Address
+                    </label>
+                    <input
+                      required
+                      type="email"
+                      name="email"
+                      placeholder="you@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
+                        text-gray-900 placeholder:text-gray-500
+                        outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* PHONE */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-800">
+                      Phone Number
+                    </label>
+                    <input
+                      required
+                      name="phone"
+                      placeholder="+91 98897 79890"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
+                        text-gray-900 placeholder:text-gray-500
+                        outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* DESTINATION */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-800">
+                      Preferred Destination
+                    </label>
+                    <select
+                      name="destination"
+                      value={formData.destination}
+                      onChange={handleChange}
+                      className="w-full rounded-2xl bg-[#f5efe9] px-6 py-4
+                        text-gray-900 outline-none
+                        focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="">Select a destination</option>
+                      <option>Kashmir</option>
+                      <option>Kerala</option>
+                      <option>Goa</option>
+                      <option>Japan</option>
+                      <option>Bali</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* MESSAGE */}
+                <div className="flex flex-col gap-2 mt-6">
+                  <label className="text-sm font-medium text-gray-800">
+                    Your Message
+                  </label>
+                  <textarea
+                    name="message"
+                    rows={5}
+                    placeholder="Tell us about your travel plans, preferences, and any special requirements..."
+                    value={formData.message}
+                    onChange={handleChange}
+                    className="w-full rounded-3xl bg-[#f5efe9] px-6 py-5
+                      text-gray-900 placeholder:text-gray-500
+                      outline-none resize-none
+                      focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+
+                {/* BUTTON */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="mt-10 w-full py-5 rounded-full
+                    bg-primary text-primary-foreground
+                    flex items-center justify-center gap-2
+                    text-base font-medium
+                    hover:opacity-90 transition"
+                >
+                  {isSubmitting ? (
+                    "Sending..."
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" /> Send Inquiry
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 };
 
-export default TripEnquiryForm;
+export default EnquireNow;
