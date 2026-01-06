@@ -60,9 +60,11 @@ const servicesList = [
 const DesktopDropdown = ({
   title,
   items,
+  onSelect,
 }: {
   title: string;
   items: { label: string; icon?: any }[];
+  onSelect?: (label: string) => void;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -97,13 +99,17 @@ const DesktopDropdown = ({
 
                 <div className="space-y-2">
                   {items.map(({ label, icon: Icon }) => (
-                    <div
+                    <button
                       key={label}
-                      className="flex items-center gap-3 px-4 py-2 rounded-xl bg-background/60 text-xs"
+                      onClick={() => {
+                        onSelect?.(label);
+                        setOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2 rounded-xl bg-background/60 hover:bg-primary hover:text-primary-foreground text-xs transition text-left"
                     >
-                      {Icon && <Icon className="w-4 h-4 text-primary" />}
+                      {Icon && <Icon className="w-4 h-4" />}
                       {label}
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -131,7 +137,7 @@ const Header = () => {
 
   return (
     <>
-      {/* HEADER BAR */}
+      {/* HEADER */}
       <header className="fixed top-0 left-0 right-0 z-[10000] px-4 py-4">
         <motion.div
           className="mx-auto max-w-7xl rounded-full px-6 py-3 flex items-center justify-between glass-header"
@@ -154,6 +160,18 @@ const Header = () => {
           {/* DESKTOP NAV */}
           <nav className="hidden md:flex items-center gap-8">
             <DesktopDropdown
+              title="Domestic"
+              items={domesticDestinations.map((d) => ({ label: d }))}
+              onSelect={setSelectedDestination}
+            />
+
+            <DesktopDropdown
+              title="International"
+              items={internationalDestinations.map((d) => ({ label: d }))}
+              onSelect={setSelectedDestination}
+            />
+
+            <DesktopDropdown
               title="Services"
               items={servicesList}
             />
@@ -175,7 +193,7 @@ const Header = () => {
         </motion.div>
       </header>
 
-      {/* MOBILE MENU (UNCHANGED – WORKING) */}
+      {/* MOBILE MENU (unchanged & working) */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
@@ -208,6 +226,7 @@ const Header = () => {
         )}
       </AnimatePresence>
 
+      {/* ENQUIRY MODAL */}
       <EnquiryModal
         isOpen={!!selectedDestination}
         destination={selectedDestination ?? ""}
