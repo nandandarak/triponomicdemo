@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import DestinationRow from "@/components/DestinationRow";
 import SelectionModal from "@/components/SelectionModal";
-import EnquiryModal from "@/components/EnquiryModal";
+import GoogleFormModal from "@/components/GoogleFormModal";
 import Footer from "@/components/Footer";
 
 /* Destination Lists */
@@ -80,7 +80,7 @@ const Index = () => {
     type: "domestic",
   });
 
-  /* Enquiry Modal */
+  /* Google Form Enquiry Modal */
   const [enquiryModal, setEnquiryModal] = useState<{
     isOpen: boolean;
     destination: string;
@@ -161,12 +161,13 @@ const Index = () => {
         }}
       />
 
-      {/* Enquiry Modal */}
-      <EnquiryModal
-        isOpen={enquiryModal.isOpen}
-        onClose={closeEnquiry}
-        destination={enquiryModal.destination}
-      />
+      {/* Google Form Enquiry Modal */}
+      {enquiryModal.isOpen && (
+        <GoogleFormModal
+          destination={enquiryModal.destination}
+          onClose={closeEnquiry}
+        />
+      )}
     </div>
   );
 };
