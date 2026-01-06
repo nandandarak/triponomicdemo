@@ -55,72 +55,6 @@ const servicesList = [
   { label: "Cruise Holidays", icon: Ship },
 ];
 
-/* ---------------- DESKTOP DROPDOWN ---------------- */
-
-const DesktopDropdown = ({
-  title,
-  items,
-  onSelect,
-}: {
-  title: string;
-  items: { label: string; icon?: any }[];
-  onSelect?: (label: string) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((p) => !p)}
-        className="nav-link flex items-center gap-1"
-      >
-        {title}
-        <ChevronDown className={`w-4 h-4 transition ${open ? "rotate-180" : ""}`} />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-[9998]"
-              onClick={() => setOpen(false)}
-            />
-
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full mt-4 left-1/2 -translate-x-1/2 z-[9999]"
-            >
-              <div className="bg-card rounded-2xl p-6 min-w-[320px] shadow-xl border">
-                <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold">
-                  {title}
-                </p>
-
-                <div className="space-y-2">
-                  {items.map(({ label, icon: Icon }) => (
-                    <button
-                      key={label}
-                      onClick={() => {
-                        onSelect?.(label);
-                        setOpen(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-2 rounded-xl bg-background/60 hover:bg-primary hover:text-primary-foreground text-xs transition text-left"
-                    >
-                      {Icon && <Icon className="w-4 h-4" />}
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
 /* ---------------- HEADER ---------------- */
 
 const Header = () => {
@@ -128,6 +62,7 @@ const Header = () => {
   const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  /* Scroll effect */
   useEffect(() => {
     const onScroll = () =>
       setIsScrolled(window.scrollY > window.innerHeight * 0.6);
@@ -135,10 +70,26 @@ const Header = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* Lock body scroll when modal opens */
+  useEffect(() => {
+    if (selectedDestination) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedDestination]);
+
   return (
     <>
       {/* HEADER */}
-      <header className="fixed top-0 left-0 right-0 z-[10000] px-4 py-4">
+      <header
+        className={`fixed top-0 left-0 right-0 z-[10000] px-4 py-4 transition-opacity duration-300 ${
+          selectedDestination ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
         <motion.div
           className="mx-auto max-w-7xl rounded-full px-6 py-3 flex items-center justify-between glass-header"
           animate={{
@@ -159,22 +110,9 @@ const Header = () => {
 
           {/* DESKTOP NAV */}
           <nav className="hidden md:flex items-center gap-8">
-            <DesktopDropdown
-              title="Domestic"
-              items={domesticDestinations.map((d) => ({ label: d }))}
-              onSelect={setSelectedDestination}
-            />
-
-            <DesktopDropdown
-              title="International"
-              items={internationalDestinations.map((d) => ({ label: d }))}
-              onSelect={setSelectedDestination}
-            />
-
-            <DesktopDropdown
-              title="Services"
-              items={servicesList}
-            />
+            <span className="nav-link">Domestic</span>
+            <span className="nav-link">International</span>
+            <span className="nav-link">Services</span>
 
             <Link to="/enquire">
               <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
@@ -193,21 +131,68 @@ const Header = () => {
         </motion.div>
       </header>
 
-      {/* MOBILE MENU (unchanged & working) */}
+      {/* MOBILE MENU */}
       <AnimatePresence>
-        {mobileMenuOpen && (
+        {mobileMenuOpen && !selectedDestination && (
           <>
+            {/* Backdrop */}
             <motion.div
               className="fixed inset-0 z-[9998] bg-black/40 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
             />
+
+            {/* Menu Card */}
             <motion.div
-              className="fixed top-[96px] left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md bg-card rounded-2xl p-6 shadow-2xl"
+              className="fixed top-[96px] left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md bg-card rounded-2xl p-6 shadow-2xl border border-border/50"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
             >
+              {/* Domestic */}
+              <p className="text-xs font-bold mb-3">Domestic</p>
+              <div className="flex flex-wrap gap-2 mb-5">
+                {domesticDestinations.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => {
+                      setSelectedDestination(d);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-2 bg-background/70 rounded-full text-xs"
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+
+              {/* International */}
+              <p className="text-xs font-bold mb-3">International</p>
+              <div className="flex flex-wrap gap-2 mb-5">
+                {internationalDestinations.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => {
+                      setSelectedDestination(d);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-2 bg-background/70 rounded-full text-xs"
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+
+              {/* Services */}
               <p className="text-xs font-bold mb-3">Services</p>
               <div className="space-y-2 mb-6">
                 {servicesList.map(({ label, icon: Icon }) => (
-                  <div key={label} className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs">
+                  <div
+                    key={label}
+                    className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs"
+                  >
                     <Icon className="w-4 h-4 text-primary" />
                     {label}
                   </div>
