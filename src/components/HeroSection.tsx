@@ -61,7 +61,7 @@ const HeroSection = () => {
             <source src={heroVideo} type="video/mp4" />
           </video>
 
-          {/* Clean cinematic overlay */}
+          {/* Cinematic overlays */}
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
         </motion.div>
@@ -73,41 +73,26 @@ const HeroSection = () => {
           animate="visible"
           className="relative z-20 max-w-4xl mx-auto text-center"
         >
-          {/* Logo */}
+          {/* Logo (NO BOX) */}
           <motion.div
             variants={itemVariants}
-            className="mb-8 flex justify-center"
+            className="mb-10 flex justify-center"
           >
-            <div
+            <img
+              src={logo}
+              alt="Triponomic"
               className="
-                relative rounded-[28px]
-                p-6 md:p-7
-                bg-white/15
-                backdrop-blur-xl
-                border border-white/20
-                shadow-[0_20px_60px_rgba(0,0,0,0.35)]
+                h-20 md:h-24 lg:h-28
+                w-auto object-contain
+                drop-shadow-[0_12px_30px_rgba(0,0,0,0.45)]
               "
-            >
-              {/* soft edge highlight */}
-              <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-gradient-to-br from-white/30 via-transparent to-transparent" />
-
-              <img
-                src={logo}
-                alt="Triponomic"
-                className="
-                  relative
-                  h-20 md:h-24 lg:h-28
-                  w-auto object-contain
-                  drop-shadow-[0_10px_25px_rgba(0,0,0,0.35)]
-                "
-              />
-            </div>
+            />
           </motion.div>
 
           {/* Title */}
           <div className="overflow-hidden mb-6">
             <motion.div variants={itemVariants} className="relative inline-block">
-              {/* subtle ambient glow */}
+              {/* Ambient glow */}
               <motion.div
                 animate={{
                   opacity: [0.15, 0.35, 0.15],
@@ -145,7 +130,7 @@ const HeroSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* Bottom fade (natural section blend) */}
+        {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background via-background/80 to-transparent z-20 pointer-events-none" />
       </section>
     </div>
