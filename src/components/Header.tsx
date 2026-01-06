@@ -190,7 +190,7 @@ const Header = () => {
         </motion.div>
       </header>
 
-      {/* MOBILE MENU */}
+      {/* MOBILE MENU — SERVICES ONLY */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
@@ -215,47 +215,13 @@ const Header = () => {
                 overflow-y-auto
               "
             >
-              {/* DOMESTIC */}
-              <p className="text-xs font-bold mb-2">Domestic</p>
-              <div className="space-y-2 mb-6">
-                {domesticDestinations.map((place) => (
-                  <button
-                    key={place}
-                    onClick={() => {
-                      setSelectedDestination(place);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 rounded-xl bg-background/70 text-xs"
-                  >
-                    {place}
-                  </button>
-                ))}
-              </div>
+              <p className="text-xs font-bold mb-3">Services</p>
 
-              {/* INTERNATIONAL */}
-              <p className="text-xs font-bold mb-2">International</p>
-              <div className="space-y-2 mb-6">
-                {internationalDestinations.map((place) => (
-                  <button
-                    key={place}
-                    onClick={() => {
-                      setSelectedDestination(place);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 rounded-xl bg-background/70 text-xs"
-                  >
-                    {place}
-                  </button>
-                ))}
-              </div>
-
-              {/* SERVICES */}
-              <p className="text-xs font-bold mb-2">Services</p>
               <div className="space-y-2 mb-6">
                 {servicesList.map(({ label, icon: Icon }) => (
                   <div
                     key={label}
-                    className="flex items-center gap-3 px-4 py-2 bg-background/70 rounded-xl text-xs"
+                    className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs"
                   >
                     <Icon className="w-4 h-4 text-primary" />
                     {label}
