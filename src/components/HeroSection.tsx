@@ -15,7 +15,6 @@ const HeroSection = () => {
   const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const videoScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -40,10 +39,14 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full">
+    <div className="relative w-full">
       <section
         ref={containerRef}
-        className="relative min-h-screen w-full flex items-center justify-center px-6 overflow-hidden z-10"
+        className="
+          relative w-full flex items-center justify-center px-6 overflow-hidden z-10
+          pt-24 md:pt-0
+          min-h-[calc(100vh-96px)] md:min-h-screen
+        "
       >
         {/* Video Background */}
         <motion.div
@@ -61,7 +64,6 @@ const HeroSection = () => {
             <source src={heroVideo} type="video/mp4" />
           </video>
 
-          {/* Cinematic overlays */}
           <div className="absolute inset-0 bg-black/35" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/55" />
         </motion.div>
@@ -73,7 +75,7 @@ const HeroSection = () => {
           animate="visible"
           className="relative z-20 max-w-5xl mx-auto text-center"
         >
-          {/* LOGO (WHITE, BIG, SLIGHT OVERLAP) */}
+          {/* LOGO */}
           <motion.div
             variants={itemVariants}
             className="-mb-8 flex justify-center"
@@ -82,7 +84,7 @@ const HeroSection = () => {
               src={logo}
               alt="Triponomic"
               className="
-                h-52 md:h-56 lg:h-60
+                h-44 md:h-56 lg:h-60
                 w-auto object-contain
                 brightness-0 invert opacity-95
                 drop-shadow-[0_20px_55px_rgba(0,0,0,0.65)]
@@ -93,7 +95,6 @@ const HeroSection = () => {
           {/* TITLE */}
           <div className="overflow-hidden mb-8">
             <motion.div variants={itemVariants} className="relative inline-block">
-              {/* Ambient glow */}
               <motion.div
                 animate={{
                   opacity: [0.15, 0.35, 0.15],
@@ -103,7 +104,7 @@ const HeroSection = () => {
                 className="absolute inset-0 blur-3xl bg-primary/25 scale-150"
               />
 
-              <h1 className="relative font-primary text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-primary-foreground drop-shadow-2xl tracking-tight">
+              <h1 className="relative font-primary text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-primary-foreground drop-shadow-2xl tracking-tight">
                 Triponomic
               </h1>
             </motion.div>
@@ -115,7 +116,7 @@ const HeroSection = () => {
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <p className="text-xl md:text-2xl text-primary-foreground font-secondary font-light tracking-[0.2em] uppercase drop-shadow-lg opacity-90">
+            <p className="text-lg md:text-2xl text-primary-foreground font-secondary font-light tracking-[0.2em] uppercase drop-shadow-lg opacity-90">
               Your Customized Travel Partner
             </p>
           </motion.div>
@@ -123,7 +124,7 @@ const HeroSection = () => {
           {/* SUBTEXT */}
           <motion.p
             variants={itemVariants}
-            className="mt-5 text-sm md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-xl mx-auto leading-relaxed"
+            className="mt-5 text-xs md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-xl mx-auto leading-relaxed"
           >
             Your Vision, Our Plan. Custom-built itineraries
             <br className="hidden md:block" />
