@@ -1,11 +1,12 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import heroVideo from "@/assets/hero-train-video.mp4";
+import logo from "@/assets/logo.png";
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Parallax effect (safe & layout-stable)
+  // Parallax effect
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
@@ -39,7 +40,6 @@ const HeroSection = () => {
   };
 
   return (
-    /* OUTER WRAPPER — reserves layout space (IMPORTANT) */
     <div className="relative min-h-screen w-full">
       <section
         ref={containerRef}
@@ -61,9 +61,9 @@ const HeroSection = () => {
             <source src={heroVideo} type="video/mp4" />
           </video>
 
-          {/* Overlays */}
-          <div className="absolute inset-0 bg-black/25" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#2f6f73]/20 via-transparent to-black/40" />
+          {/* Clean overlay - no dotted patterns or radial gradients */}
+          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
         </motion.div>
 
         {/* Hero Content */}
@@ -73,20 +73,34 @@ const HeroSection = () => {
           animate="visible"
           className="relative z-20 max-w-4xl mx-auto text-center"
         >
+          {/* Logo with Glassmorphism Container */}
+          <motion.div 
+            variants={itemVariants}
+            className="mb-8 flex justify-center"
+          >
+            <div className="glass-logo-container rounded-3xl p-6 md:p-8">
+              <img 
+                src={logo} 
+                alt="Triponomic" 
+                className="h-24 md:h-32 lg:h-40 w-auto object-contain"
+              />
+            </div>
+          </motion.div>
+
           {/* Title */}
           <div className="overflow-hidden mb-6">
             <motion.div variants={itemVariants} className="relative inline-block">
-              {/* Glow */}
+              {/* Subtle Glow */}
               <motion.div
                 animate={{
-                  opacity: [0.35, 0.6, 0.35],
-                  scale: [1, 1.1, 1],
+                  opacity: [0.2, 0.4, 0.2],
+                  scale: [1, 1.05, 1],
                 }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="absolute inset-0 blur-3xl bg-[#638C7D]/40 scale-150"
+                className="absolute inset-0 blur-3xl bg-primary/20 scale-150"
               />
 
-              <h1 className="relative font-script text-7xl md:text-8xl lg:text-9xl font-semibold text-white italic drop-shadow-2xl tracking-tight">
+              <h1 className="relative font-primary text-6xl md:text-7xl lg:text-8xl font-bold text-primary-foreground drop-shadow-2xl tracking-tight">
                 Triponomic
               </h1>
             </motion.div>
@@ -98,7 +112,7 @@ const HeroSection = () => {
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <p className="text-xl md:text-2xl text-white font-light tracking-[0.2em] uppercase drop-shadow-lg opacity-90">
+            <p className="text-xl md:text-2xl text-primary-foreground font-secondary font-light tracking-[0.2em] uppercase drop-shadow-lg opacity-90">
               Your Customized Travel Partner
             </p>
           </motion.div>
@@ -106,7 +120,7 @@ const HeroSection = () => {
           {/* Sub text */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 text-sm md:text-base text-white/80 font-light tracking-widest italic max-w-lg mx-auto leading-relaxed"
+            className="mt-6 text-sm md:text-base text-primary-foreground/80 font-secondary font-light tracking-widest max-w-lg mx-auto leading-relaxed"
           >
             Your Vision, Our Plan. Custom-built itineraries
             <br className="hidden md:block" />
@@ -114,8 +128,8 @@ const HeroSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* Bottom Fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none" />
+        {/* Bottom Fade - clean solid color transition */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background via-background/80 to-transparent z-20 pointer-events-none" />
       </section>
     </div>
   );
