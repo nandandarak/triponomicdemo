@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const EnquireNow = () => {
   const { toast } = useToast();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,12 +15,11 @@ const EnquireNow = () => {
     destination: "",
     message: "",
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -28,11 +28,11 @@ const EnquireNow = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((r) => setTimeout(r, 1200));
 
     toast({
       title: "Inquiry Sent!",
-      description: "We'll get back to you within 24 hours.",
+      description: "Our team will contact you shortly.",
     });
 
     setFormData({
@@ -42,6 +42,7 @@ const EnquireNow = () => {
       destination: "",
       message: "",
     });
+
     setIsSubmitting(false);
   };
 
@@ -49,208 +50,155 @@ const EnquireNow = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="pt-32 pb-16 px-6">
+      {/* IMPORTANT padding so header doesn't overlap */}
+      <main className="pt-[140px] pb-16 px-6">
         <div className="max-w-6xl mx-auto">
-          {/* Page Header */}
+          {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-3">
-              Get in Touch
-            </p>
-            <h1 className="text-4xl md:text-5xl font-medium text-foreground mb-4">
+            <h1 className="text-4xl md:text-5xl font-medium mb-4">
               Plan Your Journey
             </h1>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Tell us about your dream destination and we'll craft a personalized
-              experience just for you.
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Tell us about your destination and we’ll design a perfect trip.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-5 gap-12">
             {/* CONTACT INFO */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="md:col-span-2 space-y-8"
-            >
-              <div className="bg-card rounded-card p-8 shadow-card">
-                <h2 className="text-xl font-medium text-foreground mb-6">
+            <div className="md:col-span-2">
+              <div className="bg-card p-8 rounded-2xl shadow-card">
+                <h2 className="text-xl font-medium mb-6">
                   Contact Information
                 </h2>
 
                 <div className="space-y-6">
-                  {/* Phone */}
-                  <div className="flex items-start gap-4">
+                  {/* PHONE */}
+                  <div className="flex gap-4">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <Phone className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Phone
-                      </p>
+                      <p className="text-sm text-muted-foreground">Phone</p>
                       <a
                         href="tel:+919752177088"
-                        className="block text-foreground font-medium hover:text-primary transition-colors"
+                        className="block font-medium hover:text-primary"
                       >
-                        +91 97521 77088
+                        +91 9752177088
                       </a>
                       <a
                         href="tel:+919611922632"
-                        className="block text-foreground font-medium hover:text-primary transition-colors"
+                        className="block font-medium hover:text-primary"
                       >
-                        +91 96119 22632
+                        +91 9611922632
                       </a>
                     </div>
                   </div>
 
-                  {/* Email */}
-                  <div className="flex items-start gap-4">
+                  {/* EMAIL */}
+                  <div className="flex gap-4">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <Mail className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Email
-                      </p>
+                      <p className="text-sm text-muted-foreground">Email</p>
                       <a
                         href="mailto:trips@triponomic.in"
-                        className="text-foreground font-medium hover:text-primary transition-colors"
+                        className="font-medium hover:text-primary"
                       >
                         trips@triponomic.in
                       </a>
                     </div>
                   </div>
 
-                  {/* Address */}
-                  <div className="flex items-start gap-4">
+                  {/* ADDRESS */}
+                  <div className="flex gap-4">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <MapPin className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Address
-                      </p>
-                      <p className="text-foreground font-medium leading-relaxed">
-                        720, 7th Floor, 26, Service Rd, Tapeshwari Bagh Colony,
-                        <br />
+                      <p className="text-sm text-muted-foreground">Address</p>
+                      <p className="font-medium leading-relaxed">
+                        720, 7th Floor, 26, Service Rd<br />
+                        Tapeshwari Bagh Colony<br />
                         Indore, Madhya Pradesh 452016
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* FORM */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="md:col-span-3"
-            >
+            <div className="md:col-span-3">
               <form
                 onSubmit={handleSubmit}
-                className="bg-card rounded-card p-8 shadow-card"
+                className="bg-card p-8 rounded-2xl shadow-card"
               >
                 <div className="grid md:grid-cols-2 gap-6">
-                  {/* Name */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-button bg-secondary/50 border border-border/50"
-                      placeholder="Your name"
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-button bg-secondary/50 border border-border/50"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-button bg-secondary/50 border border-border/50"
-                      placeholder="+91 97521 77088"
-                    />
-                  </div>
-
-                  {/* Destination */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Preferred Destination
-                    </label>
-                    <select
-                      name="destination"
-                      value={formData.destination}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-button bg-secondary/50 border border-border/50"
-                    >
-                      <option value="">Select a destination</option>
-                      <option value="Domestic">Domestic</option>
-                      <option value="International">International</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Message */}
-                <div className="mt-6">
-                  <label className="block text-sm font-medium mb-2">
-                    Your Message
-                  </label>
-                  <textarea
-                    name="message"
-                    rows={5}
-                    value={formData.message}
+                  <input
+                    required
+                    name="name"
+                    placeholder="Full Name"
+                    value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-button bg-secondary/50 border border-border/50 resize-none"
-                    placeholder="Tell us about your travel plans..."
+                    className="input"
                   />
+                  <input
+                    required
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="input"
+                  />
+                  <input
+                    required
+                    name="phone"
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="input"
+                  />
+                  <select
+                    name="destination"
+                    value={formData.destination}
+                    onChange={handleChange}
+                    className="input"
+                  >
+                    <option value="">Select Destination</option>
+                    <option>Kashmir</option>
+                    <option>Kerala</option>
+                    <option>Goa</option>
+                    <option>Japan</option>
+                    <option>Bali</option>
+                  </select>
                 </div>
 
-                {/* Submit */}
+                <textarea
+                  name="message"
+                  rows={5}
+                  placeholder="Your travel requirements..."
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="input mt-6 resize-none"
+                />
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="mt-8 w-full py-4 bg-primary text-primary-foreground rounded-button font-medium flex items-center justify-center gap-2"
+                  className="mt-8 w-full py-4 bg-primary text-primary-foreground rounded-full flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? "Sending..." : <>
-                    <Send className="w-5 h-5" /> Send Inquiry
+                    <Send className="w-4 h-4" /> Send Inquiry
                   </>}
                 </button>
               </form>
-            </motion.div>
+            </div>
           </div>
         </div>
       </main>
