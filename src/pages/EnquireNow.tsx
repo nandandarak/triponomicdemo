@@ -30,22 +30,46 @@ const EnquireNow = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await new Promise((r) => setTimeout(r, 1200));
+    const url = "https://docs.google.com/forms/d/e/1FAIpQLSf88dmE-ehVNUPjVmyOcUSWPMo4Bc5J46-OFaCLHL63nMh45w/formResponse";
+    
+    const formParams = new URLSearchParams();
+    formParams.append("entry.923065776", formData.name);
+    formParams.append("entry.729870809", formData.email);
+    formParams.append("entry.1797843080", formData.phone);
+    formParams.append("entry.1652213528", formData.destination);
+    formParams.append("entry.1164108945", formData.message);
 
-    toast({
-      title: "Inquiry Sent!",
-      description: "Our team will contact you shortly.",
-    });
+    try {
+      await fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        body: formParams,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
 
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      destination: "",
-      message: "",
-    });
+      toast({
+        title: "Inquiry Sent!",
+        description: "Our team will contact you shortly.",
+      });
 
-    setIsSubmitting(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        destination: "",
+        message: "",
+      });
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "Please try again later or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

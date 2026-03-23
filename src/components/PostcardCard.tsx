@@ -21,41 +21,43 @@ interface PostcardCardProps {
 }
 
 const defaultDestinationData: Record<string, DestinationData> = {
-  Kashmir: {
-    duration: "5–7 Days",
-    investment: "₹35,000*",
-    bestTime: "Mar – Oct",
-  },
+  // Domestic
+  "Leh Ladakh": { duration: "6–8 Days", investment: "₹35,000*", bestTime: "Jun – Sep" },
+  "Spiti": { duration: "6–8 Days", investment: "₹25,000*", bestTime: "Jun – Sep" },
+  Kashmir: { duration: "5–7 Days", investment: "₹25,000*", bestTime: "Mar – Oct" },
+  Meghalaya: { duration: "5–7 Days", investment: "₹30,000*", bestTime: "Oct – May" },
+  Sikkim: { duration: "5–7 Days", investment: "₹25,000*", bestTime: "Mar – May, Oct – Dec" },
+  "Arunachal Pradesh": { duration: "6–8 Days", investment: "₹30,000*", bestTime: "Oct – Apr" },
+  Himachal: { duration: "5–7 Days", investment: "₹17,000*", bestTime: "Mar – Jun, Sep – Dec" },
+  Uttarakhand: { duration: "5–7 Days", investment: "₹20,000*", bestTime: "Mar – Jun, Sep – Nov" },
+  Kerala: { duration: "4–6 Days", investment: "₹30,000*", bestTime: "Sep – Mar" },
+  Goa: { duration: "4–5 Days", investment: "₹20,000*", bestTime: "Nov – Feb" },
+  Rajasthan: { duration: "5–7 Days", investment: "₹25,000*", bestTime: "Oct – Mar" },
+  Andaman: { duration: "5–7 Days", investment: "₹35,000*", bestTime: "Oct – May" },
+  Mumbai: { duration: "2-3 Days", investment: "₹15,000*", bestTime: "Oct - Mar" },
+  Pune: { duration: "2-3 Days", investment: "₹12,000*", bestTime: "Oct - Feb" },
 
-  Kerala: {
-    duration: "4–6 Days",
-    investment: "₹30,000*",
-    bestTime: "Sep – Mar",
-  },
-
-  Goa: {
-    duration: "4–5 Days",
-    investment: "₹25,000*",
-    bestTime: "Nov – Feb",
-  },
-
-  Japan: {
-    duration: "7–10 Days",
-    investment: "₹1,50,000*",
-    bestTime: "Mar – May",
-  },
-
-  Bali: {
-    duration: "5–7 Days",
-    investment: "₹75,000*",
-    bestTime: "Apr – Oct",
-  },
-
-  "South Korea": {
-    duration: "6–8 Days",
-    investment: "₹1,20,000*",
-    bestTime: "Mar – May",
-  },
+  // International 
+  Vietnam: { duration: "5–7 Days", investment: "₹80,000*", bestTime: "Nov – Apr" },
+  Thailand: { duration: "5–7 Days", investment: "₹70,000*", bestTime: "Nov – Apr" },
+  "Sri Lanka": { duration: "5–7 Days", investment: "₹60,000*", bestTime: "Dec – Apr" },
+  Malaysia: { duration: "5–7 Days", investment: "₹70,000*", bestTime: "Mar – Oct" },
+  Kazakhstan: { duration: "6–8 Days", investment: "₹75,000*", bestTime: "May – Sep" },
+  Philippines: { duration: "6–8 Days", investment: "₹1,20,000*", bestTime: "Dec – May" },
+  Bali: { duration: "5–7 Days", investment: "₹80,000*", bestTime: "Apr – Oct" },
+  Egypt: { duration: "6–8 Days", investment: "₹90,000*", bestTime: "Oct – Apr" },
+  Turkey: { duration: "7–10 Days", investment: "₹1,50,000*", bestTime: "Apr – May, Sep – Nov" },
+  Kenya: { duration: "6–8 Days", investment: "₹1,50,000*", bestTime: "Jul – Oct" },
+  "South Africa": { duration: "8–12 Days", investment: "₹1,70,000*", bestTime: "May – Oct" },
+  Mauritius: { duration: "6–8 Days", investment: "₹1,30,000*", bestTime: "May – Dec" },
+  "South Korea": { duration: "6–8 Days", investment: "₹1,50,000*", bestTime: "Mar – May, Sep – Nov" },
+  Japan: { duration: "7–10 Days", investment: "₹2,00,000*", bestTime: "Mar – May, Sep – Nov" },
+  Maldives: { duration: "4–6 Days", investment: "₹1,70,000*", bestTime: "Nov – Apr" },
+  France: { duration: "7–10 Days", investment: "₹2,50,000*", bestTime: "Apr – Jun, Sep – Nov" },
+  Spain: { duration: "7–10 Days", investment: "₹2,50,000*", bestTime: "Apr – Jun, Sep – Oct" },
+  Switzerland: { duration: "7–10 Days", investment: "₹2,50,000*", bestTime: "Jun – Aug, Dec – Mar" },
+  "New Zealand": { duration: "10–14 Days", investment: "₹3,50,000*", bestTime: "Dec – Feb" },
+  Australia: { duration: "10–14 Days", investment: "₹2,90,000*", bestTime: "Sep – Nov, Mar – May" },
 };
 
 
@@ -80,13 +82,7 @@ const PostcardCard = ({
     };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="w-full perspective-1000"
-    >
+    <div className="w-full perspective-1000">
       {!isGateway ? (
         <div
           className="relative w-full aspect-[3/4] cursor-pointer"
@@ -186,7 +182,7 @@ const PostcardCard = ({
           </p>
         </button>
       )}
-    </motion.div>
+    </div>
   );
 };
 

@@ -14,6 +14,7 @@ import {
   Ship,
   MapPin,
   Globe,
+  Phone,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagneticButton from "./MagneticButton";
@@ -23,32 +24,44 @@ import logo from "@/assets/logo.png";
 /* ---------------- DATA ---------------- */
 
 const domesticDestinations = [
-  "Mumbai",
-  "Pune",
-  "Goa",
-  "Leh-Ladakh",
-  "Jaipur",
-  "Kerala",
-  "Manali",
-  "Rishikesh",
-  "Udaipur",
+  "Leh Ladakh",
   "Spiti Valley",
+  "Kashmir",
+  "Meghalaya",
+  "Sikkim",
+  "Arunachal Pradesh",
+  "Himachal",
+  "Uttarakhand",
+  "Kerala",
+  "Goa",
+  "Rajasthan",
+  "Andaman",
 ];
 
 const internationalDestinations = [
-  "Japan",
-  "Bali",
-  "South Korea",
-  "Thailand",
   "Vietnam",
-  "Iceland",
+  "Bali",
+  "Japan",
+  "Kenya",
+  "Thailand",
+  "Egypt",
+  "Sri Lanka",
+  "Philippines",
+  "Kazakhstan",
+  "Maldives",
   "Turkey",
-  "Singapore",
+  "South Africa",
   "France",
+  "New Zealand",
+  "Spain",
   "Switzerland",
+  "Australia",
+  "Malaysia",
+  "Mauritius",
+  "South Korea",
 ];
 
-const servicesList = [
+export const servicesList = [
   { label: "Flight Bookings", icon: Plane },
   { label: "Hotel Bookings", icon: Hotel },
 
@@ -150,7 +163,7 @@ const Header = () => {
   return (
     <>
       {/* HEADER */}
-      <header className="fixed top-4 left-0 right-0 z-[9999] px-4">
+      <header className="absolute top-4 left-0 right-0 z-[9999] px-4">
         <motion.div
           className="mx-auto max-w-7xl rounded-full px-6 py-3 flex items-center justify-between glass-header"
           animate={{
@@ -181,20 +194,36 @@ const Header = () => {
 
             <DesktopDropdown title="Services" items={servicesList} />
 
-            <Link to="/enquire">
+            {/* <Link to="/enquire">
               <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
                 CONTACT US
               </MagneticButton>
-            </Link>
+            </Link> */}
+
+            <a
+              href="tel:+919611922632"
+              className="flex items-center gap-2 px-5 py-2 border border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white transition-colors rounded-full text-sm font-medium whitespace-nowrap"
+            >
+              <Phone className="w-4 h-4" />
+              +91-9611922632
+            </a>
           </nav>
 
-          {/* MOBILE TOGGLE */}
-          <button
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen((p) => !p)}
-          >
-            {mobileMenuOpen ? <X /> : <Menu />}
-          </button>
+          {/* MOBILE TOGGLE & PHONE */}
+          <div className="flex md:hidden items-center gap-4">
+            <a
+              href="tel:+919611922632"
+              className="flex items-center justify-center p-2 rounded-full border border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white transition-colors"
+              aria-label="Call Us"
+            >
+              <Phone className="w-4 h-4" />
+            </a>
+            <button
+              onClick={() => setMobileMenuOpen((p) => !p)}
+            >
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
         </motion.div>
       </header>
 
@@ -237,13 +266,22 @@ const Header = () => {
                 ))}
               </div>
 
-              <Link
-                to="/enquire"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block w-full py-3 bg-primary text-primary-foreground rounded-full text-xs font-bold text-center tracking-widest"
-              >
-                CONTACT US
-              </Link>
+              <div className="flex flex-col gap-3">
+                <a
+                  href="tel:+919611922632"
+                  className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#00B4D8] text-[#00B4D8] rounded-full text-xs font-bold tracking-widest"
+                >
+                  <Phone className="w-4 h-4" />
+                  +91-9611922632
+                </a>
+                {/* <Link
+                  to="/enquire"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block w-full py-3 bg-primary text-primary-foreground rounded-full text-xs font-bold text-center tracking-widest"
+                >
+                  CONTACT US
+                </Link> */}
+              </div>
             </motion.div>
           </>
         )}

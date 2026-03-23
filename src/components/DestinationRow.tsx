@@ -1,5 +1,12 @@
 import { motion } from "framer-motion";
 import PostcardCard from "./PostcardCard";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface Destination {
   name: string;
@@ -88,40 +95,38 @@ const DestinationRow = ({
           </div>
         </motion.div>
 
-        {/* Cards Grid */}
+        {/* Cards Carousel */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
-          className="
-            relative
-            grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
-            gap-10
-            perspective-1000
-          "
+          className="relative perspective-1000 mt-12 w-full max-w-[95vw] md:max-w-none mx-auto"
         >
-          {destinations.map((destination, index) => (
-            <PostcardCard
-              key={destination.name}
-              name={destination.name}
-              image={destination.image}
-              index={index}
-              onClick={() => onDestinationClick(destination.name)}
-              onEnquire={() => onEnquire(destination.name)}
-            />
-          ))}
-
-          {/* Gateway Card */}
-          <PostcardCard
-            name="Gateway"
-            image=""
-            isGateway
-            gatewayText={gatewayText}
-            index={destinations.length}
-            onClick={onGatewayClick}
-            onEnquire={() => {}}
-          />
+          <Carousel
+            opts={{
+              align: "start",
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4 md:-ml-8 cursor-grab active:cursor-grabbing pb-8 pt-4">
+              {destinations.map((destination, index) => (
+                <CarouselItem key={destination.name + index} className="pl-4 md:pl-8 basis-[85%] sm:basis-1/2 md:basis-1/3 lg:basis-1/4 select-none">
+                  <PostcardCard
+                    name={destination.name}
+                    image={destination.image}
+                    index={index}
+                    onClick={() => onDestinationClick(destination.name)}
+                    onEnquire={() => onEnquire(destination.name)}
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="hidden md:block">
+              <CarouselPrevious className="-left-14 xl:-left-16 bg-[#FDFCF9] border-[#638C7D] text-[#638C7D] hover:bg-[#638C7D] hover:text-[#FDFCF9] w-12 h-12 absolute top-1/2 -translate-y-1/2 transition-colors duration-300" />
+              <CarouselNext className="-right-14 xl:-right-16 bg-[#FDFCF9] border-[#638C7D] text-[#638C7D] hover:bg-[#638C7D] hover:text-[#FDFCF9] w-12 h-12 absolute top-1/2 -translate-y-1/2 transition-colors duration-300" />
+            </div>
+          </Carousel>
         </motion.div>
       </div>
     </section>
