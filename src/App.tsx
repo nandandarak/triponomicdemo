@@ -7,6 +7,7 @@ import { Routes, Route } from "react-router-dom";
 import ScrollToTop from "@/components/ScrollToTop"; // ✅ ADD THIS
 
 import Index from "./pages/Index";
+import Hotels from "./pages/Hotels";
 import EnquireNow from "./pages/EnquireNow";
 import NotFound from "./pages/NotFound";
 
@@ -33,6 +34,7 @@ const App = () => {
         {/* App Routes */}
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/hotels" element={<Hotels />} />
           <Route path="/enquire" element={<EnquireNow />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

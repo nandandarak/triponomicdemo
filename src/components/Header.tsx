@@ -77,16 +77,21 @@ export const servicesList = [
   { label: "Cruise Holidays", icon: Ship },
 ];
 
+
+
+
 /* ---------------- DESKTOP DROPDOWN ---------------- */
 
 const DesktopDropdown = ({
   title,
   items,
   onSelect,
+  isHotels,
 }: {
   title: string;
-  items: { label: string; icon?: any }[];
+  items: { label: string; icon?: React.ElementType; tier?: string }[];
   onSelect?: (label: string) => void;
+  isHotels?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -108,34 +113,64 @@ const DesktopDropdown = ({
               onClick={() => setOpen(false)}
             />
 
-            {/* ✅ ONLY ALIGNMENT FIX HERE */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="absolute top-full mt-4 right-0 z-[9999]"
             >
-              <div className="bg-card rounded-2xl p-6 min-w-[320px] shadow-xl border">
-                <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold">
-                  {title}
-                </p>
-
-                <div className="space-y-2">
-                  {items.map(({ label, icon: Icon }) => (
-                    <button
-                      key={label}
-                      onClick={() => {
-                        onSelect?.(label);
-                        setOpen(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-2 rounded-xl bg-background/60 hover:bg-primary hover:text-primary-foreground text-xs transition text-left"
-                    >
-                      {Icon && <Icon className="w-4 h-4" />}
-                      {label}
-                    </button>
-                  ))}
+              {isHotels ? (
+                /* Hotels mega-dropdown — 2 column grid */
+                <div className="bg-card rounded-2xl p-6 shadow-xl border" style={{ minWidth: "480px" }}>
+                  <p className="text-[10px] uppercase tracking-widest text-primary mb-1 font-bold">
+                    Hotel Partners
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mb-5">
+                    Exclusive rates &amp; curated upgrades at India's finest hotels
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {items.map(({ label, tier }) => (
+                      <button
+                        key={label}
+                        onClick={() => {
+                          onSelect?.(`${label} Hotel Stay`);
+                          setOpen(false);
+                        }}
+                        className="flex flex-col items-start gap-0.5 px-4 py-3 rounded-xl bg-background/60 hover:bg-primary hover:text-primary-foreground text-left transition group"
+                      >
+                        <span className="text-xs font-semibold">{label}</span>
+                        {tier && (
+                          <span className="text-[9px] text-muted-foreground group-hover:text-primary-foreground/70 uppercase tracking-wide">
+                            {tier}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                /* Standard dropdown */
+                <div className="bg-card rounded-2xl p-6 min-w-[320px] shadow-xl border">
+                  <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold">
+                    {title}
+                  </p>
+                  <div className="space-y-2">
+                    {items.map(({ label, icon: Icon }) => (
+                      <button
+                        key={label}
+                        onClick={() => {
+                          onSelect?.(label);
+                          setOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2 rounded-xl bg-background/60 hover:bg-primary hover:text-primary-foreground text-xs transition text-left"
+                      >
+                        {Icon && <Icon className="w-4 h-4" />}
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </motion.div>
           </>
         )}
@@ -152,6 +187,7 @@ const Header = () => {
     null
   );
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileSection, setMobileSection] = useState<"services" | "hotels">("services");
 
   useEffect(() => {
     const onScroll = () =>
@@ -193,6 +229,13 @@ const Header = () => {
             />
 
             <DesktopDropdown title="Services" items={servicesList} />
+
+            <Link
+              to="/hotels"
+              className="nav-link text-sm font-medium flex items-center gap-1 hover:text-primary transition-colors"
+            >
+              Hotels
+            </Link>
 
             {/* <Link to="/enquire">
               <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
@@ -252,19 +295,57 @@ const Header = () => {
                 overflow-y-auto
               "
             >
-              <p className="text-xs font-bold mb-3">Services</p>
-
-              <div className="space-y-2 mb-6">
-                {servicesList.map(({ label, icon: Icon }) => (
-                  <div
-                    key={label}
-                    className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs"
-                  >
-                    <Icon className="w-4 h-4 text-primary" />
-                    {label}
-                  </div>
-                ))}
+              {/* Mobile Tab Switcher */}
+              <div className="flex gap-2 mb-5">
+                <button
+                  onClick={() => setMobileSection("services")}
+                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${
+                    mobileSection === "services"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background/70 text-muted-foreground"
+                  }`}
+                >
+                  Services
+                </button>
+                <button
+                  onClick={() => setMobileSection("hotels")}
+                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${
+                    mobileSection === "hotels"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background/70 text-muted-foreground"
+                  }`}
+                >
+                  Hotels
+                </button>
               </div>
+
+              {mobileSection === "services" ? (
+                <div className="space-y-2 mb-6">
+                  {servicesList.map(({ label, icon: Icon }) => (
+                    <div
+                      key={label}
+                      className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs"
+                    >
+                      <Icon className="w-4 h-4 text-primary" />
+                      {label}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mb-6">
+                  <Link
+                    to="/hotels"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-3 w-full py-4 bg-[#344E41] text-white rounded-2xl text-sm font-bold tracking-widest hover:bg-[#2A3E34] transition-colors"
+                  >
+                    <Hotel className="w-5 h-5" />
+                    View All Hotel Partners
+                  </Link>
+                  <p className="text-center text-xs text-muted-foreground mt-3">
+                    ITC · Taj · Leela · Oberoi · JW Marriott &amp; more
+                  </p>
+                </div>
+              )}
 
               <div className="flex flex-col gap-3">
                 <a

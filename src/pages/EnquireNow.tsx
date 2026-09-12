@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Send } from "lucide-react";
+import { Phone, Mail, MapPin, Send, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import BlurText from "@/components/animations/BlurText";
 
 const EnquireNow = () => {
   const { toast } = useToast();
@@ -85,11 +86,15 @@ const EnquireNow = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-4xl md:text-5xl font-medium mb-4">
-              Plan Your Journey
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/60 border border-emerald-200/80 text-emerald-800 text-xs font-bold tracking-wider uppercase mb-3">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              Let's Plan Your Dream Trip
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+              <BlurText text="Plan Your Journey" animateBy="words" className="text-gray-900" />
             </h1>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Tell us about your destination and we’ll design a perfect trip.
+            <p className="text-gray-600 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
+              Tell us what you love, and our expert travel architects will craft a custom-tailored itinerary packed with unforgettable memories.
             </p>
           </motion.div>
 

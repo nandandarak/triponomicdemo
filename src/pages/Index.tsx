@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import DestinationRow from "@/components/DestinationRow";
+import TripCategoriesSection from "@/components/TripCategoriesSection";
+import AboutSection from "@/components/AboutSection";
 import SelectionModal from "@/components/SelectionModal";
 import EnquiryModal from "@/components/EnquiryModal";
 import Footer from "@/components/Footer";
@@ -117,6 +119,9 @@ const internationalCards = [
   { name: "South Korea", image: "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80" },
 ];
 
+import HappyTravelStrip from "@/components/HappyTravelStrip";
+import VelocityMarquee from "@/components/animations/VelocityMarquee";
+
 const Index = () => {
   const [selectionModal, setSelectionModal] = useState<{
     isOpen: boolean;
@@ -149,6 +154,17 @@ const Index = () => {
       <main>
         <HeroSection />
 
+        {/* Happy Fresh Vibe Strip */}
+        <HappyTravelStrip />
+
+        {/* ReactBits Infinite Scrolling Ticker */}
+        <div className="border-y border-emerald-100/60 bg-emerald-50/30 backdrop-blur-sm">
+          <VelocityMarquee speed={32} />
+        </div>
+
+        {/* Trip Categories */}
+        <TripCategoriesSection />
+
         {/* Domestic */}
         <DestinationRow
           title="Discover India"
@@ -174,6 +190,14 @@ const Index = () => {
           onDestinationClick={openEnquiry}
           onEnquire={openEnquiry}
         />
+
+        {/* Happy vibe secondary ticker */}
+        <div className="py-2 border-y border-amber-100/60 bg-amber-50/20">
+          <VelocityMarquee speed={40} reverse={true} />
+        </div>
+
+        {/* About Section */}
+        <AboutSection />
       </main>
 
       <Footer />

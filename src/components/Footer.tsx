@@ -27,6 +27,12 @@ const Footer = () => {
               Home
             </Link>
             <Link
+              to="/hotels"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Hotels
+            </Link>
+            <Link
               to="/enquire"
               className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
             >

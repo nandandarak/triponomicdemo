@@ -98,67 +98,91 @@ const PostcardCard = ({
           >
             {/* FRONT */}
             <div
-              className="absolute inset-0 card-destination overflow-hidden"
+              className="absolute inset-0 card-destination overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] group/card border border-white/20"
               style={{ backfaceVisibility: "hidden" }}
             >
               <img
                 src={image}
                 alt={name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-0 p-6">
-                <h3 className="text-2xl font-medium text-white">{name}</h3>
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-black/20 to-transparent" />
+              <div className="absolute top-4 right-4">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white/90 border border-white/20">
+                  Explore
+                </span>
+              </div>
+              <div className="absolute bottom-0 p-6 flex items-end justify-between w-full">
+                <div>
+                  <p className="text-[11px] uppercase tracking-widest text-emerald-400 font-bold mb-1">
+                    Featured Destination
+                  </p>
+                  <h3 className="text-2xl font-bold text-white leading-tight">{name}</h3>
+                </div>
+                <span className="text-[10px] text-white/60 bg-white/10 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">
+                  Flip ↷
+                </span>
               </div>
             </div>
 
             {/* BACK (SCROLLABLE FOR MOBILE) */}
             <div
-              className="absolute inset-0 card-destination flex flex-col"
+              className="absolute inset-0 card-destination flex flex-col shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-emerald-100"
               style={{
                 backfaceVisibility: "hidden",
                 transform: "rotateY(180deg)",
-                backgroundColor: "#FDFCF9",
+                backgroundColor: "#FFFFFF",
                 backgroundImage:
-                  "radial-gradient(circle, #D4AF37 0.5px, transparent 0.5px)",
+                  "radial-gradient(circle, #10B981 0.4px, transparent 0.4px)",
                 backgroundSize: "20px 20px",
               }}
             >
               <div className="flex-1 overflow-y-auto p-6">
-                <h3 className="font-script text-3xl italic text-[#344E41] mb-6">
-                  {name}
-                </h3>
+                <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+                  <h3 className="text-xl font-bold text-gray-900">
+                    {name}
+                  </h3>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                    Curated Trip
+                  </span>
+                </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-[#D4AF37]" />
+                  <div className="flex items-center gap-3 p-2 rounded-xl bg-gray-50/70">
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                      <Clock className="w-4 h-4" />
+                    </div>
                     <div>
-                      <p className="text-[10px] uppercase">Duration</p>
-                      <p className="text-sm">{data.duration}</p>
+                      <p className="text-[10px] uppercase text-gray-400 font-semibold tracking-wider">Duration</p>
+                      <p className="text-sm font-semibold text-gray-800">{data.duration}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <Coins className="w-5 h-5 text-[#D4AF37]" />
+                  <div className="flex items-center gap-3 p-2 rounded-xl bg-gray-50/70">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                      <Coins className="w-4 h-4" />
+                    </div>
                     <div>
-                      <p className="text-[10px] uppercase">Ideal Budget</p>
-                      <p className="text-sm">From {data.investment}</p>
+                      <p className="text-[10px] uppercase text-gray-400 font-semibold tracking-wider">Ideal Budget</p>
+                      <p className="text-sm font-semibold text-emerald-700">From {data.investment}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <Sun className="w-5 h-5 text-[#D4AF37]" />
+                  <div className="flex items-center gap-3 p-2 rounded-xl bg-gray-50/70">
+                    <div className="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 shrink-0">
+                      <Sun className="w-4 h-4" />
+                    </div>
                     <div>
-                      <p className="text-[10px] uppercase">Best Time</p>
-                      <p className="text-sm">{data.bestTime}</p>
+                      <p className="text-[10px] uppercase text-gray-400 font-semibold tracking-wider">Best Time To Visit</p>
+                      <p className="text-sm font-semibold text-gray-800">{data.bestTime}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4">
+              <div className="p-4 bg-gray-50/80 border-t border-gray-100">
                 <MagneticButton
-                  className="w-full py-3 bg-[#638C7D] hover:bg-[#4A7066] text-white rounded-full text-xs font-bold tracking-widest"
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold tracking-widest shadow-md transition-all duration-300"
                   onClick={onEnquire}
                 >
                   ENQUIRE NOW
