@@ -1,11 +1,13 @@
 import { EnquiryLead } from "./enquiryStore";
 import { DestinationCard } from "./cardStore";
 
-export type CloudProvider = "supabase" | "firebase" | "webhook" | "custom";
+export type CloudProvider = "googlesheet" | "supabase" | "firebase" | "webhook" | "custom";
 
 export interface CloudSyncSettings {
   enabled: boolean;
   provider: CloudProvider;
+  // Google Sheet Configuration (Published CSV or Google Apps Script URL)
+  googleSheetUrl: string;
   // Supabase Configuration
   supabaseUrl: string;
   supabaseAnonKey: string;
@@ -26,7 +28,8 @@ const SYNC_QUEUE_KEY = "triponomic_offline_queue_v1";
 
 export const DEFAULT_CLOUD_SETTINGS: CloudSyncSettings = {
   enabled: true,
-  provider: "supabase",
+  provider: "googlesheet",
+  googleSheetUrl: "",
   supabaseUrl: "",
   supabaseAnonKey: "",
   firebaseUrl: "",
@@ -36,6 +39,151 @@ export const DEFAULT_CLOUD_SETTINGS: CloudSyncSettings = {
   lastSyncStatus: "idle",
   lastSyncMessage: "Initialized",
 };
+
+/**
+ * Robust CSV string parser compliant with RFC 4180 (handles quoted values, commas, and newlines)
+ */
+export function parseCSV(text: string): string[][] {
+  const lines: string[][] = [];
+  let row: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === "," && !inQuotes) {
+      row.push(current.trim());
+      current = "";
+    } else if ((char === "\r" || char === "\n") && !inQuotes) {
+      if (char === "\r" && nextChar === "\n") {
+        i++;
+      }
+      row.push(current.trim());
+      if (row.some((cell) => cell.length > 0)) {
+        lines.push(row);
+      }
+      row = [];
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  if (current.length > 0 || row.length > 0) {
+    row.push(current.trim());
+    if (row.some((cell) => cell.length > 0)) {
+      lines.push(row);
+    }
+  }
+
+  return lines;
+}
+
+/**
+ * Intelligent Google Sheet parser that detects columns for Timestamp, Name, Phone, Destination, Email, Budget
+ */
+export function parseGoogleSheetData(rows: string[][]): EnquiryLead[] {
+  if (rows.length <= 1) return [];
+
+  const headers = rows[0].map((h) => (h || "").toLowerCase().trim());
+
+  // Detect column indices based on header names
+  let timeIdx = headers.findIndex((h) => h.includes("timestamp") || h.includes("date") || h.includes("time"));
+  let nameIdx = headers.findIndex((h) => h.includes("name") || h.includes("traveler") || h.includes("client"));
+  let phoneIdx = headers.findIndex((h) => h.includes("phone") || h.includes("mobile") || h.includes("contact") || h.includes("number"));
+  let destIdx = headers.findIndex((h) => h.includes("destination") || h.includes("route") || h.includes("trail") || h.includes("trip") || h.includes("details"));
+  let emailIdx = headers.findIndex((h) => h.includes("email") || h.includes("mail"));
+  let budgetIdx = headers.findIndex((h) => h.includes("budget") || h.includes("quote") || h.includes("rate") || h.includes("investment"));
+
+  // Fallbacks to default Google Form column ordering (A: Time, B: Name, C: Phone, D: Route/Dest, E: Email, F: Budget)
+  if (timeIdx === -1) timeIdx = 0;
+  if (nameIdx === -1) nameIdx = 1;
+  if (phoneIdx === -1) phoneIdx = 2;
+  if (destIdx === -1) destIdx = 3;
+  if (emailIdx === -1) emailIdx = 4;
+  if (budgetIdx === -1) budgetIdx = 5;
+
+  const leads: EnquiryLead[] = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || row.length < 2) continue;
+
+    const rawTime = row[timeIdx] || "";
+    const name = row[nameIdx] || "Guest Traveler";
+    const phone = row[phoneIdx] || "";
+    const rawDest = row[destIdx] || "Custom Trail";
+    const email = row[emailIdx] || "";
+    const budget = row[budgetIdx] || "";
+
+    if (!phone && !name && !rawDest) continue;
+
+    // Parse pipe-separated route details if formatted by InteractiveTrailBuilder
+    let destination = rawDest;
+    let departureHub = "";
+    let duration = "";
+    let travelers = "";
+    let hotelTier = "";
+    let notes = "";
+
+    if (rawDest.includes("|")) {
+      const parts = rawDest.split("|").map((p) => p.trim());
+      destination = parts[0] || rawDest;
+      for (let p = 1; p < parts.length; p++) {
+        const part = parts[p];
+        if (part.toLowerCase().includes("hub")) departureHub = part.replace(/hub/i, "").trim();
+        else if (part.includes("Adult") || part.includes("Kid") || part.includes("Couple")) travelers = part;
+        else if (part.endsWith("D") || part.toLowerCase().includes("days")) duration = part;
+        else if (part.includes("★") || part.toLowerCase().includes("luxury") || part.toLowerCase().includes("boutique")) hotelTier = part;
+        else if (part.toLowerCase().includes("notes:") || part.toLowerCase().includes("month:")) notes += (notes ? " | " : "") + part;
+      }
+    }
+
+    // Stable ID for row deduplication
+    const cleanPhone = (phone || name).replace(/[^a-zA-Z0-9]/g, "").slice(-6);
+    const rowId = `gsheet-${i}-${cleanPhone}`;
+
+    // Parse date safely
+    let parsedDate = new Date().toISOString();
+    if (rawTime) {
+      const d = new Date(rawTime);
+      if (!isNaN(d.getTime())) {
+        parsedDate = d.toISOString();
+      }
+    }
+
+    leads.push({
+      id: rowId,
+      name,
+      fullName: name,
+      phone,
+      email: email.includes("@") ? email : undefined,
+      destination,
+      source: "Google Sheet / Form",
+      departureHub: departureHub || undefined,
+      duration: duration || undefined,
+      travelers: travelers || undefined,
+      hotelTier: hotelTier || undefined,
+      budget: budget || undefined,
+      notes: notes || undefined,
+      date: parsedDate,
+      createdAt: parsedDate,
+      status: "New",
+    });
+  }
+
+  // Newest submissions first
+  return leads.reverse();
+}
 
 /**
  * Get current Cloud Sync configuration from localStorage
@@ -206,6 +354,45 @@ export const fetchEnquiriesFromCloud = async (): Promise<EnquiryLead[] | null> =
       const data = await res.json();
       if (!data) return [];
       return Object.values(data) as EnquiryLead[];
+    } else if (settings.provider === "googlesheet" && settings.googleSheetUrl) {
+      let url = settings.googleSheetUrl.trim();
+
+      // Automatically convert standard Google Sheet URL to CSV export format
+      const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (
+        match &&
+        !url.includes("output=csv") &&
+        !url.includes("export?format=csv") &&
+        !url.includes("macros/s/")
+      ) {
+        const sheetId = match[1];
+        const gidMatch = url.match(/gid=([0-9]+)/);
+        const gid = gidMatch ? gidMatch[1] : "0";
+        url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+      }
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Google Sheet returned HTTP ${res.status}`);
+
+      const text = await res.text();
+
+      // Handle JSON response if Google Apps Script
+      if (text.trim().startsWith("[") || text.trim().startsWith("{")) {
+        try {
+          const parsed = JSON.parse(text);
+          if (Array.isArray(parsed)) {
+            if (Array.isArray(parsed[0])) {
+              return parseGoogleSheetData(parsed);
+            }
+            return parsed as EnquiryLead[];
+          }
+        } catch {
+          // Fall through to CSV
+        }
+      }
+
+      const rows = parseCSV(text);
+      return parseGoogleSheetData(rows);
     } else if (settings.webhookUrl) {
       const res = await fetch(
         `${settings.webhookUrl}${settings.webhookUrl.includes("?") ? "&" : "?"}action=get_enquiries`
@@ -325,7 +512,53 @@ export const testCloudConnection = async (
   const start = performance.now();
 
   try {
-    if (settings.provider === "supabase") {
+    if (settings.provider === "googlesheet") {
+      if (!settings.googleSheetUrl) {
+        return { success: false, message: "Please paste your Google Sheet link or Apps Script Web App URL." };
+      }
+      let url = settings.googleSheetUrl.trim();
+      const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (
+        match &&
+        !url.includes("output=csv") &&
+        !url.includes("export?format=csv") &&
+        !url.includes("macros/s/")
+      ) {
+        const sheetId = match[1];
+        const gidMatch = url.match(/gid=([0-9]+)/);
+        const gid = gidMatch ? gidMatch[1] : "0";
+        url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+      }
+
+      const res = await fetch(url);
+      const latencyMs = Math.round(performance.now() - start);
+
+      if (!res.ok) {
+        return {
+          success: false,
+          message: `Could not access Google Sheet (HTTP ${res.status}). Make sure the sheet is shared ('Anyone with the link can view') or Published to Web.`,
+          latencyMs,
+        };
+      }
+
+      const text = await res.text();
+      let rowCount = 0;
+      if (text.trim().startsWith("[") || text.trim().startsWith("{")) {
+        try {
+          const parsed = JSON.parse(text);
+          if (Array.isArray(parsed)) rowCount = parsed.length;
+        } catch {}
+      } else {
+        const rows = parseCSV(text);
+        rowCount = Math.max(0, rows.length - 1);
+      }
+
+      return {
+        success: true,
+        message: `Connected to Google Sheet successfully! Found ${rowCount} customer enquiry submissions (${latencyMs}ms).`,
+        latencyMs,
+      };
+    } else if (settings.provider === "supabase") {
       if (!settings.supabaseUrl || !settings.supabaseAnonKey) {
         return { success: false, message: "Please enter both Supabase URL and Anon Key." };
       }

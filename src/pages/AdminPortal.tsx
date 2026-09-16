@@ -1170,11 +1170,12 @@ export const AdminPortal: React.FC = () => {
                 <label className="block text-xs font-semibold text-slate-200 uppercase tracking-wider">
                   Cloud Storage Provider
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                   {[
-                    { id: "supabase", label: "Supabase (Recommended)", desc: "PostgreSQL with instant REST API" },
+                    { id: "googlesheet", label: "Google Sheet (Form)", desc: "Direct from your linked Sheet" },
+                    { id: "supabase", label: "Supabase (DB)", desc: "PostgreSQL cloud database" },
                     { id: "firebase", label: "Google Firebase", desc: "Realtime DB instant sync" },
-                    { id: "webhook", label: "Custom Webhook", desc: "Google Sheets / API URL" },
+                    { id: "webhook", label: "Custom Webhook", desc: "Apps Script / API URL" },
                   ].map((p) => (
                     <button
                       key={p.id}
@@ -1182,18 +1183,76 @@ export const AdminPortal: React.FC = () => {
                       onClick={() => setCloudSettings((prev) => ({ ...prev, provider: p.id as any }))}
                       className={`p-3 rounded-xl border text-left transition cursor-pointer ${
                         cloudSettings.provider === p.id
-                          ? "bg-[#151B40] border-amber-400 text-white shadow-md"
+                          ? theme === "light"
+                            ? "bg-amber-50 border-amber-500 text-slate-900 shadow-md ring-2 ring-amber-400/30"
+                            : "bg-[#151B40] border-amber-400 text-white shadow-md"
+                          : theme === "light"
+                          ? "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
                           : "bg-slate-900/60 border-slate-700 text-slate-300 hover:border-slate-600"
                       }`}
                     >
-                      <div className="font-semibold text-xs text-white">{p.label}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">{p.desc}</div>
+                      <div className={`font-semibold text-xs ${
+                        cloudSettings.provider === p.id && theme === "light" ? "text-slate-900" : "text-white"
+                      }`}>{p.label}</div>
+                      <div className={`text-[10px] mt-0.5 ${
+                        cloudSettings.provider === p.id && theme === "light" ? "text-slate-600" : "text-slate-400"
+                      }`}>{p.desc}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Provider Configuration Inputs */}
+              {cloudSettings.provider === "googlesheet" && (
+                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                      <Database className="w-3.5 h-3.5 text-emerald-400" /> Google Sheet Live Integration
+                    </span>
+                    <span className="text-[10px] uppercase font-bold text-amber-500 dark:text-amber-300 bg-amber-400/20 border border-amber-400/30 px-2 py-0.5 rounded-full">
+                      Zero Setup Required
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-300 mb-1">
+                      Google Sheet Link or Published CSV Link
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://docs.google.com/spreadsheets/d/.../edit or .../pub?output=csv"
+                      value={cloudSettings.googleSheetUrl}
+                      onChange={(e) => setCloudSettings({ ...cloudSettings, googleSheetUrl: e.target.value.trim() })}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className={`p-3.5 rounded-xl border text-[11px] space-y-1.5 leading-relaxed ${
+                    theme === "light"
+                      ? "bg-amber-50/80 border-amber-300/80 text-slate-800"
+                      : "bg-slate-950/70 border-slate-800 text-slate-300"
+                  }`}>
+                    <div className={`font-semibold flex items-center gap-1.5 ${
+                      theme === "light" ? "text-amber-950" : "text-white"
+                    }`}>
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" /> How to connect your Google Sheet in 30 seconds:
+                    </div>
+                    <ol className={`list-decimal pl-4 space-y-1 ${
+                      theme === "light" ? "text-slate-800" : "text-slate-300"
+                    }`}>
+                      <li>Open the Google Sheet linked to your Triponomic Google Form.</li>
+                      <li>Click <strong>File &gt; Share &gt; Publish to web</strong>.</li>
+                      <li>Under Link, select <strong>Entire Document</strong> (or your responses sheet) and choose <strong>Comma-separated values (.csv)</strong>.</li>
+                      <li>Click <strong>Publish</strong>, copy that link, and paste it in the box above!</li>
+                    </ol>
+                    <p className={`text-[10px] pt-1 font-semibold ${
+                      theme === "light" ? "text-amber-900" : "text-amber-300/90"
+                    }`}>
+                      *Tip: You can also simply share the Google Sheet (&quot;Anyone with the link can view&quot;) and paste the normal URL!
+                    </p>
+                  </div>
+                </div>
+              )}
               {cloudSettings.provider === "supabase" && (
                 <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-3.5">
                   <div className="flex items-center justify-between">
