@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, ArrowRight, SlidersHorizontal, Sparkles, CheckCircle2 } from "lucide-react";
+import { Star, ArrowRight, SlidersHorizontal, Sparkles, CheckCircle2, Volume2, VolumeX } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnquiryModal from "@/components/EnquiryModal";
+import FAQSection from "@/components/FAQSection";
 import BlurText from "@/components/animations/BlurText";
 import SpotlightCard from "@/components/animations/SpotlightCard";
 
@@ -172,6 +173,51 @@ const hotels = [
 
 const tiers = ["All", "Ultra Luxury", "Iconic Luxury", "Grand Luxury", "Luxury", "Upper Upscale", "Upscale"];
 
+const hotelFaqs = [
+  {
+    id: "hotel-partnerships-how",
+    category: "Hotel Stays",
+    question: "How does Triponomic offer privileged member rates and perks at 5-star hotels?",
+    answer:
+      "Through established direct trade relationships with premier hospitality chains like Taj, ITC, The Leela, The Oberoi, and Marriott, we unlock contracted partner tariffs, complimentary daily buffet breakfasts, early check-in preference, and resort dining/spa credits that are not accessible via standard public travel portals.",
+  },
+  {
+    id: "hotel-standalone-booking",
+    category: "Hotel Stays",
+    question: "Can I book only a hotel through Triponomic without booking a full holiday package?",
+    answer:
+      "Yes, absolutely! Whether you're booking an intimate weekend retreat in Udaipur, a business stay in Mumbai, or a luxury resort in Dubai, you can reserve standalone hotel stays through Triponomic and still receive all partner perks and privileged pricing.",
+  },
+  {
+    id: "hotel-loyalty-programs",
+    category: "Hotel Stays",
+    question: "Will I still earn my hotel loyalty points (e.g. Marriott Bonvoy, Taj InnerCircle)?",
+    answer:
+      "In most cases, direct partner reservations qualify for loyalty night credits and elite member privileges. Simply provide your membership number when submitting your inquiry, and our team will ensure your profile is tied directly to the property reservation.",
+  },
+  {
+    id: "hotel-upgrades-guarantee",
+    category: "Hotel Stays",
+    question: "Are complimentary room upgrades and early check-ins guaranteed?",
+    answer:
+      "Room upgrades and early check-in/late check-out are subject to availability upon arrival. However, because Triponomic coordinates directly with hotel general managers and sales directors, our guests receive top VIP priority over standard retail online bookings.",
+  },
+  {
+    id: "hotel-cancellation-policy",
+    category: "Hotel Stays",
+    question: "What is the cancellation and refund policy for luxury hotel bookings?",
+    answer:
+      "Cancellation policies depend on the specific hotel and season (e.g., peak holiday dates vs. regular flexible seasons). We provide full, transparent cancellation terms and deadlines in writing before any payment is collected.",
+  },
+  {
+    id: "hotel-special-requests",
+    category: "Hotel Stays",
+    question: "Can you arrange special celebrations, anniversary setups, or airport transfers?",
+    answer:
+      "Yes! We coordinate directly with on-property concierges to set up curated amenities — from honeymoon bed decorations and celebratory cakes to private beachside candlelit dinners and luxury chauffeur airport transfers.",
+  },
+];
+
 /* ------------------------------------------------------------------ */
 /*  HOTEL CARD                                                           */
 /* ------------------------------------------------------------------ */
@@ -295,6 +341,37 @@ const Hotels = () => {
     destination: "",
   });
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  // Pause video decoding when off-screen to free GPU/CPU for smooth 60fps scrolling
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
+  const toggleSound = () => {
+    if (videoRef.current) {
+      const nextMuted = !isMuted;
+      videoRef.current.muted = nextMuted;
+      setIsMuted(nextMuted);
+    }
+  };
+
   const filtered =
     activeTier === "All"
       ? hotels
@@ -304,46 +381,79 @@ const Hotels = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* PAGE HERO */}
-      <section className="relative pt-36 pb-24 px-6 overflow-hidden bg-gradient-to-b from-[#12231A] via-[#1A2E23] to-[#12231A]">
-        {/* Background image with overlay */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1800&q=80"
-            alt="Luxury hotel"
-            className="w-full h-full object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#12231A]/70 via-[#1A2E23]/85 to-[#12231A]" />
+      {/* PAGE HERO WITH LOOPING HOTEL VIDEO */}
+      <section className="relative min-h-[75vh] md:min-h-[82vh] flex flex-col justify-center items-center pt-32 pb-20 px-6 overflow-hidden bg-[#0a1018] text-white">
+        {/* Looping Hotel Video Background - Full Fit & Cinematic Framing */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1800&q=80"
+            className="w-full h-full object-cover object-center brightness-[0.80] contrast-[1.05]"
+          >
+            <source src="/video/hotel.mp4" type="video/mp4" />
+          </video>
+          {/* Subtle cinematic overlays for legibility without losing video vibrancy */}
+          <div className="absolute inset-0 bg-black/35" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[#0a1018]" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
+        {/* Ambient Sound Toggle Button */}
+        <div className="absolute top-28 md:top-32 right-6 z-20">
+          <button
+            onClick={toggleSound}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/45 hover:bg-black/75 text-white/85 hover:text-white backdrop-blur-md border border-white/20 text-xs font-medium shadow-xl transition-all hover:scale-105"
+            title={isMuted ? "Turn sound on" : "Mute sound"}
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-bold tracking-widest uppercase mb-4">
+            {isMuted ? (
+              <>
+                <VolumeX className="w-3.5 h-3.5 text-white/70" />
+                <span className="hidden sm:inline">Audio Muted</span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                <span className="hidden sm:inline">Audio Playing</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-bold tracking-widest uppercase mb-4 shadow-sm backdrop-blur-md">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              Direct Hotel Partnerships
+              Direct 5★ Hotel Partnerships
             </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6 max-w-3xl">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-tight mb-5 max-w-4xl mx-auto">
               <BlurText text="Stay In Pure Luxury" animateBy="words" className="text-white" />
             </h1>
-            <p className="text-white/80 text-base md:text-lg max-w-xl leading-relaxed mb-8">
-              We partner directly with India's most iconic hotel brands to give you exclusive member-tier rates, complimentary upgrades, and bespoke welcome amenities.
+            <p className="text-white/85 text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-8 font-light drop-shadow">
+              Direct trade relationships with India's most iconic hotel chains — Taj, Oberoi, ITC, and The Leela. Contracted partner tariffs, complimentary suite upgrades, and bespoke welcome amenities.
             </p>
 
-            {/* Quick stats */}
-            <div className="flex flex-wrap gap-8">
+            {/* Quick stats with glassmorphic cards */}
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
               {[
                 { num: "12+", label: "Iconic Hotel Chains" },
                 { num: "50+", label: "Palaces & Resorts" },
                 { num: "5★", label: "Luxury Standard" },
                 { num: "100%", label: "Exclusive Member Perks" },
               ].map((s) => (
-                <div key={s.label}>
-                  <p className="text-3xl font-extrabold text-amber-400">{s.num}</p>
-                  <p className="text-white/70 text-xs font-semibold uppercase tracking-wider">{s.label}</p>
+                <div
+                  key={s.label}
+                  className="px-4 py-2.5 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 shadow-sm text-center"
+                >
+                  <p className="text-2xl sm:text-3xl font-extrabold text-amber-400">{s.num}</p>
+                  <p className="text-white/70 text-[11px] font-semibold uppercase tracking-wider">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -414,6 +524,15 @@ const Hotels = () => {
           )}
         </div>
       </section>
+
+      {/* Hotel Partnerships FAQ Section */}
+      <FAQSection
+        faqs={hotelFaqs}
+        title="Luxury Hotels & Partnerships FAQ"
+        subtitle="Frequently asked questions about booking 5-star properties, complimentary upgrades, and privileged tariffs through Triponomic."
+        badge="Hotel Perks & Privileges"
+        showCategories={false}
+      />
 
       {/* BOTTOM CTA BANNER */}
       <section className="py-20 px-6 bg-[#1C2B22]">

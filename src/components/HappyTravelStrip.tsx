@@ -1,6 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Star, ShieldCheck, HeartHandshake, Compass, Clock } from "lucide-react";
+import traveler1 from "@/assets/traveler_1.jpg";
+import traveler2 from "@/assets/traveler_2.jpg";
+import traveler3 from "@/assets/traveler_3.jpg";
+import traveler4 from "@/assets/traveler_4.jpg";
 
 export const HappyTravelStrip = () => {
   const highlights = [
@@ -48,35 +52,43 @@ export const HappyTravelStrip = () => {
           <div className="flex -space-x-3 overflow-hidden">
             <img
               className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+              src={traveler1}
               alt="Happy traveler"
             />
             <img
               className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+              src={traveler2}
               alt="Happy traveler"
             />
             <img
               className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"
+              src={traveler3}
               alt="Happy traveler"
             />
             <img
               className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+              src={traveler4}
               alt="Happy traveler"
             />
           </div>
           <div>
-            <div className="flex items-center gap-1.5 text-amber-500">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-              ))}
-              <span className="text-xs font-bold text-gray-800 ml-1">4.9 / 5.0</span>
-            </div>
-            <p className="text-xs text-gray-600 font-medium">
-              Trusted by <span className="font-bold text-emerald-800">500+ happy wanderers</span> across India
-            </p>
+            <a
+              href="#google-reviews"
+              className="group block"
+            >
+              <div className="flex items-center gap-1.5 text-amber-500">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                ))}
+                <span className="text-xs font-bold text-gray-800 ml-1">5.0 / 5.0</span>
+                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.2 rounded group-hover:bg-emerald-200 transition-colors">
+                  Google
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 font-medium mt-0.5">
+                Rated <span className="font-bold text-emerald-800">5.0 Stars</span> verified Google reviews
+              </p>
+            </a>
           </div>
         </div>
 
@@ -113,9 +125,9 @@ export const HappyTravelStrip = () => {
                 <Icon className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-gray-900 leading-tight mb-1">
+                <p className="text-sm font-bold text-gray-900 leading-tight mb-1">
                   {item.title}
-                </h4>
+                </p>
                 <p className="text-xs text-gray-500 leading-relaxed">
                   {item.desc}
                 </p>

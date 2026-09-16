@@ -159,7 +159,7 @@
 }
 
 /* =========================
-   UTILITIES
+   UTILITIES & GPU ACCELERATION
 ========================= */
 @layer utilities {
   .text-balance {
@@ -178,4 +178,41 @@
   .perspective-1000 {
     perspective: 1000px;
   }
+
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+/* =========================
+   COMPOSITOR MARQUEE ANIMATIONS
+========================= */
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee {
+  animation: marquee linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse linear infinite;
+  will-change: transform;
 }

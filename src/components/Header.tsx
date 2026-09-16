@@ -15,9 +15,13 @@ import {
   MapPin,
   Globe,
   Phone,
+  HelpCircle,
+  Sparkles,
+  Compass,
+  ArrowRight,
+  MessageSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import MagneticButton from "./MagneticButton";
 import EnquiryModal from "./EnquiryModal";
 import logo from "@/assets/logo.png";
 
@@ -77,9 +81,6 @@ export const servicesList = [
   { label: "Cruise Holidays", icon: Ship },
 ];
 
-
-
-
 /* ---------------- DESKTOP DROPDOWN ---------------- */
 
 const DesktopDropdown = ({
@@ -87,11 +88,13 @@ const DesktopDropdown = ({
   items,
   onSelect,
   isHotels,
+  isScrolled,
 }: {
   title: string;
   items: { label: string; icon?: React.ElementType; tier?: string }[];
   onSelect?: (label: string) => void;
   isHotels?: boolean;
+  isScrolled: boolean;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -99,10 +102,14 @@ const DesktopDropdown = ({
     <div className="relative">
       <button
         onClick={() => setOpen((p) => !p)}
-        className="nav-link flex items-center gap-1"
+        className={`flex items-center gap-1.5 text-sm font-medium transition-colors duration-300 ${
+          isScrolled
+            ? "text-foreground hover:text-primary"
+            : "text-white/90 hover:text-white"
+        }`}
       >
         {title}
-        <ChevronDown className={`w-4 h-4 transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-3.5 h-3.5 transition ${open ? "rotate-180" : ""}`} />
       </button>
 
       <AnimatePresence>
@@ -114,13 +121,13 @@ const DesktopDropdown = ({
             />
 
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
               className="absolute top-full mt-4 right-0 z-[9999]"
             >
               {isHotels ? (
-                /* Hotels mega-dropdown — 2 column grid */
                 <div className="bg-card rounded-2xl p-6 shadow-xl border" style={{ minWidth: "480px" }}>
                   <p className="text-[10px] uppercase tracking-widest text-primary mb-1 font-bold">
                     Hotel Partners
@@ -149,7 +156,6 @@ const DesktopDropdown = ({
                   </div>
                 </div>
               ) : (
-                /* Standard dropdown */
                 <div className="bg-card rounded-2xl p-6 min-w-[320px] shadow-xl border">
                   <p className="text-[10px] uppercase tracking-widest text-primary mb-4 font-bold">
                     {title}
@@ -183,15 +189,38 @@ const DesktopDropdown = ({
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState<string | null>(
-    null
-  );
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileSection, setMobileSection] = useState<"services" | "hotels">("services");
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
-    const onScroll = () =>
-      setIsScrolled(window.scrollY > window.innerHeight * 0.6);
+    let lastScrolled = false;
+    let ticking = false;
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = window.scrollY > window.innerHeight * 0.15;
+          if (scrolled !== lastScrolled) {
+            lastScrolled = scrolled;
+            setIsScrolled(scrolled);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -199,70 +228,141 @@ const Header = () => {
   return (
     <>
       {/* HEADER */}
-      <header className="absolute top-4 left-0 right-0 z-[9999] px-4">
+      <header
+        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-500 ${
+          isScrolled ? "py-2 px-4" : "py-4 px-4"
+        }`}
+      >
         <motion.div
-          className="mx-auto max-w-7xl rounded-full px-6 py-3 flex items-center justify-between glass-header"
-          animate={{
-            backgroundColor: isScrolled
-              ? "hsl(40 40% 99% / 0.95)"
-              : "hsl(40 40% 99% / 0.85)",
-          }}
+          className={`mx-auto max-w-7xl rounded-full px-6 py-2.5 flex items-center justify-between transition-all duration-500 ${
+            isScrolled
+              ? "glass-header shadow-[0_4px_30px_rgba(139,125,107,0.12)] border border-border/40"
+              : "bg-transparent border border-transparent hover:bg-black/15 hover:border-white/10 hover:backdrop-blur-sm"
+          }`}
         >
-          {/* LOGO + TITLE */}
-          <Link to="/" className="flex items-center gap-3">
-            <img src={logo} alt="Triponomic" className="h-9 w-auto" />
-            <span className="font-semibold text-lg">Triponomic</span>
-          </Link>
-
-          {/* DESKTOP NAV */}
-          <nav className="hidden md:flex items-center gap-8">
-            <DesktopDropdown
-              title="Domestic"
-              items={domesticDestinations.map((d) => ({ label: d }))}
-              onSelect={setSelectedDestination}
-            />
-
-            <DesktopDropdown
-              title="International"
-              items={internationalDestinations.map((d) => ({ label: d }))}
-              onSelect={setSelectedDestination}
-            />
-
-            <DesktopDropdown title="Services" items={servicesList} />
-
-            <Link
-              to="/hotels"
-              className="nav-link text-sm font-medium flex items-center gap-1 hover:text-primary transition-colors"
-            >
-              Hotels
+          {/* LEFT: LOGO + DESKTOP NAV */}
+          <div className="flex items-center gap-8 lg:gap-10">
+            {/* LOGO + TITLE */}
+            <Link to="/" className="flex items-center gap-3 shrink-0">
+              <img
+                src={logo}
+                alt="Triponomic"
+                className={`h-8 md:h-9 w-auto transition-all duration-300 ${
+                  isScrolled ? "" : "brightness-0 invert"
+                }`}
+              />
+              <span
+                className={`font-semibold text-lg transition-colors duration-300 ${
+                  isScrolled ? "text-foreground" : "text-white"
+                }`}
+              >
+                Triponomic
+              </span>
             </Link>
 
-            {/* <Link to="/enquire">
-              <MagneticButton className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold tracking-widest">
-                CONTACT US
-              </MagneticButton>
-            </Link> */}
+            {/* DESKTOP NAV */}
+            <nav className="hidden md:flex items-center gap-6 lg:gap-7">
+              <Link
+                to="/domestic"
+                className={`text-sm font-medium transition-colors duration-300 ${
+                  isScrolled
+                    ? "text-foreground hover:text-primary"
+                    : "text-white/90 hover:text-white"
+                }`}
+              >
+                Domestic
+              </Link>
 
+              <Link
+                to="/international"
+                className={`text-sm font-medium transition-colors duration-300 ${
+                  isScrolled
+                    ? "text-foreground hover:text-primary"
+                    : "text-white/90 hover:text-white"
+                }`}
+              >
+                International
+              </Link>
+
+              <Link
+                to="/hotels"
+                className={`text-sm font-medium transition-colors duration-300 ${
+                  isScrolled
+                    ? "text-foreground hover:text-primary"
+                    : "text-white/90 hover:text-white"
+                }`}
+              >
+                Hotels
+              </Link>
+
+              <Link
+                to="/experiences"
+                className={`text-sm font-medium transition-colors duration-300 ${
+                  isScrolled
+                    ? "text-foreground hover:text-primary"
+                    : "text-white/90 hover:text-white"
+                }`}
+              >
+                Experiences
+              </Link>
+
+              <Link
+                to="/about"
+                className={`text-sm font-medium transition-colors duration-300 ${
+                  isScrolled
+                    ? "text-foreground hover:text-primary"
+                    : "text-white/90 hover:text-white"
+                }`}
+              >
+                About
+              </Link>
+
+              <Link
+                to="/faq"
+                className={`text-sm font-medium transition-colors duration-300 ${
+                  isScrolled
+                    ? "text-foreground hover:text-primary"
+                    : "text-white/90 hover:text-white"
+                }`}
+              >
+                FAQs
+              </Link>
+            </nav>
+          </div>
+
+          {/* RIGHT: DESKTOP CTA */}
+          <div className="hidden md:flex items-center gap-3">
             <a
               href="tel:+919611922632"
-              className="flex items-center gap-2 px-5 py-2 border border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white transition-colors rounded-full text-sm font-medium whitespace-nowrap"
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
+                isScrolled
+                  ? "border border-[#151B40] text-[#151B40] hover:bg-[#151B40] hover:text-white shadow-[0_2px_12px_rgba(21,27,64,0.15)]"
+                  : "bg-[#151B40]/85 hover:bg-[#151B40] border border-white/20 text-white shadow-[0_4px_16px_rgba(21,27,64,0.45)] backdrop-blur-md"
+              }`}
             >
-              <Phone className="w-4 h-4" />
+              <Phone className="w-3.5 h-3.5 text-cyan-300" />
               +91-9611922632
             </a>
-          </nav>
+          </div>
 
           {/* MOBILE TOGGLE & PHONE */}
           <div className="flex md:hidden items-center gap-4">
             <a
               href="tel:+919611922632"
-              className="flex items-center justify-center p-2 rounded-full border border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white transition-colors"
+              className={`flex items-center justify-center p-2 rounded-full transition-colors duration-300 ${
+                isScrolled
+                  ? "border border-[#151B40] text-[#151B40] hover:bg-[#151B40] hover:text-white"
+                  : "bg-[#151B40]/85 hover:bg-[#151B40] border border-white/20 text-white shadow-[0_2px_12px_rgba(21,27,64,0.35)]"
+              }`}
               aria-label="Call Us"
             >
-              <Phone className="w-4 h-4" />
+              <Phone className="w-4 h-4 text-cyan-300" />
             </a>
             <button
               onClick={() => setMobileMenuOpen((p) => !p)}
+              className={`transition-colors duration-300 ${
+                isScrolled ? "text-foreground" : "text-white"
+              }`}
             >
               {mobileMenuOpen ? <X /> : <Menu />}
             </button>
@@ -270,101 +370,188 @@ const Header = () => {
         </motion.div>
       </header>
 
-      {/* MOBILE MENU — SERVICES ONLY */}
+      {/* MOBILE MENU (FULL-SCREEN LUXURY DRAWER) */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-[9998] bg-black/40 backdrop-blur-sm"
-              onClick={() => setMobileMenuOpen(false)}
-            />
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="fixed inset-0 z-[10000] bg-[#141926]/98 backdrop-blur-2xl text-white flex flex-col justify-between overflow-y-auto"
+          >
+            {/* Top Bar inside Mobile Menu */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-black/20">
+              <Link
+                to="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5"
+              >
+                <img
+                  src={logo}
+                  alt="Triponomic"
+                  className="h-8 w-auto brightness-0 invert"
+                />
+                <span className="font-semibold text-lg text-white">Triponomic</span>
+              </Link>
 
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="
-                fixed top-[96px]
-                left-4 right-4
-                z-[9999]
-                bg-card
-                rounded-2xl
-                p-6
-                shadow-2xl
-                max-h-[calc(100vh-120px)]
-                overflow-y-auto
-              "
-            >
-              {/* Mobile Tab Switcher */}
-              <div className="flex gap-2 mb-5">
-                <button
-                  onClick={() => setMobileSection("services")}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${
-                    mobileSection === "services"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background/70 text-muted-foreground"
-                  }`}
-                >
-                  Services
-                </button>
-                <button
-                  onClick={() => setMobileSection("hotels")}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition ${
-                    mobileSection === "hotels"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background/70 text-muted-foreground"
-                  }`}
-                >
-                  Hotels
-                </button>
-              </div>
-
-              {mobileSection === "services" ? (
-                <div className="space-y-2 mb-6">
-                  {servicesList.map(({ label, icon: Icon }) => (
-                    <div
-                      key={label}
-                      className="flex items-center gap-3 px-4 py-3 bg-background/70 rounded-xl text-xs"
-                    >
-                      <Icon className="w-4 h-4 text-primary" />
-                      {label}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="mb-6">
-                  <Link
-                    to="/hotels"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-3 w-full py-4 bg-[#344E41] text-white rounded-2xl text-sm font-bold tracking-widest hover:bg-[#2A3E34] transition-colors"
-                  >
-                    <Hotel className="w-5 h-5" />
-                    View All Hotel Partners
-                  </Link>
-                  <p className="text-center text-xs text-muted-foreground mt-3">
-                    ITC · Taj · Leela · Oberoi · JW Marriott &amp; more
-                  </p>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
                 <a
                   href="tel:+919611922632"
-                  className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#00B4D8] text-[#00B4D8] rounded-full text-xs font-bold tracking-widest"
+                  className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 hover:bg-white/20 transition active:scale-95"
+                  aria-label="Call Us"
                 >
                   <Phone className="w-4 h-4" />
-                  +91-9611922632
                 </a>
-                {/* <Link
-                  to="/enquire"
+
+                <button
+                  type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block w-full py-3 bg-primary text-primary-foreground rounded-full text-xs font-bold text-center tracking-widest"
+                  className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition active:scale-95"
+                  aria-label="Close menu"
                 >
-                  CONTACT US
-                </Link> */}
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            </motion.div>
-          </>
+            </div>
+
+            {/* Navigation Items List */}
+            <div className="px-5 py-5 space-y-2 flex-1">
+              {[
+                {
+                  to: "/domestic",
+                  label: "Domestic Journeys",
+                  sub: "Kashmir, Ladakh, Kerala, Spiti, Rajasthan",
+                  icon: MapPin,
+                  tag: "India",
+                },
+                {
+                  to: "/international",
+                  label: "International Escapes",
+                  sub: "Bali, Vietnam, Switzerland, Maldives, Europe",
+                  icon: Plane,
+                  tag: "Global",
+                },
+                {
+                  to: "/hotels",
+                  label: "5★ Partner Hotels",
+                  sub: "Contracted direct tariffs with Taj, ITC, Oberoi & Leela",
+                  icon: Hotel,
+                  tag: "Direct Tariffs",
+                },
+                {
+                  to: "/experiences",
+                  label: "Curated Experiences",
+                  sub: "Artisanal adventures, candlelit dining & scenic tours",
+                  icon: Compass,
+                },
+                {
+                  to: "/build-trail",
+                  label: "Build Your Journey",
+                  sub: "Interactive 100% custom itinerary crafter",
+                  icon: Sparkles,
+                  highlight: true,
+                  tag: "Bespoke Studio",
+                },
+                {
+                  to: "/about",
+                  label: "About Triponomic",
+                  sub: "Our philosophy, direct partner story & curators",
+                  icon: Globe,
+                },
+                {
+                  to: "/faq",
+                  label: "FAQs & Support",
+                  sub: "Booking assistance, partner tariffs & concierge",
+                  icon: HelpCircle,
+                },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center justify-between p-3.5 rounded-2xl transition-all ${
+                      item.highlight
+                        ? "bg-gradient-to-r from-[#404762] to-[#2E364E] text-white border border-[#BAC7F5]/30 shadow-lg"
+                        : "bg-white/[0.04] hover:bg-white/[0.08] active:bg-white/[0.12] text-white/90 border border-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                          item.highlight
+                            ? "bg-white/20 text-amber-300"
+                            : "bg-white/10 text-[#BAC7F5]"
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-white truncate">
+                            {item.label}
+                          </span>
+                          {item.tag && (
+                            <span
+                              className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                                item.highlight
+                                  ? "bg-amber-400 text-gray-950 font-black"
+                                  : "bg-white/10 text-[#BAC7F5]"
+                              }`}
+                            >
+                              {item.tag}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-white/60 truncate mt-0.5 font-light">
+                          {item.sub}
+                        </p>
+                      </div>
+                    </div>
+
+                    <ArrowRight className="w-4 h-4 text-white/40 shrink-0 ml-2" />
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Bottom Actions & Trust Footnote */}
+            <div className="p-5 border-t border-white/10 bg-black/40 space-y-3">
+              <div className="grid grid-cols-2 gap-2.5">
+                <a
+                  href="tel:+919611922632"
+                  className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 text-white text-xs font-bold transition border border-white/15"
+                >
+                  <Phone className="w-3.5 h-3.5 text-cyan-300" />
+                  Call Concierge
+                </a>
+
+                <a
+                  href="https://wa.me/919611922632?text=Hi%20Triponomic%2C%20I%20would%20like%20to%20plan%20a%20journey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-xs font-bold transition shadow-sm"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  WhatsApp
+                </a>
+              </div>
+
+              <Link
+                to="/build-trail"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 rounded-xl bg-[#404762] hover:bg-[#4E5779] active:scale-95 text-white text-xs font-extrabold tracking-wider uppercase text-center transition block shadow-lg"
+              >
+                ✦ Plan A Bespoke Trip
+              </Link>
+
+              <p className="text-center text-[10px] text-white/50 tracking-wider">
+                Direct Contracted Tariffs • 24/7 Dedicated Concierge
+              </p>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

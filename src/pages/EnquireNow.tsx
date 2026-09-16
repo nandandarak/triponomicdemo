@@ -3,8 +3,47 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Send, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import FAQSection from "@/components/FAQSection";
 import { useToast } from "@/hooks/use-toast";
 import BlurText from "@/components/animations/BlurText";
+
+const enquiryFaqs = [
+  {
+    id: "enq-response-time",
+    category: "Consultation & Quotes",
+    question: "How quickly will Triponomic get back to me?",
+    answer:
+      "Our team reviews new inquiries promptly. You can expect a response within 2-4 business hours (or within 30 minutes on WhatsApp during business hours) to schedule a short consultation call and understand your travel vision.",
+  },
+  {
+    id: "enq-quote-cost",
+    category: "Consultation & Quotes",
+    question: "Is receiving a custom itinerary and quote completely free?",
+    answer:
+      "Yes, 100% free with zero obligation! We take the time to learn your travel style, pacing, and preferences, and curate a detailed itinerary proposal without any upfront fee or pressure.",
+  },
+  {
+    id: "enq-itinerary-revisions",
+    category: "Consultation & Quotes",
+    question: "Can I adjust or modify the itinerary after receiving the initial quote?",
+    answer:
+      "Absolutely. Custom travel planning is fully collaborative. You can adjust sightseeing spots, upgrade or change hotel categories, modify dates, or tweak flight times with unlimited revisions until it's just right.",
+  },
+  {
+    id: "enq-info-needed",
+    category: "Consultation & Quotes",
+    question: "What details should I mention to get the most tailored proposal?",
+    answer:
+      "Helpful details include your tentative travel month/dates, travel party size (adults & children), preferred vibe (relaxed leisure, romantic escape, action-packed adventure), hotel tier (boutique, 4-star, 5-star luxury), and any special milestones (honeymoon, birthday, anniversary).",
+  },
+  {
+    id: "enq-direct-call",
+    category: "Consultation & Quotes",
+    question: "Can I speak directly with a travel architect right away?",
+    answer:
+      "Yes! If you prefer a quick phone conversation instead of waiting, call our direct lines at +91-96119 22632 or +91-97521 77088, or tap the WhatsApp button to chat with our team immediately.",
+  },
+];
 
 const EnquireNow = () => {
   const { toast } = useToast();
@@ -281,6 +320,16 @@ const EnquireNow = () => {
             </div>
           </div>
         </div>
+
+        {/* Inquiry FAQ Section */}
+        <FAQSection
+          faqs={enquiryFaqs}
+          title="Inquiry & Consultation FAQ"
+          subtitle="Everything you need to know about the Triponomic consultation process, quotes, and customization."
+          badge="Quick Answers"
+          showCategories={false}
+          className="mt-16 -mx-6 px-6"
+        />
       </main>
 
       <Footer />

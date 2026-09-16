@@ -55,18 +55,36 @@ export const BlurText: React.FC<BlurTextProps> = ({
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-60px" }}
-        className="inline-flex flex-wrap gap-x-[0.25em]"
+        className="inline"
       >
-        {elements.map((item, index) => (
-          <motion.span
-            key={`${item}-${index}`}
-            variants={itemVariants}
-            className="inline-block"
-          >
-            {item}
-            {animateBy === "words" && index < elements.length - 1 ? "\u00A0" : ""}
-          </motion.span>
-        ))}
+        {elements.map((item, index) => {
+          if (animateBy === "letters") {
+            if (item === " ") {
+              return " ";
+            }
+            return (
+              <motion.span
+                key={`${item}-${index}`}
+                variants={itemVariants}
+                className="inline-block"
+              >
+                {item}
+              </motion.span>
+            );
+          }
+
+          return (
+            <React.Fragment key={`${item}-${index}`}>
+              <motion.span
+                variants={itemVariants}
+                className="inline-block"
+              >
+                {item}
+              </motion.span>
+              {index < elements.length - 1 ? " " : ""}
+            </React.Fragment>
+          );
+        })}
       </motion.span>
     </Component>
   );

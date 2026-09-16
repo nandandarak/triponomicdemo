@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { addEnquiry } from "@/services/enquiryStore";
 
 interface Props {
   destination: string;
@@ -17,10 +18,30 @@ const TripEnquiryForm = ({ destination, onSuccess }: Props) => {
 
     const formData = new FormData(e.currentTarget);
 
-    await fetch(FORM_ACTION_URL, {
-      method: "POST",
-      mode: "no-cors",
-      body: formData,
+    const name = (formData.get("entry.2005620554") as string) || "Traveler";
+    const phone = (formData.get("entry.1166974658") as string) || "";
+    const email = (formData.get("entry.1045781291") as string) || undefined;
+    const budget = (formData.get("entry.1203831394") as string) || undefined;
+
+    try {
+      await fetch(FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (err) {
+      console.error("Google form post error", err);
+    }
+
+    // Save lead in admin store
+    addEnquiry({
+      name,
+      phone,
+      email,
+      destination,
+      source: "Enquire Modal",
+      budget,
+      notes: "Submitted via bespoke journey enquiry modal.",
     });
 
     setLoading(false);

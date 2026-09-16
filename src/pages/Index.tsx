@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PhoneIncoming, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
-import HeroSection from "@/components/HeroSection";
+import MapHero from "@/components/MapHero";
 import DestinationRow from "@/components/DestinationRow";
 import TripCategoriesSection from "@/components/TripCategoriesSection";
 import AboutSection from "@/components/AboutSection";
+import FAQSection from "@/components/FAQSection";
+import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import SelectionModal from "@/components/SelectionModal";
 import EnquiryModal from "@/components/EnquiryModal";
 import Footer from "@/components/Footer";
+import { useDestinationCards } from "@/services/cardStore";
 
 // Domestic Images
 import kashmirImg from "@/assets/kashmir.jpg";
@@ -123,6 +126,8 @@ import HappyTravelStrip from "@/components/HappyTravelStrip";
 import VelocityMarquee from "@/components/animations/VelocityMarquee";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { domesticCards, internationalCards } = useDestinationCards();
   const [selectionModal, setSelectionModal] = useState<{
     isOpen: boolean;
     type: "domestic" | "international";
@@ -152,7 +157,7 @@ const Index = () => {
       <Header />
 
       <main>
-        <HeroSection />
+        <MapHero />
 
         {/* Happy Fresh Vibe Strip */}
         <HappyTravelStrip />
@@ -171,9 +176,7 @@ const Index = () => {
           subtitle="Domestic Journeys"
           destinations={domesticCards}
           gatewayText="Discover More"
-          onGatewayClick={() =>
-            setSelectionModal({ isOpen: true, type: "domestic" })
-          }
+          onGatewayClick={() => navigate("/domestic")}
           onDestinationClick={openEnquiry}
           onEnquire={openEnquiry}
         />
@@ -184,9 +187,7 @@ const Index = () => {
           subtitle="International Adventures"
           destinations={internationalCards}
           gatewayText="Explore Global"
-          onGatewayClick={() =>
-            setSelectionModal({ isOpen: true, type: "international" })
-          }
+          onGatewayClick={() => navigate("/international")}
           onDestinationClick={openEnquiry}
           onEnquire={openEnquiry}
         />
@@ -196,8 +197,16 @@ const Index = () => {
           <VelocityMarquee speed={40} reverse={true} />
         </div>
 
+        {/* Verified Real Google Reviews Section */}
+        <div id="google-reviews">
+          <GoogleReviewsSection />
+        </div>
+
         {/* About Section */}
         <AboutSection />
+
+        {/* Frequently Asked Questions */}
+        <FAQSection />
       </main>
 
       <Footer />
@@ -215,8 +224,8 @@ const Index = () => {
         }
         destinations={
           selectionModal.type === "domestic"
-            ? domesticDestinations
-            : internationalDestinations
+            ? domesticCards.map((c) => c.name)
+            : internationalCards.map((c) => c.name)
         }
         onSelect={(destination) => {
           setSelectionModal((prev) => ({ ...prev, isOpen: false }));
@@ -241,16 +250,25 @@ const WhatsAppButton = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    const toggleVisibility = () => {
-      // Show when page is scrolled down
-      if (window.scrollY > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
+    let lastVisible = false;
+    let ticking = false;
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const visible = window.scrollY > 300;
+          if (visible !== lastVisible) {
+            lastVisible = visible;
+            setIsVisible(visible);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
-    window.addEventListener("scroll", toggleVisibility);
-    return () => window.removeEventListener("scroll", toggleVisibility);
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   if (!isVisible) return null;

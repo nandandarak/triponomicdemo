@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Clock, Coins, Sun, ArrowRight } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
@@ -82,44 +81,43 @@ const PostcardCard = ({
     };
 
   return (
-    <div className="w-full perspective-1000">
+    <div className="w-full [perspective:1000px]">
       {!isGateway ? (
         <div
           className="relative w-full aspect-[3/4] cursor-pointer"
           onMouseEnter={() => setIsFlipped(true)}
           onMouseLeave={() => setIsFlipped(false)}
-          style={{ transformStyle: "preserve-3d" }}
         >
-          <motion.div
-            className="w-full h-full"
-            animate={{ rotateY: isFlipped ? 180 : 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-            style={{ transformStyle: "preserve-3d" }}
+          <div
+            className={`w-full h-full transition-transform duration-500 ease-out [transform-style:preserve-3d] ${
+              isFlipped ? "[transform:rotateY(180deg)]" : ""
+            }`}
           >
             {/* FRONT */}
             <div
-              className="absolute inset-0 card-destination overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] group/card border border-white/20"
-              style={{ backfaceVisibility: "hidden" }}
+              className="absolute inset-0 card-destination overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.08)] group/card border border-white/20 rounded-2xl bg-slate-900 [backface-visibility:hidden]"
             >
               <img
                 src={image}
                 alt={name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-950/85 via-black/25 to-transparent" />
               <div className="absolute top-4 right-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white/90 border border-white/20">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-white border border-white/20 shadow-sm">
                   Explore
                 </span>
               </div>
               <div className="absolute bottom-0 p-6 flex items-end justify-between w-full">
                 <div>
-                  <p className="text-[11px] uppercase tracking-widest text-emerald-400 font-bold mb-1">
+                  <p className="text-xs font-semibold text-emerald-400 mb-1">
                     Featured Destination
                   </p>
                   <h3 className="text-2xl font-bold text-white leading-tight">{name}</h3>
                 </div>
-                <span className="text-[10px] text-white/60 bg-white/10 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">
+                <span className="text-xs text-white/80 bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
                   Flip ↷
                 </span>
               </div>
@@ -127,15 +125,7 @@ const PostcardCard = ({
 
             {/* BACK (SCROLLABLE FOR MOBILE) */}
             <div
-              className="absolute inset-0 card-destination flex flex-col shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-emerald-100"
-              style={{
-                backfaceVisibility: "hidden",
-                transform: "rotateY(180deg)",
-                backgroundColor: "#FFFFFF",
-                backgroundImage:
-                  "radial-gradient(circle, #10B981 0.4px, transparent 0.4px)",
-                backgroundSize: "20px 20px",
-              }}
+              className="absolute inset-0 card-destination flex flex-col shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-emerald-100 rounded-2xl bg-white [backface-visibility:hidden] [transform:rotateY(180deg)]"
             >
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
@@ -189,7 +179,7 @@ const PostcardCard = ({
                 </MagneticButton>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       ) : (
         /* GATEWAY CARD */

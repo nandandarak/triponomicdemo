@@ -19,7 +19,7 @@ const Footer = () => {
           </Link>
 
           {/* Links */}
-          <nav className="flex items-center gap-8">
+          <nav className="flex flex-wrap items-center gap-6 md:gap-8">
             <Link
               to="/"
               className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
@@ -27,10 +27,40 @@ const Footer = () => {
               Home
             </Link>
             <Link
+              to="/domestic"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Domestic
+            </Link>
+            <Link
+              to="/international"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+            >
+              International
+            </Link>
+            <Link
               to="/hotels"
               className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
             >
               Hotels
+            </Link>
+            <Link
+              to="/experiences"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Experiences
+            </Link>
+            <Link
+              to="/about"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+            >
+              About
+            </Link>
+            <Link
+              to="/faq"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+            >
+              FAQs
             </Link>
             <Link
               to="/enquire"
@@ -40,10 +70,18 @@ const Footer = () => {
             </Link>
           </nav>
 
-          {/* Copyright */}
-          <p className="text-sm font-secondary text-muted-foreground">
-            © 2026 Triponomic. All rights reserved.
-          </p>
+          {/* Copyright & Admin Link */}
+          <div className="flex items-center gap-4">
+            <p className="text-sm font-secondary text-muted-foreground">
+              © 2026 Triponomic. All rights reserved.
+            </p>
+            <Link
+              to="/admin"
+              className="text-xs font-secondary text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 opacity-60 hover:opacity-100 border border-border/40 px-2 py-0.5 rounded"
+            >
+              Admin
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

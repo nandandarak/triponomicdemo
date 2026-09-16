@@ -2,29 +2,33 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, Users, MapPin, Award, Sparkles, Heart, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import BlurText from "./animations/BlurText";
 
 /* ------------------------------------------------------------------ */
 /*  ANIMATED COUNTER                                                     */
 /* ------------------------------------------------------------------ */
 
-const useCounter = (target: number, duration = 2000, isActive: boolean) => {
+const useCounter = (target: number, duration = 1600, isActive: boolean) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!isActive) return;
-    let start = 0;
-    const increment = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
+    let startTime: number | null = null;
+    let animationFrameId: number;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      // Fast start, smooth deceleration
+      const easedProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setCount(Math.floor(easedProgress * target));
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animate);
       }
-    }, 16);
-    return () => clearInterval(timer);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameId);
   }, [target, duration, isActive]);
 
   return count;
@@ -98,7 +102,7 @@ const mosaicImages = [
 ];
 
 const stats = [
-  { value: 500, suffix: "+", label: "Happy Travellers", icon: Users, delay: 0, color: "#059669", bgLight: "#ECFDF5" },
+  { value: 9000, suffix: "+", label: "Happy Travellers", icon: Users, delay: 0, color: "#059669", bgLight: "#ECFDF5" },
   { value: 50, suffix: "+", label: "Destinations Covered", icon: MapPin, delay: 0.1, color: "#D97706", bgLight: "#FFFBEB" },
   { value: 5, suffix: "+", label: "Years of Excellence", icon: Award, delay: 0.2, color: "#0284C7", bgLight: "#F0F9FF" },
   { value: 100, suffix: "%", label: "Personalized Care", icon: Sparkles, delay: 0.3, color: "#7C3AED", bgLight: "#F5F3FF" },
@@ -113,32 +117,30 @@ const AboutSection = () => {
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   return (
-    <section ref={sectionRef} className="py-28 px-6 bg-gradient-to-b from-background via-emerald-50/20 to-background relative overflow-hidden">
+    <section ref={sectionRef} className="py-12 md:py-16 px-6 bg-gradient-to-b from-background via-emerald-50/20 to-background relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section header */}
-        <div className="mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/60 border border-emerald-200/80 text-emerald-800 text-xs font-bold tracking-wider uppercase mb-3">
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-            Who We Are
-          </div>
-          <div className="flex items-center gap-8">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
-              <BlurText text="More Than a Travel Agency" animateBy="words" className="text-gray-900" />
-            </h2>
-          </div>
-        </div>
-
         {/* Main content — split */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           {/* LEFT — Copy + Stats + CTA */}
-          <div>
+          <div className="flex flex-col justify-center">
+            {/* Section Header */}
+            <div className="mb-5">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/60 border border-emerald-200/80 text-emerald-800 text-xs font-bold tracking-wider uppercase mb-3">
+                <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+                Who We Are
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                More Than a <span className="text-emerald-700">Travel Agency</span>
+              </h2>
+            </div>
+
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="space-y-5 mb-10"
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="space-y-4 mb-8"
             >
               <p className="text-gray-800 text-base md:text-lg leading-relaxed font-medium">
                 Triponomic was born from a deep love for wanderlust and the belief that travel should make your heart skip a beat. We don't do cookie-cutter tours — we handcraft happy memories that linger forever.
@@ -208,9 +210,8 @@ const AboutSection = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.7, delay: i * 0.1, ease: "easeOut" }}
-                  className={`overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 ${
-                    i === 0 ? "col-span-2 aspect-[16/9]" : "aspect-square"
-                  }`}
+                  className={`overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 ${i === 0 ? "col-span-2 aspect-[16/9]" : "aspect-square"
+                    }`}
                 >
                   <img
                     src={img.src}

@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Users, Heart, Home, Backpack, ArrowRight, Sparkles, Compass } from "lucide-react";
 import EnquiryModal from "./EnquiryModal";
-import BlurText from "./animations/BlurText";
+import TrailBuilderModal from "./TrailBuilderModal";
 import SpotlightCard from "./animations/SpotlightCard";
 
 import soloImg from "@/assets/category_solo.jpg";
@@ -26,6 +27,8 @@ const categories = [
     accentColor: "#F59E0B",
     spotlightColor: "rgba(245, 158, 11, 0.22)",
     enquiryLabel: "Solo Trip",
+    trailVibe: "Solo" as const,
+    actionText: "Plan My Solo Trip",
   },
   {
     id: "honeymoon",
@@ -38,6 +41,8 @@ const categories = [
     accentColor: "#EC4899",
     spotlightColor: "rgba(236, 72, 153, 0.22)",
     enquiryLabel: "Honeymoon Package",
+    trailVibe: "Couple" as const,
+    actionText: "Plan My Honeymoon Trip",
   },
   {
     id: "family",
@@ -50,6 +55,8 @@ const categories = [
     accentColor: "#10B981",
     spotlightColor: "rgba(16, 185, 129, 0.22)",
     enquiryLabel: "Family Trip",
+    trailVibe: "Family" as const,
+    actionText: "Plan My Family Trip",
   },
   {
     id: "friends",
@@ -62,6 +69,8 @@ const categories = [
     accentColor: "#8B5CF6",
     spotlightColor: "rgba(139, 92, 246, 0.22)",
     enquiryLabel: "Friends Group Trip",
+    trailVibe: "Friends" as const,
+    actionText: "Plan My Friends Trip",
   },
 ];
 
@@ -72,46 +81,45 @@ const categories = [
 const CategoryCard = ({
   category,
   index,
-  onEnquire,
+  onPlanTrail,
 }: {
   category: (typeof categories)[0];
   index: number;
-  onEnquire: (label: string) => void;
+  onPlanTrail: (vibe: "Couple" | "Family" | "Friends" | "Solo") => void;
 }) => {
   const [hovered, setHovered] = useState(false);
   const Icon = category.icon;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 35 }}
+      initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className="flex-1 min-w-0"
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.55, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full"
     >
       <SpotlightCard
         spotlightColor={category.spotlightColor}
-        spotlightSize={420}
-        className="relative overflow-hidden rounded-[28px] cursor-pointer group h-full shadow-[0_10px_35px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.14)] transition-all duration-500 border border-white/40"
-        style={{ minHeight: "530px" }}
+        spotlightSize={360}
+        className="relative w-full aspect-[3/4] overflow-hidden rounded-[26px] cursor-pointer group shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_18px_45px_rgba(0,0,0,0.16)] transition-all duration-500 border border-white/30 bg-slate-900"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onClick={() => onEnquire(category.enquiryLabel)}
+        onClick={() => onPlanTrail(category.trailVibe)}
       >
         {/* Background image */}
         <motion.div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-slate-900"
           style={{ backgroundImage: `url(${category.image})` }}
-          animate={{ scale: hovered ? 1.08 : 1 }}
+          animate={{ scale: hovered ? 1.07 : 1 }}
           transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
         />
 
-        {/* Multi-tier gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950/90 via-gray-900/30 to-black/10 transition-opacity duration-300" />
+        {/* Multi-tier gradient overlay for maximum readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent transition-opacity duration-300" />
 
         {/* Dynamic top highlight badge */}
-        <div className="absolute top-5 left-5 z-20">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold tracking-wide shadow-sm">
+        <div className="absolute top-4 left-4 z-20">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-semibold tracking-wide shadow-sm">
             {category.badge}
           </span>
         </div>
@@ -125,59 +133,56 @@ const CategoryCard = ({
         />
 
         {/* Content */}
-        <div className="absolute inset-0 flex flex-col justify-end p-7 lg:p-8 z-20">
+        <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-5.5 z-20">
           {/* Icon badge with sleek glassmorphism */}
           <motion.div
-            className="mb-4 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-lg"
+            className="mb-2 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-md shadow-md"
             style={{
               backgroundColor: `${category.accentColor}30`,
               border: `1.5px solid ${category.accentColor}80`,
             }}
-            animate={{ scale: hovered ? 1.12 : 1, rotate: hovered ? 6 : 0 }}
+            animate={{ scale: hovered ? 1.1 : 1, rotate: hovered ? 6 : 0 }}
             transition={{ duration: 0.3 }}
           >
-            <Icon className="w-5 h-5 text-white" />
+            <Icon className="w-4 h-4 text-white" />
           </motion.div>
 
           {/* Label */}
           <p
-            className="text-[11px] uppercase tracking-[0.3em] font-extrabold mb-1.5 drop-shadow-sm"
+            className="text-xs uppercase tracking-wider font-extrabold mb-1 drop-shadow-sm"
             style={{ color: category.accentColor }}
           >
             {category.label}
           </p>
 
           {/* Title / Tagline */}
-          <h3 className="text-white text-2xl lg:text-3xl font-bold leading-snug mb-2 drop-shadow-md">
+          <h3 className="text-white text-lg md:text-xl font-bold leading-tight mb-1.5 drop-shadow-md">
             {category.tagline}
           </h3>
 
-          {/* Description — smooth revelation */}
+          {/* Description — legible and high contrast */}
           <motion.p
-            className="text-white/80 text-sm leading-relaxed mb-5 line-clamp-3"
-            animate={{
-              opacity: hovered ? 1 : 0.85,
-              y: hovered ? 0 : 4,
-            }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="text-white/95 text-xs sm:text-[13px] font-medium leading-snug mb-3 line-clamp-2 drop-shadow-sm"
+            animate={{ opacity: hovered ? 1 : 0.9 }}
+            transition={{ duration: 0.2 }}
           >
             {category.description}
           </motion.p>
 
           {/* Happy CTA button */}
           <motion.div
-            className="flex items-center justify-between pt-3 border-t border-white/15 w-full"
-            animate={{ opacity: hovered ? 1 : 0.85 }}
+            className="flex items-center justify-between pt-2.5 border-t border-white/15 w-full"
+            animate={{ opacity: hovered ? 1 : 0.9 }}
           >
-            <span className="text-xs font-bold text-white tracking-wider flex items-center gap-1.5">
-              Plan My {category.label.split(" ")[0]} Trip
+            <span className="text-xs font-bold text-white tracking-wide truncate pr-2">
+              {category.actionText}
             </span>
             <motion.div
-              className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-gray-900 transition-colors"
-              animate={{ x: hovered ? 4 : 0 }}
+              className="w-7 h-7 shrink-0 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-gray-900 transition-colors shadow-sm"
+              animate={{ x: hovered ? 3 : 0 }}
               transition={{ duration: 0.25 }}
             >
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </motion.div>
           </motion.div>
         </div>
@@ -191,20 +196,17 @@ const CategoryCard = ({
 /* ------------------------------------------------------------------ */
 
 const TripCategoriesSection = () => {
-  const [enquiry, setEnquiry] = useState<{ isOpen: boolean; destination: string }>({
-    isOpen: false,
-    destination: "",
-  });
+  const navigate = useNavigate();
+
+  const handlePlanTrail = (vibe: "Couple" | "Family" | "Friends" | "Solo") => {
+    navigate(`/build-trail?vibe=${vibe}`);
+  };
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-b from-background via-emerald-50/20 to-background relative overflow-hidden">
-      {/* Decorative cheerful background aura */}
-      <div className="absolute -top-40 right-0 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 left-0 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl pointer-events-none" />
-
+    <section className="pt-12 pb-8 md:pt-14 md:pb-10 px-6 bg-background relative">
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section header with BlurText */}
-        <div className="mb-14">
+        <div className="mb-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/60 border border-emerald-200/80 text-emerald-800 text-xs font-bold tracking-wider uppercase mb-3">
             <Compass className="w-3.5 h-3.5 text-emerald-600" />
             How Do You Travel?
@@ -212,11 +214,17 @@ const TripCategoriesSection = () => {
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
-                <BlurText text="Travel Your Way" animateBy="words" className="text-gray-900" />{" "}
+              <motion.h2
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight"
+              >
+                Travel Your Way{" "}
                 <span className="font-script italic text-emerald-600 font-normal">With Joy</span>
-              </h2>
-              <p className="mt-3 text-gray-600 text-sm md:text-base max-w-xl leading-relaxed">
+              </motion.h2>
+              <p className="mt-2.5 text-gray-600 text-sm max-w-xl leading-relaxed">
                 Whether you're chasing mindful solitude, unforgettable romance, joyful family moments, or wild adventures with your favorite crew — we craft journeys full of happy memories.
               </p>
             </div>
@@ -230,24 +238,17 @@ const TripCategoriesSection = () => {
         </div>
 
         {/* Cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
           {categories.map((category, index) => (
             <CategoryCard
               key={category.id}
               category={category}
               index={index}
-              onEnquire={(label) => setEnquiry({ isOpen: true, destination: label })}
+              onPlanTrail={handlePlanTrail}
             />
           ))}
         </div>
       </div>
-
-      {/* Enquiry Modal */}
-      <EnquiryModal
-        isOpen={enquiry.isOpen}
-        destination={enquiry.destination}
-        onClose={() => setEnquiry({ isOpen: false, destination: "" })}
-      />
     </section>
   );
 };
