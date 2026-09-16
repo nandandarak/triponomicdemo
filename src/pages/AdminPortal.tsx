@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 import {
   useEnquiries,
   EnquiryLead,
@@ -56,10 +57,130 @@ import {
   LogOut,
   Lock,
   KeyRound,
+  Sun,
+  Moon,
+  Database,
+  Wifi,
+  WifiOff,
+  Copy,
+  Check,
+  Volume2,
+  VolumeX,
+  Bell,
+  RefreshCw,
 } from "lucide-react";
+import {
+  getCloudSyncSettings,
+  saveCloudSyncSettings,
+  testCloudConnection,
+  pushAllEnquiriesToCloud,
+  SUPABASE_SQL_SCHEMA,
+  CloudSyncSettings,
+} from "@/services/cloudSync";
 
 export const AdminPortal: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => isAdminAuthenticated());
+
+  // Theme state with localStorage persistence (dark / light)
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    const saved = localStorage.getItem("triponomic_admin_theme");
+    return saved === "light" || saved === "dark" ? saved : "dark";
+  });
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      localStorage.setItem("triponomic_admin_theme", next);
+      return next;
+    });
+  };
+
+  // Cloud Sync state & settings
+  const [cloudSettings, setCloudSettings] = useState<CloudSyncSettings>(() => getCloudSyncSettings());
+  const [isTestingCloud, setIsTestingCloud] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string; latencyMs?: number } | null>(null);
+  const [isPushingAll, setIsPushingAll] = useState(false);
+  const [pushStatus, setPushStatus] = useState<string | null>(null);
+  const [schemaCopied, setSchemaCopied] = useState(false);
+  const [newLeadAlert, setNewLeadAlert] = useState<{ name: string; destination: string; count: number } | null>(null);
+
+  // Audio chime helper using Web Audio API (cross-browser, zero external audio asset required)
+  const playLeadNotificationChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.setValueAtTime(880.0, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.45);
+    } catch {
+      // Ignored if browser policy blocks autoplay before interaction
+    }
+  };
+
+  useEffect(() => {
+    const handleNewLead = (e: any) => {
+      const detail = e.detail;
+      if (detail && detail.latest) {
+        setNewLeadAlert({
+          name: detail.latest.name || detail.latest.fullName || "Customer",
+          destination: detail.latest.destination || "Curated Trail",
+          count: detail.newCount || 1,
+        });
+        if (cloudSettings.soundAlerts) {
+          playLeadNotificationChime();
+        }
+      }
+    };
+    window.addEventListener("triponomic_new_lead_received", handleNewLead);
+    return () => window.removeEventListener("triponomic_new_lead_received", handleNewLead);
+  }, [cloudSettings.soundAlerts]);
+
+  // Cloud action handlers
+  const handleTestCloud = async () => {
+    setIsTestingCloud(true);
+    setTestResult(null);
+    try {
+      const res = await testCloudConnection(cloudSettings);
+      setTestResult(res);
+    } finally {
+      setIsTestingCloud(false);
+    }
+  };
+
+  const handleSaveCloudSettings = () => {
+    saveCloudSyncSettings(cloudSettings);
+    handleTestCloud();
+  };
+
+  const handlePushAllToCloud = async () => {
+    setIsPushingAll(true);
+    setPushStatus(null);
+    try {
+      const res = await pushAllEnquiriesToCloud(enquiries);
+      setPushStatus(
+        `Successfully synced ${res.successCount} enquiries to the cloud!${
+          res.failCount > 0 ? ` (${res.failCount} failed)` : ""
+        }`
+      );
+    } finally {
+      setIsPushingAll(false);
+    }
+  };
+
+  const handleCopySchema = () => {
+    navigator.clipboard.writeText(SUPABASE_SQL_SCHEMA);
+    setSchemaCopied(true);
+    setTimeout(() => setSchemaCopied(false), 2500);
+  };
 
   // Password change state in Settings
   const [currentPass, setCurrentPass] = useState("");
@@ -67,7 +188,7 @@ export const AdminPortal: React.FC = () => {
   const [confirmPass, setConfirmPass] = useState("");
   const [passChangeStatus, setPassChangeStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
-  const { enquiries } = useEnquiries();
+  const { enquiries, isSyncing, syncNow } = useEnquiries();
   const { domesticCards, internationalCards, allCards } = useDestinationCards();
 
   const [activeTab, setActiveTab] = useState<"enquiries" | "domestic" | "international" | "settings">("enquiries");
@@ -288,41 +409,117 @@ export const AdminPortal: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
+    <div
+      className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
+        theme === "light" ? "admin-light bg-slate-50 text-slate-900" : "bg-slate-900 text-slate-100"
+      }`}
+    >
       {/* Top Executive Header */}
-      <header className="sticky top-0 z-40 bg-[#151B40] border-b border-white/10 shadow-md backdrop-blur-md">
+      <header
+        className={`sticky top-0 z-40 border-b shadow-sm backdrop-blur-md transition-colors duration-200 ${
+          theme === "light"
+            ? "bg-white/95 border-slate-200 text-slate-900"
+            : "bg-[#151B40] border-white/10 text-white"
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-amber-400 text-[#151B40] flex items-center justify-center font-bold text-lg shadow-md group-hover:scale-105 transition">
-                T
-              </div>
+            <Link to="/" className="flex items-center gap-3 group">
+              <img
+                src={logo}
+                alt="Triponomic"
+                className={`h-8 md:h-9 w-auto object-contain transition-transform group-hover:scale-105 ${
+                  theme === "dark" ? "brightness-0 invert" : ""
+                }`}
+              />
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-white tracking-wide text-base">TRIPONOMIC</span>
-                  <span className="text-[10px] uppercase font-bold tracking-widest bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span
+                    className={`font-bold tracking-wide text-base ${
+                      theme === "light" ? "text-slate-900" : "text-white"
+                    }`}
+                  >
+                    TRIPONOMIC
+                  </span>
+                  <span className="text-[10px] uppercase font-bold tracking-widest bg-amber-400/20 text-amber-600 dark:text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full flex items-center gap-1">
                     <ShieldCheck className="w-3 h-3" /> Admin Portal
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-300">Operations & Destination CMS Dashboard</p>
+                <p
+                  className={`text-[11px] ${
+                    theme === "light" ? "text-slate-500" : "text-slate-300"
+                  }`}
+                >
+                  Operations &amp; Destination CMS Dashboard
+                </p>
               </div>
             </Link>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* Live Cloud Sync Button */}
+            <button
+              type="button"
+              onClick={() => syncNow()}
+              disabled={isSyncing}
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all cursor-pointer shadow-sm ${
+                isSyncing
+                  ? "bg-amber-400/20 text-amber-500 border-amber-400/50 animate-pulse"
+                  : theme === "light"
+                  ? "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300"
+                  : "bg-white/10 hover:bg-white/20 text-slate-200 border-white/20"
+              }`}
+              title="Sync latest customer enquiries across all PCs"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-amber-500" : "text-emerald-500"}`} />
+              <span className="hidden sm:inline">{isSyncing ? "Syncing..." : "Sync Cloud"}</span>
+            </button>
+
+            {/* Theme Toggle Button (Light / Dark) */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all cursor-pointer shadow-sm ${
+                theme === "light"
+                  ? "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300"
+                  : "bg-white/10 hover:bg-white/20 text-amber-300 border-white/20"
+              }`}
+              title={theme === "light" ? "Switch to Dark Theme" : "Switch to Light Theme"}
+            >
+              {theme === "light" ? (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                  <span className="hidden sm:inline">Dark Theme</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Light Theme</span>
+                </>
+              )}
+            </button>
+
             <Link
               to="/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition"
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition ${
+                theme === "light"
+                  ? "bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200"
+                  : "bg-white/10 hover:bg-white/20 text-white"
+              }`}
             >
               <span>Live Website</span>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-300" />
+              <ExternalLink
+                className={`w-3.5 h-3.5 ${
+                  theme === "light" ? "text-slate-500" : "text-slate-300"
+                }`}
+              />
             </Link>
 
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 transition cursor-pointer"
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 transition cursor-pointer"
               title="Sign out of Admin Portal"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -331,6 +528,39 @@ export const AdminPortal: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* Real-time Incoming Lead Alert Banner */}
+      {newLeadAlert && (
+        <div className="bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-blue-500/20 border-b border-amber-400/40 px-4 py-2.5 backdrop-blur-md animate-in slide-in-from-top duration-300">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5 text-xs">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
+              <Bell className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className={`font-semibold ${theme === "light" ? "text-slate-900" : "text-white"}`}>
+                🔔 New Enquiry received from <span className="font-bold underline text-amber-500">{newLeadAlert.name}</span> for {newLeadAlert.destination}!
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setActiveTab("enquiries");
+                  setNewLeadAlert(null);
+                }}
+                className="text-[11px] font-bold px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 transition shadow-sm"
+              >
+                View in Inbox
+              </button>
+              <button
+                onClick={() => setNewLeadAlert(null)}
+                className="text-slate-400 hover:text-slate-200 p-1"
+                title="Dismiss"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Layout Body */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 space-y-6">
@@ -869,6 +1099,238 @@ export const AdminPortal: React.FC = () => {
         {/* TAB 4: SETTINGS & SYNC */}
         {activeTab === "settings" && (
           <div className="max-w-3xl space-y-6">
+            {/* Cloud Database & Live Cross-Device Sync Setup */}
+            <div className="bg-slate-800/80 border border-amber-500/30 rounded-2xl p-6 space-y-5 shadow-lg relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/80 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400">
+                    <Database className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-bold text-white">Cloud Database &amp; Cross-Device Sync</h3>
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <Wifi className="w-3 h-3" /> Live Sync
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300">
+                      Syncs enquiries in real-time when customers submit from other PCs or mobile phones.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleTestCloud}
+                    disabled={isTestingCloud}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600 transition cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isTestingCloud ? "animate-spin text-amber-400" : ""}`} />
+                    <span>{isTestingCloud ? "Testing..." : "Test Connection"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveCloudSettings}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold transition shadow-sm cursor-pointer"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Save Config</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Status or Diagnostic Result */}
+              {testResult && (
+                <div
+                  className={`p-3 rounded-xl border text-xs flex items-center gap-2.5 animate-in fade-in duration-200 ${
+                    testResult.success
+                      ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
+                      : "bg-red-500/15 border-red-500/40 text-red-300"
+                  }`}
+                >
+                  {testResult.success ? (
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+                  )}
+                  <span>{testResult.message}</span>
+                </div>
+              )}
+
+              {pushStatus && (
+                <div className="p-3 rounded-xl border border-blue-500/40 bg-blue-500/15 text-blue-300 text-xs flex items-center gap-2 animate-in fade-in duration-200">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-blue-400" />
+                  <span>{pushStatus}</span>
+                </div>
+              )}
+
+              {/* Provider Selection */}
+              <div className="space-y-3">
+                <label className="block text-xs font-semibold text-slate-200 uppercase tracking-wider">
+                  Cloud Storage Provider
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {[
+                    { id: "supabase", label: "Supabase (Recommended)", desc: "PostgreSQL with instant REST API" },
+                    { id: "firebase", label: "Google Firebase", desc: "Realtime DB instant sync" },
+                    { id: "webhook", label: "Custom Webhook", desc: "Google Sheets / API URL" },
+                  ].map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setCloudSettings((prev) => ({ ...prev, provider: p.id as any }))}
+                      className={`p-3 rounded-xl border text-left transition cursor-pointer ${
+                        cloudSettings.provider === p.id
+                          ? "bg-[#151B40] border-amber-400 text-white shadow-md"
+                          : "bg-slate-900/60 border-slate-700 text-slate-300 hover:border-slate-600"
+                      }`}
+                    >
+                      <div className="font-semibold text-xs text-white">{p.label}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{p.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Provider Configuration Inputs */}
+              {cloudSettings.provider === "supabase" && (
+                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                      <Database className="w-3.5 h-3.5" /> Supabase Connection Details
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopySchema}
+                      className="text-[11px] font-semibold text-slate-300 hover:text-white flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 border border-slate-700 hover:bg-slate-700 transition cursor-pointer"
+                      title="Copy SQL table definition to clipboard"
+                    >
+                      {schemaCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      <span>{schemaCopied ? "SQL Copied!" : "Copy SQL Schema"}</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-400 mb-1">
+                        Supabase Project URL
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://xyzcompany.supabase.co"
+                        value={cloudSettings.supabaseUrl}
+                        onChange={(e) => setCloudSettings({ ...cloudSettings, supabaseUrl: e.target.value.trim() })}
+                        className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-400 mb-1">
+                        Supabase Public Anon Key
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+                        value={cloudSettings.supabaseAnonKey}
+                        onChange={(e) => setCloudSettings({ ...cloudSettings, supabaseAnonKey: e.target.value.trim() })}
+                        className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Tip: Create a free project on <a href="https://supabase.com" target="_blank" rel="noreferrer" className="text-amber-400 underline">supabase.com</a>, click <strong>"Copy SQL Schema"</strong> above, paste it into the Supabase SQL Editor and click Run. Then paste your URL and Anon Key here.
+                  </p>
+                </div>
+              )}
+
+              {cloudSettings.provider === "firebase" && (
+                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-3">
+                  <label className="block text-[11px] font-medium text-slate-400">
+                    Firebase Realtime Database URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://your-triponomic-default-rtdb.firebaseio.com"
+                    value={cloudSettings.firebaseUrl}
+                    onChange={(e) => setCloudSettings({ ...cloudSettings, firebaseUrl: e.target.value.trim() })}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              )}
+
+              {cloudSettings.provider === "webhook" && (
+                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-3">
+                  <label className="block text-[11px] font-medium text-slate-400">
+                    Webhook Endpoint / Google Apps Script URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://script.google.com/macros/s/.../exec"
+                    value={cloudSettings.webhookUrl}
+                    onChange={(e) => setCloudSettings({ ...cloudSettings, webhookUrl: e.target.value.trim() })}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              )}
+
+              {/* Sync Controls & Options */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
+                  <div>
+                    <div className="text-xs font-semibold text-white">Auto-Polling Interval</div>
+                    <div className="text-[10px] text-slate-400">Checks for customer leads in background</div>
+                  </div>
+                  <select
+                    value={cloudSettings.pollIntervalMs}
+                    onChange={(e) => setCloudSettings({ ...cloudSettings, pollIntervalMs: Number(e.target.value) })}
+                    className="bg-slate-950 border border-slate-700 text-xs text-white rounded-lg px-2.5 py-1 focus:outline-none focus:border-amber-400 cursor-pointer"
+                  >
+                    <option value={5000}>5 Seconds (Live)</option>
+                    <option value={10000}>10 Seconds (Standard)</option>
+                    <option value={30000}>30 Seconds</option>
+                    <option value={60000}>1 Minute</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
+                  <div>
+                    <div className="text-xs font-semibold text-white">Audio Alert on New Lead</div>
+                    <div className="text-[10px] text-slate-400">Plays chime when enquiry arrives</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCloudSettings({ ...cloudSettings, soundAlerts: !cloudSettings.soundAlerts })}
+                    className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg border transition cursor-pointer ${
+                      cloudSettings.soundAlerts
+                        ? "bg-amber-400/20 text-amber-400 border-amber-400/40"
+                        : "bg-slate-800 text-slate-400 border-slate-700"
+                    }`}
+                  >
+                    {cloudSettings.soundAlerts ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                    <span>{cloudSettings.soundAlerts ? "Sound ON" : "Muted"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Push Local to Cloud Action */}
+              <div className="flex items-center justify-between p-3.5 rounded-xl bg-amber-400/10 border border-amber-400/20">
+                <div>
+                  <div className="text-xs font-bold text-amber-300">Push Local Enquiries to Cloud</div>
+                  <div className="text-[11px] text-slate-300">Uploads all {enquiries.length} current enquiries so other PCs immediately see them.</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handlePushAllToCloud}
+                  disabled={isPushingAll}
+                  className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 transition shadow-sm shrink-0 cursor-pointer"
+                >
+                  {isPushingAll ? "Uploading..." : "Push to Cloud"}
+                </button>
+              </div>
+            </div>
+
             <div className="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 space-y-4">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-amber-400" />

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 import { verifyAdminCredentials } from "@/services/adminAuth";
 import { Shield, Lock, User, Eye, EyeOff, ArrowRight, AlertCircle, Sparkles } from "lucide-react";
 
@@ -54,8 +55,8 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess }) => {
       <div className="w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-8 relative z-10 space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#151B40] border border-amber-400/40 text-amber-400 shadow-xl mx-auto">
-            <Shield className="w-8 h-8" />
+          <div className="inline-flex items-center justify-center px-4 py-3 rounded-2xl bg-[#151B40] border border-amber-400/40 shadow-xl mx-auto">
+            <img src={logo} alt="Triponomic" className="h-9 w-auto object-contain brightness-0 invert" />
           </div>
           <div>
             <div className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-widest text-amber-300">

@@ -1,4 +1,12 @@
 import { useState, useEffect } from "react";
+import {
+  pushEnquiryToCloud,
+  fetchEnquiriesFromCloud,
+  updateEnquiryInCloud,
+  deleteEnquiryFromCloud,
+  getCloudSyncSettings,
+  processOfflineQueue,
+} from "./cloudSync";
 
 export interface EnquiryLead {
   id: string;
@@ -171,6 +179,12 @@ export const addEnquiry = (
   } catch (err) {
     console.error("Error saving enquiry", err);
   }
+
+  // Asynchronously dispatch to Cloud Database so Admin Portal on other PCs receive it
+  pushEnquiryToCloud(newLead).catch((err) => {
+    console.warn("Async cloud enquiry sync queued", err);
+  });
+
   return newLead;
 };
 
@@ -197,6 +211,11 @@ export const updateEnquiryStatus = (
   } catch (err) {
     console.error("Error updating enquiry", err);
   }
+
+  // Update in cloud
+  updateEnquiryInCloud(id, { status, notes }).catch((err) => {
+    console.warn("Cloud status update failed", err);
+  });
 };
 
 export const updateEnquiryNotes = (id: string, notes: string): void => {
@@ -217,6 +236,11 @@ export const updateEnquiryNotes = (id: string, notes: string): void => {
   } catch (err) {
     console.error("Error updating enquiry notes", err);
   }
+
+  // Update in cloud
+  updateEnquiryInCloud(id, { notes }).catch((err) => {
+    console.warn("Cloud notes update failed", err);
+  });
 };
 
 export const deleteEnquiry = (id: string): void => {
@@ -228,6 +252,11 @@ export const deleteEnquiry = (id: string): void => {
   } catch (err) {
     console.error("Error deleting enquiry", err);
   }
+
+  // Delete from cloud
+  deleteEnquiryFromCloud(id).catch((err) => {
+    console.warn("Cloud delete failed", err);
+  });
 };
 
 export const clearAllEnquiries = (): void => {
@@ -248,8 +277,80 @@ export const resetEnquiriesToDefault = (): void => {
   }
 };
 
+/**
+ * Synchronize local enquiries store with remote Cloud Database
+ */
+export const syncWithCloud = async (): Promise<{ newCount: number }> => {
+  try {
+    processOfflineQueue();
+    const cloudLeads = await fetchEnquiriesFromCloud();
+    if (!cloudLeads || !cloudLeads.length) return { newCount: 0 };
+
+    const localLeads = getEnquiries();
+    const localMap = new Map<string, EnquiryLead>(localLeads.map((l) => [l.id, l]));
+
+    let newCount = 0;
+    const mergedList: EnquiryLead[] = [];
+
+    // Combine cloud leads and local leads intelligently
+    for (const cloudLead of cloudLeads) {
+      if (!localMap.has(cloudLead.id)) {
+        newCount++;
+        mergedList.push(cloudLead);
+      } else {
+        const local = localMap.get(cloudLead.id)!;
+        // Merge: keep latest status & notes
+        mergedList.push({
+          ...cloudLead,
+          status: local.status || cloudLead.status,
+          notes: local.notes !== undefined ? local.notes : cloudLead.notes,
+        });
+        localMap.delete(cloudLead.id);
+      }
+    }
+
+    // Append any local-only leads that are not in cloud yet
+    for (const remainingLocal of localMap.values()) {
+      mergedList.push(remainingLocal);
+    }
+
+    // Sort newest first
+    mergedList.sort((a, b) => {
+      const timeA = new Date(a.createdAt || a.date || 0).getTime();
+      const timeB = new Date(b.createdAt || b.date || 0).getTime();
+      return timeB - timeA;
+    });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedList));
+    window.dispatchEvent(new CustomEvent("triponomic_enquiries_updated"));
+
+    if (newCount > 0) {
+      window.dispatchEvent(
+        new CustomEvent("triponomic_new_lead_received", {
+          detail: { newCount, latest: cloudLeads[0] },
+        })
+      );
+    }
+
+    return { newCount };
+  } catch (err) {
+    console.error("Cloud sync error", err);
+    return { newCount: 0 };
+  }
+};
+
 export const useEnquiries = () => {
   const [enquiries, setEnquiries] = useState<EnquiryLead[]>(() => getEnquiries());
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+
+  const performSync = async () => {
+    setIsSyncing(true);
+    try {
+      await syncWithCloud();
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   useEffect(() => {
     const handleUpdate = () => {
@@ -259,14 +360,44 @@ export const useEnquiries = () => {
     window.addEventListener("triponomic_enquiries_updated", handleUpdate);
     window.addEventListener("storage", handleUpdate);
 
+    // Initial background sync on mount
+    performSync();
+
+    // Auto-polling interval for real-time updates across multiple PCs
+    const settings = getCloudSyncSettings();
+    const intervalMs = settings.pollIntervalMs || 10000;
+
+    let timer: any = null;
+    if (settings.enabled) {
+      timer = setInterval(() => {
+        syncWithCloud();
+      }, intervalMs);
+    }
+
+    // Listen for settings changes to update poll interval
+    const handleSettingsChange = (e: any) => {
+      if (timer) clearInterval(timer);
+      const newSettings = e.detail;
+      if (newSettings && newSettings.enabled) {
+        timer = setInterval(() => {
+          syncWithCloud();
+        }, newSettings.pollIntervalMs || 10000);
+      }
+    };
+    window.addEventListener("triponomic_cloud_settings_changed", handleSettingsChange);
+
     return () => {
       window.removeEventListener("triponomic_enquiries_updated", handleUpdate);
       window.removeEventListener("storage", handleUpdate);
+      window.removeEventListener("triponomic_cloud_settings_changed", handleSettingsChange);
+      if (timer) clearInterval(timer);
     };
   }, []);
 
   return {
     enquiries,
+    isSyncing,
+    syncNow: performSync,
     addEnquiry,
     updateEnquiryStatus,
     updateEnquiryNotes,

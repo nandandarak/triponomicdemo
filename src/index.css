@@ -216,3 +216,130 @@
   animation: marquee-reverse linear infinite;
   will-change: transform;
 }
+
+/* =======================================
+   ADMIN PORTAL LIGHT THEME ENHANCEMENTS
+======================================= */
+.admin-light {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.admin-light .bg-slate-800\/80,
+.admin-light .bg-slate-800\/70,
+.admin-light .bg-slate-800\/60,
+.admin-light .bg-slate-800\/90,
+.admin-light .bg-slate-800\/40,
+.admin-light .bg-slate-800 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+.admin-light table {
+  background-color: #ffffff !important;
+}
+
+.admin-light tbody tr {
+  background-color: #ffffff !important;
+}
+
+.admin-light tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+.admin-light thead {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
+.admin-light thead th {
+  color: #475569 !important;
+}
+
+.admin-light .bg-slate-700 {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+}
+
+.admin-light .bg-slate-900\/60,
+.admin-light .bg-slate-900\/80,
+.admin-light .bg-slate-900 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+.admin-light .border-slate-800,
+.admin-light .border-slate-700,
+.admin-light .border-slate-700\/80,
+.admin-light .border-slate-700\/60,
+.admin-light .border-slate-700\/50 {
+  border-color: #e2e8f0 !important;
+}
+
+.admin-light .text-white {
+  color: #0f172a !important;
+}
+
+.admin-light .text-slate-100,
+.admin-light .text-slate-200 {
+  color: #1e293b !important;
+}
+
+.admin-light .text-slate-300 {
+  color: #334155 !important;
+}
+
+.admin-light .text-slate-400 {
+  color: #64748b !important;
+}
+
+.admin-light input,
+.admin-light select,
+.admin-light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.admin-light input::placeholder,
+.admin-light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.admin-light th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+}
+
+.admin-light tr.hover\:bg-slate-700\/30:hover {
+  background-color: #f8fafc !important;
+}
+
+.admin-light .divide-slate-700 > :not([hidden]) ~ :not([hidden]),
+.admin-light .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e2e8f0 !important;
+}
+
+.admin-light nav button.text-slate-400 {
+  color: #64748b !important;
+}
+
+.admin-light nav button.text-slate-400:hover {
+  color: #0f172a !important;
+  background-color: #e2e8f0 !important;
+}
+
+.admin-light .fixed .bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.admin-light .fixed .bg-slate-950 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
