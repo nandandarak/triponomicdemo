@@ -488,6 +488,8 @@ export const fetchEnquiriesFromCloud = async (): Promise<EnquiryLead[] | null> =
 // ==========================================
 // UPDATE LEAD STATUS IN CLOUD
 // ==========================================
+// UPDATE LEAD STATUS IN CLOUD
+// ==========================================
 export const updateEnquiryInCloud = async (
   id: string,
   updates: Partial<EnquiryLead>
@@ -523,18 +525,50 @@ export const updateEnquiryInCloud = async (
     } else {
       const appsScriptUrl = settings.webhookUrl || HARDCODED_APPS_SCRIPT_URL;
       if (appsScriptUrl) {
-        const phoneClean = (updates.phone || id.split("-").pop() || "").replace(/[^0-9]/g, "");
-        await fetch(appsScriptUrl, {
-          method: "POST",
-          mode: "no-cors",
-          body: JSON.stringify({
-            action: "update_status",
-            id,
-            phone: phoneClean || updates.phone || "",
-            status: updates.status || "New",
-            notes: updates.notes,
-          }),
-        });
+        const fullPhone = updates.phone || "";
+        const phoneClean = fullPhone.replace(/[^0-9]/g, "");
+        const rowMatch = id.match(/^gsheet-(\d+)/);
+        const rowIndex = rowMatch ? parseInt(rowMatch[1], 10) : undefined;
+
+        // 1. Send as application/x-www-form-urlencoded
+        const params = new URLSearchParams();
+        params.append("action", "update_status");
+        params.append("id", id);
+        params.append("phone", fullPhone);
+        params.append("phoneClean", phoneClean);
+        if (rowIndex !== undefined) params.append("rowIndex", String(rowIndex));
+        params.append("name", updates.name || updates.fullName || "");
+        params.append("status", updates.status || "New");
+        if (updates.notes !== undefined) params.append("notes", updates.notes);
+
+        try {
+          await fetch(appsScriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString(),
+          });
+        } catch (e) {}
+
+        // 2. Also send as raw JSON payload
+        try {
+          await fetch(appsScriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({
+              action: "update_status",
+              id,
+              phone: fullPhone,
+              phoneClean,
+              rowIndex,
+              name: updates.name || updates.fullName || "",
+              status: updates.status || "New",
+              notes: updates.notes,
+            }),
+          });
+        } catch (e) {}
+
         return true;
       }
     }
@@ -548,7 +582,10 @@ export const updateEnquiryInCloud = async (
 // ==========================================
 // DELETE LEAD FROM CLOUD
 // ==========================================
-export const deleteEnquiryFromCloud = async (id: string): Promise<boolean> => {
+export const deleteEnquiryFromCloud = async (
+  id: string,
+  extra?: { phone?: string; name?: string }
+): Promise<boolean> => {
   const settings = getCloudSyncSettings();
   if (!settings.enabled) return false;
 
@@ -572,16 +609,46 @@ export const deleteEnquiryFromCloud = async (id: string): Promise<boolean> => {
     } else {
       const appsScriptUrl = settings.webhookUrl || HARDCODED_APPS_SCRIPT_URL;
       if (appsScriptUrl) {
-        const phoneClean = (id.split("-").pop() || "").replace(/[^0-9]/g, "");
-        await fetch(appsScriptUrl, {
-          method: "POST",
-          mode: "no-cors",
-          body: JSON.stringify({
-            action: "delete_enquiry",
-            id,
-            phone: phoneClean,
-          }),
-        });
+        const fullPhone = extra?.phone || "";
+        const phoneClean = fullPhone.replace(/[^0-9]/g, "");
+        const rowMatch = id.match(/^gsheet-(\d+)/);
+        const rowIndex = rowMatch ? parseInt(rowMatch[1], 10) : undefined;
+
+        // 1. Send as application/x-www-form-urlencoded
+        const params = new URLSearchParams();
+        params.append("action", "delete_enquiry");
+        params.append("id", id);
+        params.append("phone", fullPhone);
+        params.append("phoneClean", phoneClean);
+        if (rowIndex !== undefined) params.append("rowIndex", String(rowIndex));
+        if (extra?.name) params.append("name", extra.name);
+
+        try {
+          await fetch(appsScriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString(),
+          });
+        } catch (e) {}
+
+        // 2. Also send as raw JSON payload
+        try {
+          await fetch(appsScriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({
+              action: "delete_enquiry",
+              id,
+              phone: fullPhone,
+              phoneClean,
+              rowIndex,
+              name: extra?.name || "",
+            }),
+          });
+        } catch (e) {}
+
         return true;
       }
     }

@@ -188,12 +188,35 @@ export const addEnquiry = (
   return newLead;
 };
 
+const DELETED_KEYS_STORAGE = "triponomic_deleted_enquiry_ids_v1";
+
+export const getDeletedEnquiryIds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(DELETED_KEYS_STORAGE);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw));
+  } catch {
+    return new Set();
+  }
+};
+
+export const markEnquiryAsDeletedLocally = (id: string): void => {
+  try {
+    const set = getDeletedEnquiryIds();
+    set.add(id);
+    localStorage.setItem(DELETED_KEYS_STORAGE, JSON.stringify(Array.from(set)));
+  } catch (err) {
+    console.error("Error saving deleted enquiry ID", err);
+  }
+};
+
 export const updateEnquiryStatus = (
   id: string,
   status: EnquiryLead["status"],
   notes?: string
 ): void => {
   const all = getEnquiries();
+  const targetLead = all.find((item) => item.id === id);
   const updated = all.map((item) => {
     if (item.id === id) {
       return {
@@ -212,14 +235,20 @@ export const updateEnquiryStatus = (
     console.error("Error updating enquiry", err);
   }
 
-  // Update in cloud
-  updateEnquiryInCloud(id, { status, notes }).catch((err) => {
+  // Update in cloud with full lead phone & name
+  updateEnquiryInCloud(id, {
+    status,
+    notes: notes !== undefined ? notes : targetLead?.notes,
+    phone: targetLead?.phone,
+    name: targetLead?.name || targetLead?.fullName,
+  }).catch((err) => {
     console.warn("Cloud status update failed", err);
   });
 };
 
 export const updateEnquiryNotes = (id: string, notes: string): void => {
   const all = getEnquiries();
+  const targetLead = all.find((item) => item.id === id);
   const updated = all.map((item) => {
     if (item.id === id) {
       return {
@@ -237,15 +266,23 @@ export const updateEnquiryNotes = (id: string, notes: string): void => {
     console.error("Error updating enquiry notes", err);
   }
 
-  // Update in cloud
-  updateEnquiryInCloud(id, { notes }).catch((err) => {
+  // Update in cloud with full lead phone & name
+  updateEnquiryInCloud(id, {
+    notes,
+    status: targetLead?.status,
+    phone: targetLead?.phone,
+    name: targetLead?.name || targetLead?.fullName,
+  }).catch((err) => {
     console.warn("Cloud notes update failed", err);
   });
 };
 
 export const deleteEnquiry = (id: string): void => {
+  markEnquiryAsDeletedLocally(id);
   const all = getEnquiries();
+  const targetLead = all.find((item) => item.id === id);
   const updated = all.filter((item) => item.id !== id);
+
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent("triponomic_enquiries_updated"));
@@ -254,7 +291,10 @@ export const deleteEnquiry = (id: string): void => {
   }
 
   // Delete from cloud
-  deleteEnquiryFromCloud(id).catch((err) => {
+  deleteEnquiryFromCloud(id, {
+    phone: targetLead?.phone,
+    name: targetLead?.name || targetLead?.fullName,
+  }).catch((err) => {
     console.warn("Cloud delete failed", err);
   });
 };
@@ -271,6 +311,7 @@ export const clearAllEnquiries = (): void => {
 export const resetEnquiriesToDefault = (): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_ENQUIRIES));
+    localStorage.removeItem(DELETED_KEYS_STORAGE);
     window.dispatchEvent(new CustomEvent("triponomic_enquiries_updated"));
   } catch (err) {
     console.error("Error resetting enquiries", err);
@@ -286,6 +327,7 @@ export const syncWithCloud = async (): Promise<{ newCount: number }> => {
     const cloudLeads = await fetchEnquiriesFromCloud();
     if (!cloudLeads || !cloudLeads.length) return { newCount: 0 };
 
+    const deletedIds = getDeletedEnquiryIds();
     const localLeads = getEnquiries();
     const localMap = new Map<string, EnquiryLead>(localLeads.map((l) => [l.id, l]));
 
@@ -294,12 +336,17 @@ export const syncWithCloud = async (): Promise<{ newCount: number }> => {
 
     // Combine cloud leads and local leads intelligently
     for (const cloudLead of cloudLeads) {
+      // Skip any lead that the Admin explicitly deleted
+      if (deletedIds.has(cloudLead.id)) {
+        continue;
+      }
+
       if (!localMap.has(cloudLead.id)) {
         newCount++;
         mergedList.push(cloudLead);
       } else {
         const local = localMap.get(cloudLead.id)!;
-        // Merge: keep latest status & notes
+        // Merge: local status & notes override cloud if set
         mergedList.push({
           ...cloudLead,
           status: local.status || cloudLead.status,
@@ -311,7 +358,9 @@ export const syncWithCloud = async (): Promise<{ newCount: number }> => {
 
     // Append any local-only leads that are not in cloud yet
     for (const remainingLocal of localMap.values()) {
-      mergedList.push(remainingLocal);
+      if (!deletedIds.has(remainingLocal.id)) {
+        mergedList.push(remainingLocal);
+      }
     }
 
     // Sort newest first
