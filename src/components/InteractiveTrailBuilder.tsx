@@ -1528,10 +1528,15 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
                               type="tel"
                               value={customerPhone}
                               onChange={(e) => {
-                                setCustomerPhone(e.target.value);
-                                if (phoneError) setPhoneError(false);
+                                const val = e.target.value;
+                                const digitsOnly = val.replace(/\D/g, "");
+                                if (digitsOnly.length <= 10 || (digitsOnly.startsWith("91") && digitsOnly.length <= 12)) {
+                                  setCustomerPhone(val);
+                                  if (phoneError) setPhoneError(false);
+                                }
                               }}
-                              placeholder="e.g. +91 98765 43210"
+                              placeholder="10-digit mobile number (e.g. 9876543210)"
+                              maxLength={15}
                               className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-white text-sm font-medium text-gray-900 outline-none transition shadow-sm ${phoneError
                                 ? "border-red-500 ring-2 ring-red-200"
                                 : "border-gray-300 focus:border-[#404762]"
@@ -1539,8 +1544,8 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
                             />
                           </div>
                           {phoneError && (
-                            <p className="text-[11px] text-red-600 mt-1 font-semibold">
-                              ⚠ Please enter a valid 10-digit mobile number
+                            <p className="text-[11px] text-red-600 mt-1 font-bold animate-shake flex items-center gap-1">
+                              ⚠ Mobile number must be strictly 10 digits
                             </p>
                           )}
                         </div>

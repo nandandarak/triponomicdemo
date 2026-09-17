@@ -81,6 +81,16 @@ const EnquireNow = () => {
       return;
     }
 
+    const trimmedEmail = formData.email.trim();
+    if (!trimmedEmail || !trimmedEmail.includes("@") || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      toast({
+        title: "Invalid Email Address",
+        description: "Please enter a valid email address containing '@' (e.g. name@domain.com).",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     const url = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/formResponse";
