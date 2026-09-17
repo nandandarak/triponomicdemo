@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Clock, Coins, Sun, ArrowRight } from "lucide-react";
 
 interface DestinationData {
@@ -73,6 +73,7 @@ const PostcardCard = ({
   onFlipToggle,
 }: PostcardCardProps) => {
   const [internalFlipped, setInternalFlipped] = useState(false);
+  const isTouchRef = useRef(false);
   const isFlipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped;
 
   const data =
@@ -83,21 +84,34 @@ const PostcardCard = ({
       bestTime: "Oct – Mar",
     };
 
+  const handleTouchStart = () => {
+    isTouchRef.current = true;
+  };
+
   const handleMouseEnter = () => {
+    if (isTouchRef.current) return;
+    if (typeof window !== "undefined" && !window.matchMedia("(hover: hover)").matches) return;
+
     setInternalFlipped(true);
     onFlipToggle?.(true);
   };
 
   const handleMouseLeave = () => {
+    if (isTouchRef.current) return;
+    if (typeof window !== "undefined" && !window.matchMedia("(hover: hover)").matches) return;
+
     setInternalFlipped(false);
     onFlipToggle?.(false);
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // For mobile/touch support or clicking to toggle
     const next = !isFlipped;
     setInternalFlipped(next);
     onFlipToggle?.(next);
+
+    setTimeout(() => {
+      isTouchRef.current = false;
+    }, 400);
   };
 
   return (
@@ -105,6 +119,7 @@ const PostcardCard = ({
       {!isGateway ? (
         <div
           className="relative w-full aspect-[3/4] cursor-pointer group select-none"
+          onTouchStart={handleTouchStart}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleCardClick}

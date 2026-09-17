@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Clock, Coins, Sun, ArrowRight } from "lucide-react";
 import MagneticButton from "../MagneticButton";
@@ -71,6 +71,7 @@ const PostcardCard = ({
   destinationData,
 }: PostcardCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const isTouchRef = useRef(false);
 
   const data =
     destinationData ||
@@ -79,6 +80,29 @@ const PostcardCard = ({
       investment: "₹45,000",
       bestTime: "Oct - Mar",
     };
+
+  const handleTouchStart = () => {
+    isTouchRef.current = true;
+  };
+
+  const handleMouseEnter = () => {
+    if (isTouchRef.current) return;
+    if (typeof window !== "undefined" && !window.matchMedia("(hover: hover)").matches) return;
+    setIsFlipped(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (isTouchRef.current) return;
+    if (typeof window !== "undefined" && !window.matchMedia("(hover: hover)").matches) return;
+    setIsFlipped(false);
+  };
+
+  const handleCardClick = () => {
+    setIsFlipped((prev) => !prev);
+    setTimeout(() => {
+      isTouchRef.current = false;
+    }, 400);
+  };
 
   return (
     <motion.div
@@ -91,8 +115,10 @@ const PostcardCard = ({
       {!isGateway ? (
         <div
           className="relative w-full aspect-[3/4] card-destination cursor-pointer"
-          onMouseEnter={() => setIsFlipped(true)}
-          onMouseLeave={() => setIsFlipped(false)}
+          onTouchStart={handleTouchStart}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleCardClick}
         >
           {!isFlipped ? (
             <div className="absolute inset-0 overflow-hidden">
