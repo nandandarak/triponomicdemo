@@ -169,7 +169,7 @@ const Domestic = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header transparentAtTop />
 
       {/* PAGE HERO WITH LOOPING INDIA VIDEO */}
       <section className="relative min-h-[75vh] md:min-h-[82vh] flex flex-col justify-center items-center pt-32 pb-20 px-6 overflow-hidden bg-[#0a150f] text-white">

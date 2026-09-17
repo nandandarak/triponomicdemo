@@ -175,7 +175,7 @@ const International = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header transparentAtTop />
 
       {/* PAGE HERO WITH LOOPING WORLD VIDEO */}
       <section className="relative min-h-[75vh] md:min-h-[82vh] flex flex-col justify-center items-center pt-32 pb-20 px-6 overflow-hidden bg-[#0c1622] text-white">

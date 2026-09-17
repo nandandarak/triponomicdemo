@@ -184,9 +184,13 @@ const DesktopDropdown = ({
   );
 };
 
+interface HeaderProps {
+  transparentAtTop?: boolean;
+}
+
 /* ---------------- HEADER ---------------- */
 
-const Header = () => {
+const Header = ({ transparentAtTop = false }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -234,6 +238,8 @@ const Header = () => {
         <motion.div
           className={`mx-auto max-w-7xl rounded-full px-6 py-2.5 flex items-center justify-between transition-all duration-500 ${isScrolled
               ? "glass-header shadow-[0_4px_30px_rgba(139,125,107,0.12)] border border-border/40"
+              : transparentAtTop
+              ? "bg-transparent border-transparent shadow-none"
               : "bg-black/20 backdrop-blur-sm border border-white/10"
             }`}
         >
