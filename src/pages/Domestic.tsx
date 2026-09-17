@@ -363,7 +363,7 @@ const Domestic = () => {
             </p>
           </div>
 
-          <InteractiveTrailBuilder initialDestination="Kashmir" />
+          <InteractiveTrailBuilder />
         </div>
       </section>
 

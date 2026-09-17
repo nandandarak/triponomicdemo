@@ -369,7 +369,7 @@ const International = () => {
             </p>
           </div>
 
-          <InteractiveTrailBuilder initialDestination="Bali" />
+          <InteractiveTrailBuilder />
         </div>
       </section>
 
