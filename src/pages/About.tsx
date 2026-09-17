@@ -30,36 +30,35 @@ import traveler4 from "@/assets/traveler_4.jpg";
 const stats = [
   { value: 9000, suffix: "+", label: "Happy Travellers Handled", desc: "Curated with love across India & worldwide" },
   { value: 50, suffix: "+", label: "Destinations Covered", desc: "From Himalayan valleys to European lakes" },
-  { value: 58, suffix: "+", label: "Verified Google Reviews", desc: "100% 5-Star rated client satisfaction" },
   { value: 100, suffix: "%", label: "Tailor-Made Routes", desc: "Zero cookie-cutter off-the-shelf packages" },
 ];
 
 const pillars = [
   {
     icon: Compass,
-    title: "Crafted From Scratch",
-    desc: "No two travelers are alike. We design every single day around your preferences, energy levels, dietary tastes, and budget.",
+    title: "100% Customized Trips",
+    desc: "Every trip is designed around your preferences, pace, and budget. No rushed tours or fixed schedules.",
     color: "#059669",
     bg: "#ECFDF5",
   },
   {
     icon: Star,
-    title: "Direct 5-Star Hotel Ties",
-    desc: "Through contracted corporate agreements with Taj, ITC, The Leela, and Marriott, our clients enjoy member rates and complimentary perks.",
+    title: "Handpicked Quality Stays",
+    desc: "Direct partnerships with top-rated hotels and trusted resorts to give you the best comfort, service, and rates.",
     color: "#D97706",
     bg: "#FFFBEB",
   },
   {
     icon: ShieldCheck,
     title: "Zero Hidden Costs",
-    desc: "Complete financial transparency with detailed inclusions, permits, taxes, and driver allowances included upfront with no surprises.",
+    desc: "Clear and honest pricing. Stays, sightseeing, private cabs, and taxes are clearly listed upfront with no surprises.",
     color: "#0284C7",
     bg: "#F0F9FF",
   },
   {
     icon: Heart,
-    title: "24/7 Dedicated Trip Concierge",
-    desc: "You are never stranded with an automated bot. Your personal trip manager is always on WhatsApp to handle schedule shifts and needs.",
+    title: "24/7 Personal Support",
+    desc: "Real travel experts available on WhatsApp and call anytime, from planning until you return home safely.",
     color: "#7C3AED",
     bg: "#F5F3FF",
   },
@@ -95,7 +94,7 @@ const About = () => {
           </motion.div>
 
           {/* STATS STRIP WITH REACTBITS COUNTUP */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -182,10 +181,10 @@ const About = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-3">
-              Why Discerning Travelers Choose Us
+              Why Travelers Choose Us
             </h2>
             <p className="text-gray-500 max-w-xl mx-auto text-sm">
-              Our 4 non-negotiable promises for every journey we design.
+              Our 4 simple promises for every trip we plan.
             </p>
           </div>
 

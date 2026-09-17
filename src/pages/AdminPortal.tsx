@@ -76,6 +76,7 @@ import {
   pushAllEnquiriesToCloud,
   SUPABASE_SQL_SCHEMA,
   CloudSyncSettings,
+  HARDCODED_GOOGLE_SHEET_URL,
 } from "@/services/cloudSync";
 
 export const AdminPortal: React.FC = () => {
@@ -190,6 +191,11 @@ export const AdminPortal: React.FC = () => {
 
   const { enquiries, isSyncing, syncNow } = useEnquiries();
   const { domesticCards, internationalCards, allCards } = useDestinationCards();
+
+  // Force live cloud sync on component mount
+  useEffect(() => {
+    syncNow();
+  }, []);
 
   const [activeTab, setActiveTab] = useState<"enquiries" | "domestic" | "international" | "settings">("enquiries");
 
@@ -643,35 +649,7 @@ export const AdminPortal: React.FC = () => {
               )}
             </button>
 
-            <button
-              onClick={() => {
-                setActiveTab("domestic");
-                setCardSearch("");
-              }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition whitespace-nowrap ${
-                activeTab === "domestic"
-                  ? "bg-[#151B40] text-white border border-amber-400/40 shadow-sm"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <MapPin className="w-4 h-4 text-emerald-400" />
-              <span>Discover India Cards ({domesticCards.length})</span>
-            </button>
 
-            <button
-              onClick={() => {
-                setActiveTab("international");
-                setCardSearch("");
-              }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition whitespace-nowrap ${
-                activeTab === "international"
-                  ? "bg-[#151B40] text-white border border-amber-400/40 shadow-sm"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <Globe2 className="w-4 h-4 text-indigo-400" />
-              <span>Beyond Borders Cards ({internationalCards.length})</span>
-            </button>
 
             <button
               onClick={() => setActiveTab("settings")}
@@ -722,6 +700,16 @@ export const AdminPortal: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  onClick={() => syncNow()}
+                  disabled={isSyncing}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm cursor-pointer disabled:opacity-50"
+                  title="Pull latest enquiries directly from Google Sheet"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+                  <span>{isSyncing ? "Syncing..." : "Sync Google Sheet"}</span>
+                </button>
+
                 <button
                   onClick={handleExportCSV}
                   className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition shadow-sm"
@@ -800,11 +788,14 @@ export const AdminPortal: React.FC = () => {
 
                             <td className="px-4 py-3.5 text-slate-300">
                               <div className="text-[11px]">
-                                <span className="font-medium text-slate-200">{lead.travelers || "N/A"}</span>
+                                <span className="font-medium text-slate-200">
+                                  {lead.travelers || lead.hotelTier || (lead.notes ? lead.notes.slice(0, 35) : "Standard Custom Enquiry")}
+                                </span>
                                 {lead.duration && ` • ${lead.duration}`}
+                                {lead.hotelTier && lead.travelers && ` • ${lead.hotelTier}`}
                               </div>
                               <div className="text-[10px] text-slate-400 mt-0.5">
-                                Budget: {lead.budget || "Flexible"}
+                                Budget: {lead.budget || "Quote On Request"}
                               </div>
                             </td>
 
@@ -874,227 +865,7 @@ export const AdminPortal: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 2: DOMESTIC CARDS CMS */}
-        {activeTab === "domestic" && (
-          <div className="space-y-4">
-            {/* Action Bar */}
-            <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
-              <div className="relative flex-1 sm:w-80">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search domestic destination, category, vibe..."
-                  value={cardSearch}
-                  onChange={(e) => setCardSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-slate-900 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition"
-                />
-              </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleOpenAddCard("domestic")}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-[#151B40] hover:bg-[#1f285e] border border-amber-400/50 text-white shadow-md transition"
-                >
-                  <Plus className="w-4 h-4 text-amber-400" />
-                  <span>Add Domestic Destination Card</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Grid of Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredDomestic.map((card) => (
-                <div
-                  key={card.id}
-                  className="bg-slate-800/90 border border-slate-700 rounded-2xl overflow-hidden shadow-lg flex flex-col group hover:border-amber-400/50 transition-all duration-300"
-                >
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
-                    <img
-                      src={card.image}
-                      alt={card.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-                    
-                    {card.featured && (
-                      <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1">
-                        <Sparkles className="w-2.5 h-2.5" /> Featured
-                      </span>
-                    )}
-
-                    <div className="absolute bottom-2.5 left-3 right-3">
-                      <span className="text-[10px] font-semibold text-amber-300 uppercase tracking-wider block">
-                        {card.category || "India"}
-                      </span>
-                      <h4 className="text-base font-bold text-white leading-tight mt-0.5">
-                        {card.name}
-                      </h4>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 flex-1 flex flex-col justify-between space-y-3">
-                    <div className="space-y-1 text-xs">
-                      <div className="text-slate-300 font-medium line-clamp-1 italic">
-                        "{card.vibe || "Curated Trail"}"
-                      </div>
-                      <div className="flex items-center justify-between text-slate-400 pt-1 border-t border-slate-700/60">
-                        <span>Duration:</span>
-                        <span className="font-semibold text-slate-200">{card.duration}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-slate-400">
-                        <span>Starting:</span>
-                        <span className="font-bold text-amber-400">{card.startingPrice}</span>
-                      </div>
-                      {card.bestSeason && (
-                        <div className="flex items-center justify-between text-slate-400">
-                          <span>Season:</span>
-                          <span className="text-slate-300">{card.bestSeason}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-slate-700/80">
-                      <button
-                        onClick={() => handleOpenEditCard(card)}
-                        className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-medium text-white transition"
-                      >
-                        <Edit2 className="w-3 h-3 text-amber-400" />
-                        <span>Edit Card</span>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteCard(card)}
-                        className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition"
-                        title="Delete Card"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: INTERNATIONAL CARDS CMS */}
-        {activeTab === "international" && (
-          <div className="space-y-4">
-            {/* Action Bar */}
-            <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
-              <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                <div className="relative flex-1 sm:w-72">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search international destination, vibe..."
-                    value={cardSearch}
-                    onChange={(e) => setCardSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-slate-900 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 transition"
-                  />
-                </div>
-
-                <div className="flex items-center gap-1.5 text-xs text-slate-300">
-                  <Filter className="w-3.5 h-3.5 text-slate-400" />
-                  <select
-                    value={cardRegionFilter}
-                    onChange={(e) => setCardRegionFilter(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 text-xs text-white rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-amber-400"
-                  >
-                    <option value="all">All Regions</option>
-                    <option value="asia">Asia</option>
-                    <option value="europe">Europe</option>
-                    <option value="middle east">Middle East</option>
-                    <option value="island">Island / Beach</option>
-                    <option value="africa">Africa</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleOpenAddCard("international")}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-[#151B40] hover:bg-[#1f285e] border border-amber-400/50 text-white shadow-md transition"
-                >
-                  <Plus className="w-4 h-4 text-amber-400" />
-                  <span>Add International Destination Card</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Grid of Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredInternational.map((card) => (
-                <div
-                  key={card.id}
-                  className="bg-slate-800/90 border border-slate-700 rounded-2xl overflow-hidden shadow-lg flex flex-col group hover:border-amber-400/50 transition-all duration-300"
-                >
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
-                    <img
-                      src={card.image}
-                      alt={card.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-                    
-                    {card.featured && (
-                      <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1">
-                        <Sparkles className="w-2.5 h-2.5" /> Featured
-                      </span>
-                    )}
-
-                    <div className="absolute bottom-2.5 left-3 right-3">
-                      <span className="text-[10px] font-semibold text-indigo-300 uppercase tracking-wider block">
-                        {card.category || "International"}
-                      </span>
-                      <h4 className="text-base font-bold text-white leading-tight mt-0.5">
-                        {card.name}
-                      </h4>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 flex-1 flex flex-col justify-between space-y-3">
-                    <div className="space-y-1 text-xs">
-                      <div className="text-slate-300 font-medium line-clamp-1 italic">
-                        "{card.vibe || "Curated Trail"}"
-                      </div>
-                      <div className="flex items-center justify-between text-slate-400 pt-1 border-t border-slate-700/60">
-                        <span>Duration:</span>
-                        <span className="font-semibold text-slate-200">{card.duration}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-slate-400">
-                        <span>Starting:</span>
-                        <span className="font-bold text-amber-400">{card.startingPrice}</span>
-                      </div>
-                      {card.bestSeason && (
-                        <div className="flex items-center justify-between text-slate-400">
-                          <span>Season:</span>
-                          <span className="text-slate-300">{card.bestSeason}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-slate-700/80">
-                      <button
-                        onClick={() => handleOpenEditCard(card)}
-                        className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-medium text-white transition"
-                      >
-                        <Edit2 className="w-3 h-3 text-amber-400" />
-                        <span>Edit Card</span>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteCard(card)}
-                        className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition"
-                        title="Delete Card"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* TAB 4: SETTINGS & SYNC */}
         {activeTab === "settings" && (
@@ -1204,53 +975,41 @@ export const AdminPortal: React.FC = () => {
 
               {/* Provider Configuration Inputs */}
               {cloudSettings.provider === "googlesheet" && (
-                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-3.5">
+                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                      <Database className="w-3.5 h-3.5 text-emerald-400" /> Google Sheet Live Integration
+                      <Database className="w-3.5 h-3.5 text-emerald-400" /> Google Sheet Live Sync Active
                     </span>
-                    <span className="text-[10px] uppercase font-bold text-amber-500 dark:text-amber-300 bg-amber-400/20 border border-amber-400/30 px-2 py-0.5 rounded-full">
-                      Zero Setup Required
+                    <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Hardcoded in Code
                     </span>
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-medium text-slate-300 mb-1">
-                      Google Sheet Link or Published CSV Link
-                    </label>
-                    <input
-                      type="url"
-                      placeholder="https://docs.google.com/spreadsheets/d/.../edit or .../pub?output=csv"
-                      value={cloudSettings.googleSheetUrl}
-                      onChange={(e) => setCloudSettings({ ...cloudSettings, googleSheetUrl: e.target.value.trim() })}
-                      className="w-full px-3 py-2 text-xs rounded-lg bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-
-                  <div className={`p-3.5 rounded-xl border text-[11px] space-y-1.5 leading-relaxed ${
-                    theme === "light"
-                      ? "bg-amber-50/80 border-amber-300/80 text-slate-800"
-                      : "bg-slate-950/70 border-slate-800 text-slate-300"
-                  }`}>
-                    <div className={`font-semibold flex items-center gap-1.5 ${
-                      theme === "light" ? "text-amber-950" : "text-white"
-                    }`}>
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500" /> How to connect your Google Sheet in 30 seconds:
+                  <div className="p-3 rounded-lg bg-slate-950/80 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+                    <div className="text-xs text-slate-300 space-y-0.5">
+                      <div className="font-semibold text-white flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Linked Google Sheet
+                      </div>
+                      <div className="text-[11px] text-slate-400 font-mono truncate max-w-md">
+                        {HARDCODED_GOOGLE_SHEET_URL}
+                      </div>
                     </div>
-                    <ol className={`list-decimal pl-4 space-y-1 ${
-                      theme === "light" ? "text-slate-800" : "text-slate-300"
-                    }`}>
-                      <li>Open the Google Sheet linked to your Triponomic Google Form.</li>
-                      <li>Click <strong>File &gt; Share &gt; Publish to web</strong>.</li>
-                      <li>Under Link, select <strong>Entire Document</strong> (or your responses sheet) and choose <strong>Comma-separated values (.csv)</strong>.</li>
-                      <li>Click <strong>Publish</strong>, copy that link, and paste it in the box above!</li>
-                    </ol>
-                    <p className={`text-[10px] pt-1 font-semibold ${
-                      theme === "light" ? "text-amber-900" : "text-amber-300/90"
-                    }`}>
-                      *Tip: You can also simply share the Google Sheet (&quot;Anyone with the link can view&quot;) and paste the normal URL!
-                    </p>
+
+                    <a
+                      href={HARDCODED_GOOGLE_SHEET_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold transition shrink-0"
+                    >
+                      <span>Open Google Sheet</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
+
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    ✨ Your Google Sheet is directly linked in code. All customer enquiries from the website automatically sync to your sheet columns in real-time.
+                  </p>
                 </div>
               )}
               {cloudSettings.provider === "supabase" && (

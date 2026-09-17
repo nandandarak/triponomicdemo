@@ -1,16 +1,10 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   HelpCircle,
   Sparkles,
   Phone,
   MessageSquare,
-  Search,
-  Compass,
-  Hotel,
-  Plane,
   ShieldCheck,
-  CheckCircle2,
 } from "lucide-react";
 import {
   Accordion,
@@ -43,55 +37,40 @@ export const DEFAULT_FAQS: FAQItem[] = [
       "Yes, completely! You have full control over your dates, hotel tiers, sightseeing pace, and transport options. Once our travel architect drafts your initial itinerary, you can fine-tune, add excursions, or swap stays with unlimited revisions until you are 100% satisfied.",
   },
   {
-    id: "hotel-perks",
-    category: "Hotels & Stays",
-    question: "How do your direct 5-star hotel partner rates and perks work?",
-    answer:
-      "We hold direct preferred partnerships with world-class hospitality chains including Taj, ITC Hotels, The Leela, The Oberoi, JW Marriott, Fairmont, and Hyatt. Through these partnerships, Triponomic guests receive negotiated member-level tariffs, complimentary gourmet breakfast, prioritized room upgrades, and valuable resort or spa dining credits.",
-  },
-  {
     id: "hotel-only-booking",
     category: "Hotels & Stays",
     question: "Can I book only luxury hotels through Triponomic without a full tour package?",
     answer:
-      "Yes! If you already have your flights or road trip planned and simply want privileged hotel rates with complimentary upgrades and amenities at top-tier properties across India and worldwide, our team can arrange direct hotel reservations for you.",
+      "Yes! If you already have your flights sorted and just want a great hotel, we can book it for you with better rates and added perks like free breakfast or room upgrades.",
   },
   {
     id: "visas-flights",
     category: "Flights & Visas",
     question: "Do you handle international visa applications, flight bookings, and travel insurance?",
     answer:
-      "Yes, we provide end-to-end logistical support. Our team manages flight routing with baggage guidance, comprehensive visa documentation and slot booking, comprehensive travel insurance, and international high-speed eSIM cards so your phone is active the moment you land.",
+      "Yes, we handle everything. We book your flights, help with visa documents, arrange travel insurance, and even get you an international SIM card so your phone works the moment you land.",
   },
   {
     id: "payment-terms",
     category: "Payments & Safety",
     question: "What is your payment structure, and are there any hidden fees?",
     answer:
-      "We practice complete financial transparency — zero hidden charges or surprise surcharges. Once you approve your itinerary, we secure your bookings with an initial deposit, with the remaining balance payable in structured milestones before your departure. We support all secure digital payment channels including UPI, NEFT/RTGS, and major credit cards.",
+      "No hidden fees, ever. We charge a small deposit to confirm your trip, and the rest is paid in easy parts before you travel. You can pay via UPI, bank transfer, or credit card.",
   },
   {
     id: "on-trip-support",
     category: "Payments & Safety",
     question: "What support do you offer while I am actively travelling on my trip?",
     answer:
-      "Every Triponomic guest is assigned a dedicated trip manager and added to a private 24/7 WhatsApp concierge group. Whether you need to reschedule a driver pickup, want an insider restaurant reservation, or encounter an unexpected flight delay, our response team is on standby around the clock to ensure you remain completely stress-free.",
+      "Every Triponomic guest gets a personal trip manager and is added to a private WhatsApp group. Whether you need to reschedule a pickup, find a good restaurant, or handle an unexpected delay — we're available 24/7 to help.",
   },
   {
     id: "group-trips",
     category: "Planning & Customization",
     question: "Do you organize squad getaways, corporate offsites, and destination wedding guest travel?",
     answer:
-      "Absolutely. Beyond solo and honeymoon trips, our team specializes in group expeditions with friends, multi-generational family reunions, and executive corporate retreats, offering negotiated bulk tariffs, private coaches, and tailored group activities.",
+      "Yes! We handle group trips with friends, family outings, and even corporate team travel — with group discounts, private buses, and activities planned for everyone.",
   },
-];
-
-const categories = [
-  { label: "All", icon: Compass },
-  { label: "Planning & Customization", icon: Sparkles },
-  { label: "Hotels & Stays", icon: Hotel },
-  { label: "Flights & Visas", icon: Plane },
-  { label: "Payments & Safety", icon: ShieldCheck },
 ];
 
 interface FAQSectionProps {
@@ -100,7 +79,6 @@ interface FAQSectionProps {
   badge?: string;
   faqs?: FAQItem[];
   items?: FAQItem[];
-  showCategories?: boolean;
   className?: string;
   id?: string;
 }
@@ -111,23 +89,10 @@ const FAQSection = ({
   badge = "Clear Answers, Zero Doubts",
   faqs,
   items,
-  showCategories = true,
   className = "",
   id = "faq",
 }: FAQSectionProps) => {
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
   const allFaqs = faqs || items || DEFAULT_FAQS;
-
-  const filteredFaqs = allFaqs.filter((faq) => {
-    const matchesCategory =
-      activeCategory === "All" || faq.category === activeCategory;
-    const matchesSearch =
-      searchQuery.trim() === "" ||
-      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
 
   return (
     <section
@@ -145,7 +110,7 @@ const FAQSection = ({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/70 border border-emerald-200/80 text-emerald-800 text-xs font-bold tracking-wider uppercase mb-3">
             <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
@@ -159,50 +124,7 @@ const FAQSection = ({
           <p className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
             {subtitle}
           </p>
-
-          {/* Quick Search */}
-          <div className="mt-8 max-w-md mx-auto relative">
-            <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search your question (e.g. refund, customization, visa)..."
-              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-200/80 text-gray-800 text-sm shadow-[0_2px_12px_rgba(0,0,0,0.04)] focus:outline-none focus:ring-2 focus:ring-emerald-600/30 focus:border-emerald-600 transition-all placeholder:text-gray-400"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-400 hover:text-gray-600 px-2 py-1 bg-gray-100 rounded-md"
-              >
-                Clear
-              </button>
-            )}
-          </div>
         </motion.div>
-
-        {/* Category Pills (if enabled) */}
-        {showCategories && (
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
-              const isActive = activeCategory === cat.label;
-              return (
-                <button
-                  key={cat.label}
-                  onClick={() => setActiveCategory(cat.label)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 ${isActive
-                      ? "bg-emerald-700 text-white shadow-md shadow-emerald-700/20 scale-105"
-                      : "bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-200/70"
-                    }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {cat.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
 
         {/* Accordion List */}
         <motion.div
@@ -210,39 +132,29 @@ const FAQSection = ({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 mb-12"
+          className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 mb-10"
         >
-          {filteredFaqs.length > 0 ? (
-            <Accordion type="single" collapsible className="space-y-4">
-              {filteredFaqs.map((faq, index) => (
-                <AccordionItem
-                  key={faq.id}
-                  value={faq.id}
-                  className="border border-gray-100 rounded-2xl px-5 py-1 transition-all duration-200 hover:border-emerald-200/70 data-[state=open]:border-emerald-300 data-[state=open]:bg-emerald-50/20"
-                >
-                  <AccordionTrigger className="text-left font-semibold text-gray-900 text-base py-4 hover:no-underline hover:text-emerald-700 transition-colors">
-                    <span className="flex items-start gap-3">
-                      <span className="text-xs font-bold text-emerald-700/70 bg-emerald-100/60 rounded-full px-2 py-0.5 mt-0.5 shrink-0">
-                        Q{index + 1}
-                      </span>
-                      <span>{faq.question}</span>
+          <Accordion type="single" collapsible className="space-y-4">
+            {allFaqs.map((faq, index) => (
+              <AccordionItem
+                key={faq.id}
+                value={faq.id}
+                className="border border-gray-100 rounded-2xl px-5 py-1 transition-all duration-200 hover:border-emerald-200/70 data-[state=open]:border-emerald-300 data-[state=open]:bg-emerald-50/20"
+              >
+                <AccordionTrigger className="text-left font-semibold text-gray-900 text-base py-4 hover:no-underline hover:text-emerald-700 transition-colors">
+                  <span className="flex items-start gap-3">
+                    <span className="text-xs font-bold text-emerald-700/70 bg-emerald-100/60 rounded-full px-2 py-0.5 mt-0.5 shrink-0">
+                      Q{index + 1}
                     </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-gray-600 text-sm leading-relaxed pt-1 pb-4 pl-9 pr-2">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          ) : (
-            <div className="text-center py-12">
-              <HelpCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-              <p className="text-base font-semibold text-gray-700">No questions found</p>
-              <p className="text-xs text-gray-500 mt-1">
-                Try searching a different term or clear the filter.
-              </p>
-            </div>
-          )}
+                    <span>{faq.question}</span>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-600 text-sm leading-relaxed pt-1 pb-4 pl-9 pr-2">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </motion.div>
 
         {/* Still Have Questions CTA Card */}

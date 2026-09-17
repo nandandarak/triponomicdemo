@@ -42,19 +42,20 @@ const DestinationRow = ({
 }: DestinationRowProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [isPaused, setIsPaused] = useState(false);
+  const [flippedCard, setFlippedCard] = useState<string | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { margin: "150px 0px" });
 
-  // Auto-scroll sliding window (pauses when out of view, on hover, or touch)
+  // Auto-scroll sliding window: moves continuously, but STOPS when any card is clicked/flipped
   useEffect(() => {
-    if (!api || isPaused || !isInView) return;
+    if (!api || isPaused || !isInView || flippedCard !== null) return;
 
     const interval = setInterval(() => {
       api.scrollNext();
     }, 4500);
 
     return () => clearInterval(interval);
-  }, [api, isPaused, isInView]);
+  }, [api, isPaused, isInView, flippedCard]);
 
   return (
     <section
@@ -111,6 +112,10 @@ const DestinationRow = ({
                     name={destination.name}
                     image={destination.image}
                     index={index}
+                    isFlipped={flippedCard === destination.name}
+                    onFlipToggle={(flipped) => {
+                      setFlippedCard(flipped ? destination.name : null);
+                    }}
                     destinationData={
                       destination.duration && (destination.investment || destination.startingPrice)
                         ? {

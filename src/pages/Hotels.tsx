@@ -179,7 +179,7 @@ const hotelFaqs = [
     category: "Hotel Stays",
     question: "How does Triponomic offer privileged member rates and perks at 5-star hotels?",
     answer:
-      "Through established direct trade relationships with premier hospitality chains like Taj, ITC, The Leela, The Oberoi, and Marriott, we unlock contracted partner tariffs, complimentary daily buffet breakfasts, early check-in preference, and resort dining/spa credits that are not accessible via standard public travel portals.",
+      "We work directly with top 5-star hotel groups — so we get better rates and extra perks like free breakfast, early check-in, and dining credits that you won't get by booking on your own or through travel websites.",
   },
   {
     id: "hotel-standalone-booking",

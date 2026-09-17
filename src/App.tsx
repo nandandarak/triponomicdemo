@@ -52,6 +52,7 @@ const App = () => {
           <Route path="/build-trail" element={<BuildTrail />} />
           <Route path="/customise-trail" element={<BuildTrail />} />
           <Route path="/enquire" element={<EnquireNow />} />
+          <Route path="/contact" element={<EnquireNow />} />
           <Route path="/admin" element={<AdminPortal />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

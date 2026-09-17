@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Clock, Coins, Sun, ArrowRight } from "lucide-react";
-import MagneticButton from "./MagneticButton";
 
 interface DestinationData {
   duration: string;
@@ -13,10 +12,12 @@ interface PostcardCardProps {
   image: string;
   isGateway?: boolean;
   gatewayText?: string;
-  onClick: () => void;
+  onClick?: () => void;
   onEnquire: () => void;
   index: number;
   destinationData?: DestinationData;
+  isFlipped?: boolean;
+  onFlipToggle?: (flipped: boolean) => void;
 }
 
 const defaultDestinationData: Record<string, DestinationData> = {
@@ -59,7 +60,6 @@ const defaultDestinationData: Record<string, DestinationData> = {
   Australia: { duration: "10–14 Days", investment: "₹2,90,000*", bestTime: "Sep – Nov, Mar – May" },
 };
 
-
 const PostcardCard = ({
   name,
   image,
@@ -69,8 +69,11 @@ const PostcardCard = ({
   onEnquire,
   index,
   destinationData,
+  isFlipped: controlledFlipped,
+  onFlipToggle,
 }: PostcardCardProps) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [internalFlipped, setInternalFlipped] = useState(false);
+  const isFlipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped;
 
   const data =
     destinationData ||
@@ -80,103 +83,126 @@ const PostcardCard = ({
       bestTime: "Oct – Mar",
     };
 
+  const handleMouseEnter = () => {
+    setInternalFlipped(true);
+    onFlipToggle?.(true);
+  };
+
+  const handleMouseLeave = () => {
+    setInternalFlipped(false);
+    onFlipToggle?.(false);
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // For mobile/touch support or clicking to toggle
+    const next = !isFlipped;
+    setInternalFlipped(next);
+    onFlipToggle?.(next);
+  };
+
   return (
     <div className="w-full [perspective:1000px]">
       {!isGateway ? (
         <div
-          className="relative w-full aspect-[3/4] cursor-pointer"
-          onMouseEnter={() => setIsFlipped(true)}
-          onMouseLeave={() => setIsFlipped(false)}
+          className="relative w-full aspect-[3/4] cursor-pointer group select-none"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleCardClick}
         >
           <div
             className={`w-full h-full transition-transform duration-500 ease-out [transform-style:preserve-3d] ${
               isFlipped ? "[transform:rotateY(180deg)]" : ""
             }`}
           >
-            {/* FRONT */}
+            {/* FRONT FACE */}
             <div
-              className="absolute inset-0 card-destination overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.08)] group/card border border-white/20 rounded-2xl bg-slate-900 [backface-visibility:hidden]"
+              className="absolute inset-0 overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.1)] group-hover:shadow-[0_14px_35px_rgba(0,0,0,0.18)] transition-shadow duration-300 border border-white/20 rounded-2xl bg-slate-900 [backface-visibility:hidden]"
             >
               <img
                 src={image}
                 alt={name}
                 loading="lazy"
                 decoding="async"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-gray-950/85 via-black/25 to-transparent" />
+              
               <div className="absolute top-4 right-4">
                 <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-white border border-white/20 shadow-sm">
                   Explore
                 </span>
               </div>
-              <div className="absolute bottom-0 p-6 flex items-end justify-between w-full">
-                <div>
-                  <p className="text-xs font-semibold text-emerald-400 mb-1">
-                    Featured Destination
-                  </p>
-                  <h3 className="text-2xl font-bold text-white leading-tight">{name}</h3>
-                </div>
-                <span className="text-xs text-white/80 bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10 shadow-sm">
-                  Flip ↷
-                </span>
+
+              <div className="absolute bottom-0 p-5 w-full">
+                <p className="text-xs font-semibold text-emerald-400 mb-1">
+                  Featured Destination
+                </p>
+                <h3 className="text-2xl font-bold text-white leading-tight drop-shadow-sm">
+                  {name}
+                </h3>
               </div>
             </div>
 
-            {/* BACK (SCROLLABLE FOR MOBILE) */}
+            {/* BACK FACE */}
             <div
-              className="absolute inset-0 card-destination flex flex-col shadow-[0_10px_30px_rgba(0,0,0,0.1)] border border-emerald-100 rounded-2xl bg-white [backface-visibility:hidden] [transform:rotateY(180deg)]"
+              className="absolute inset-0 flex flex-col shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-emerald-100 rounded-2xl bg-white [backface-visibility:hidden] [transform:rotateY(180deg)]"
             >
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto p-5">
                 <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
-                  <h3 className="text-xl font-bold text-gray-900">
-                    {name}
-                  </h3>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                    Curated Trip
-                  </span>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 leading-tight">
+                      {name}
+                    </h3>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 inline-block mt-1">
+                      Curated Itinerary
+                    </span>
+                  </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-2 rounded-xl bg-gray-50/70">
+                <div className="space-y-3.5">
+                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
                     <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
                       <Clock className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase text-gray-400 font-semibold tracking-wider">Duration</p>
+                      <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Duration</p>
                       <p className="text-sm font-semibold text-gray-800">{data.duration}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-2 rounded-xl bg-gray-50/70">
+                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
                     <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
                       <Coins className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase text-gray-400 font-semibold tracking-wider">Ideal Budget</p>
+                      <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Ideal Budget</p>
                       <p className="text-sm font-semibold text-emerald-700">From {data.investment}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-2 rounded-xl bg-gray-50/70">
+                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
                     <div className="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 shrink-0">
                       <Sun className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase text-gray-400 font-semibold tracking-wider">Best Time To Visit</p>
+                      <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Best Season</p>
                       <p className="text-sm font-semibold text-gray-800">{data.bestTime}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 bg-gray-50/80 border-t border-gray-100">
-                <MagneticButton
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold tracking-widest shadow-md transition-all duration-300"
-                  onClick={onEnquire}
+              <div className="p-4 bg-gray-50/90 border-t border-gray-100 rounded-b-2xl">
+                <button
+                  type="button"
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-full text-xs font-bold tracking-widest shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEnquire();
+                  }}
                 >
                   ENQUIRE NOW
-                </MagneticButton>
+                </button>
               </div>
             </div>
           </div>
@@ -185,13 +211,13 @@ const PostcardCard = ({
         /* GATEWAY CARD */
         <button
           onClick={onClick}
-          className="w-full aspect-[3/4] card-destination flex flex-col items-center justify-center p-8 bg-gradient-to-br from-secondary via-accent to-secondary"
+          className="w-full aspect-[3/4] rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center p-8 bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 border border-emerald-200 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer"
         >
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-            <ArrowRight className="w-6 h-6 text-primary" />
+          <div className="w-16 h-16 rounded-full bg-emerald-600/10 flex items-center justify-center mb-6 text-emerald-700">
+            <ArrowRight className="w-6 h-6" />
           </div>
-          <p className="text-xl font-medium text-center">{gatewayText}</p>
-          <p className="text-sm text-muted-foreground mt-2 text-center">
+          <p className="text-xl font-bold text-gray-900 text-center">{gatewayText}</p>
+          <p className="text-xs text-gray-600 mt-2 text-center font-medium">
             View all destinations
           </p>
         </button>

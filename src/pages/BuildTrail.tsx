@@ -15,7 +15,7 @@ const trailBuilderFaqs: FAQItem[] = [
     category: "How It Works",
     question: "How does the Interactive Trail Builder calculate pricing?",
     answer:
-      "Our pricing engine uses live contracts with our 5-star hospitality partners (Taj, ITC, The Leela, Marriott, etc.) and vetted local private chauffeurs. When you toggle flights, hotel tiers, or group size, rates update dynamically in real time with zero hidden markups.",
+      "We use our direct tie-ups with top 5-star hotels and trusted local drivers to give you real prices. When you change your hotel type, group size, or add flights, the quote updates instantly — with no hidden fees.",
   },
   {
     id: "tb-custom-spot",
@@ -36,7 +36,7 @@ const trailBuilderFaqs: FAQItem[] = [
     category: "Booking & Support",
     question: "What happens when I click 'Send Trail to WhatsApp'?",
     answer:
-      "A pre-formatted message with your chosen departure city, destination, traveler count, hotel tier, and price estimate opens in WhatsApp directly with our trip curator. We usually reply within 15 minutes with a comprehensive proposal.",
+      "A pre-formatted message with your chosen departure city, destination, traveler count, stay preference, and trip details opens in WhatsApp directly with our trip curator, who will share a customized proposal with you.",
   },
 ];
 
@@ -66,11 +66,11 @@ const BuildTrail: React.FC = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#A5B4FC] text-xs font-bold tracking-widest uppercase mb-4 shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              ✨ TRIPONOMIC JOURNEY CRAFTER • 100% BESPOKE ITINERARIES
+              ✨ TRIPONOMIC JOURNEY CRAFTER • 100% CUSTOMIZED ITINERARIES
             </div>
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-4">
-              <BlurText text="Build Your Bespoke Journey" animateBy="words" className="text-white" />
+              <BlurText text="Build Your Custom Journey" animateBy="words" className="text-white" />
             </h1>
 
             <p className="text-white/80 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed mb-6 font-light">
@@ -81,7 +81,7 @@ const BuildTrail: React.FC = () => {
             <div className="flex flex-wrap justify-center gap-3 text-xs font-semibold text-white/80">
               <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 backdrop-blur-sm">
                 <Compass className="w-3.5 h-3.5 text-[#93C5FD]" />
-                Bespoke Partner Tariffs
+                Special Partner Tariffs
               </span>
               <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 backdrop-blur-sm">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#86EFAC]" />
@@ -97,7 +97,7 @@ const BuildTrail: React.FC = () => {
       </section>
 
       {/* ── TRAIL BUILDER MAIN CONTAINER ── */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 -mt-8 relative z-20 pb-20">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 -mt-8 relative z-20 pb-4">
         <InteractiveTrailBuilder
           initialDestination={destParam}
           initialVibe={vibeParam}
@@ -107,15 +107,12 @@ const BuildTrail: React.FC = () => {
       </main>
 
       {/* ── FAQ SECTION ── */}
-      <section className="bg-emerald-50/20 py-16 px-6 border-t border-gray-100">
-        <div className="max-w-4xl mx-auto">
-          <FAQSection
-            title="Trail Builder Frequently Asked Questions"
-            subtitle="Everything you need to know about customizing your itinerary and real-time pricing"
-            faqs={trailBuilderFaqs}
-          />
-        </div>
-      </section>
+      <FAQSection
+        className="!py-6 sm:!py-8 !pt-4 border-t border-gray-100"
+        title="Trail Builder Frequently Asked Questions"
+        subtitle="Everything you need to know about customizing your itinerary and real-time pricing"
+        faqs={trailBuilderFaqs}
+      />
 
       <Footer />
     </div>

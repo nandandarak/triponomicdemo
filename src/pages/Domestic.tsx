@@ -85,7 +85,7 @@ const domesticFaqs: FAQItem[] = [
     category: "Planning & Customization",
     question: "Can I customize the hotel tiers and days in these domestic routes?",
     answer:
-      "Yes! Every domestic route is built completely from scratch. You can combine destinations (e.g. Kashmir + Ladakh, or Rajasthan heritage + luxury desert glamping), upgrade to 5-star properties (Taj, ITC, The Oberoi), and choose your own dates.",
+      "Yes! Every domestic route is built completely from scratch. You can mix destinations (like Kashmir + Ladakh, or Rajasthan with a desert stay), upgrade to 5-star hotels, and pick your own travel dates.",
   },
   {
     id: "dom-cabs",
@@ -234,13 +234,12 @@ const Domestic = () => {
 
             {/* Quick Search */}
             <div className="max-w-xl mx-auto relative mb-8">
-              <Search className="w-5 h-5 text-white/50 absolute left-5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search domestic destination (e.g. Kashmir, Ladakh, Spiti, Kerala)..."
-                className="w-full pl-13 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder:text-white/45 text-sm shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
+                className="w-full px-5 py-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder:text-white/45 text-sm shadow-xl focus:outline-none focus:border-white/40 transition-all"
               />
               {searchQuery && (
                 <button

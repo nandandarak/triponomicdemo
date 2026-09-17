@@ -17,18 +17,28 @@ const ShinyText: React.FC<ShinyTextProps> = ({
 
   return (
     <span
-      className={`inline-block text-[#b5b5b5a4] bg-clip-text ${
-        disabled ? "" : "animate-shine"
-      } ${className}`}
-      style={{
-        backgroundImage:
-          "linear-gradient(120deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0) 60%)",
-        backgroundSize: "200% 100%",
-        WebkitBackgroundClip: "text",
-        animationDuration: animationDuration,
-      }}
+      className={`inline-block relative ${className}`}
+      style={{ animationDuration }}
     >
+      {/* Base text — always visible in the className color */}
       {text}
+      {/* Shine overlay — absolutely positioned, clips only the shine sweep */}
+      {!disabled && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 bg-clip-text animate-shine pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, 0.75) 50%, transparent 60%)",
+            backgroundSize: "200% 100%",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            animationDuration: animationDuration,
+          }}
+        >
+          {text}
+        </span>
+      )}
     </span>
   );
 };

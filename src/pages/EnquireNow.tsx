@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import FAQSection from "@/components/FAQSection";
 import { useToast } from "@/hooks/use-toast";
 import BlurText from "@/components/animations/BlurText";
+import { addEnquiry } from "@/services/enquiryStore";
 
 const enquiryFaqs = [
   {
@@ -70,14 +71,15 @@ const EnquireNow = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const url = "https://docs.google.com/forms/d/e/1FAIpQLSf88dmE-ehVNUPjVmyOcUSWPMo4Bc5J46-OFaCLHL63nMh45w/formResponse";
+    const url = "https://docs.google.com/forms/d/e/1FAIpQLSfqfDU_lEAq_Kv2PVFSZa3lk_vvvE4kBG4dRnp0gWt7XLnFvg/formResponse";
     
     const formParams = new URLSearchParams();
-    formParams.append("entry.923065776", formData.name);
-    formParams.append("entry.729870809", formData.email);
-    formParams.append("entry.1797843080", formData.phone);
-    formParams.append("entry.1652213528", formData.destination);
-    formParams.append("entry.1164108945", formData.message);
+    formParams.append("entry.2005620554", formData.name.trim());
+    formParams.append("entry.1166974658", formData.phone.trim());
+    formParams.append("entry.1045781291", formData.email.trim());
+    formParams.append("entry.1203831394", "Quote On Request");
+    formParams.append("entry.396208505", formData.destination.trim() || "General Inquiry");
+    formParams.append("entry.1012744002", formData.message.trim());
 
     try {
       await fetch(url, {
@@ -87,6 +89,17 @@ const EnquireNow = () => {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
+      });
+
+      // Also record in local store & trigger background sync to Google Sheet
+      addEnquiry({
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim() || undefined,
+        destination: formData.destination.trim() || "General Inquiry",
+        source: "Contact Us Page",
+        budget: "Quote On Request",
+        notes: formData.message.trim() || undefined,
       });
 
       toast({

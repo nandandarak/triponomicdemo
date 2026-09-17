@@ -210,8 +210,11 @@ const AboutSection = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.7, delay: i * 0.1, ease: "easeOut" }}
-                  className={`overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 ${i === 0 ? "col-span-2 aspect-[16/9]" : "aspect-square"
-                    }`}
+                  className={`overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 ${
+                    i === 0 || i === 3
+                      ? "col-span-2 aspect-[16/9]"
+                      : "aspect-square"
+                  }`}
                 >
                   <img
                     src={img.src}

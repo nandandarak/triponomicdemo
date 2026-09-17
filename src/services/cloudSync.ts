@@ -26,14 +26,22 @@ export interface CloudSyncSettings {
 const SETTINGS_KEY = "triponomic_cloud_sync_config_v1";
 const SYNC_QUEUE_KEY = "triponomic_offline_queue_v1";
 
+// Hardcoded Google Sheet link in code (Paste your Google Sheet link here to set it directly in code)
+export const HARDCODED_GOOGLE_SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1gmZt1oiBGbeMHo2u_Fkg-j3rmxbPkp3JKfpi41lb0iE/edit?usp=sharing";
+
+// Hardcoded Google Apps Script Web App URL for writing Status back to Google Sheet
+export const HARDCODED_APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbx5tSenMipz0Xz_i1p3TaGdvWS4acRywrKYXi8nhnTqNmS-aLoZovpHQwV8-O_CTlpl/exec";
+
 export const DEFAULT_CLOUD_SETTINGS: CloudSyncSettings = {
   enabled: true,
   provider: "googlesheet",
-  googleSheetUrl: "",
+  googleSheetUrl: HARDCODED_GOOGLE_SHEET_URL,
   supabaseUrl: "",
   supabaseAnonKey: "",
   firebaseUrl: "",
-  webhookUrl: "",
+  webhookUrl: HARDCODED_APPS_SCRIPT_URL,
   pollIntervalMs: 10000,
   soundAlerts: true,
   lastSyncStatus: "idle",
@@ -89,28 +97,35 @@ export function parseCSV(text: string): string[][] {
 }
 
 /**
- * Intelligent Google Sheet parser that detects columns for Timestamp, Name, Phone, Destination, Email, Budget
+ * Intelligent Google Sheet parser that detects all columns dynamically:
+ * Timestamp, Name, Phone, Email, Budget, Destination, Vibe, Adults, Children, Duration, Hotel Tier, Flights, Month, Special Requests
  */
 export function parseGoogleSheetData(rows: string[][]): EnquiryLead[] {
   if (rows.length <= 1) return [];
 
   const headers = rows[0].map((h) => (h || "").toLowerCase().trim());
 
-  // Detect column indices based on header names
+  // Detect column indices dynamically based on header text or form question keywords
   let timeIdx = headers.findIndex((h) => h.includes("timestamp") || h.includes("date") || h.includes("time"));
-  let nameIdx = headers.findIndex((h) => h.includes("name") || h.includes("traveler") || h.includes("client"));
+  let vibeIdx = headers.findIndex((h) => h.includes("vibe") || h.includes("couple") || h.includes("family") || h.includes("friends") || h.includes("solo") || h.includes("who is") || h.includes("type"));
+  let adultsIdx = headers.findIndex((h) => h.includes("adult") || h.includes("adults"));
+  let childrenIdx = headers.findIndex((h) => h.includes("child") || h.includes("children") || h.includes("kid") || h.includes("kids"));
+  let durationIdx = headers.findIndex((h) => h.includes("duration") || h.includes("days") || h.includes("number of days"));
+  let hotelIdx = headers.findIndex((h) => h.includes("hotel") || h.includes("tier") || h.includes("stay") || h.includes("comfort") || h.includes("luxury") || h.includes("category"));
+  let flightsIdx = headers.findIndex((h) => h.includes("flight") || h.includes("flights"));
+  let monthIdx = headers.findIndex((h) => h.includes("month"));
+  let notesIdx = headers.findIndex((h) => h.includes("special") || h.includes("request") || h.includes("requests") || h.includes("paragraph") || h.includes("notes") || h.includes("comment") || h.includes("requirement"));
+  let statusIdx = headers.findIndex((h) => h.includes("status") || h.includes("stage") || h.includes("state"));
+  let destIdx = headers.findIndex((h) => h.includes("destination") || h.includes("route") || h.includes("trail") || h.includes("trip") || h.includes("kashmir") || h.includes("place"));
+  let nameIdx = headers.findIndex((h) => h.includes("name") || h.includes("traveler") || h.includes("client") || h.includes("customer"));
   let phoneIdx = headers.findIndex((h) => h.includes("phone") || h.includes("mobile") || h.includes("contact") || h.includes("number"));
-  let destIdx = headers.findIndex((h) => h.includes("destination") || h.includes("route") || h.includes("trail") || h.includes("trip") || h.includes("details"));
   let emailIdx = headers.findIndex((h) => h.includes("email") || h.includes("mail"));
-  let budgetIdx = headers.findIndex((h) => h.includes("budget") || h.includes("quote") || h.includes("rate") || h.includes("investment"));
+  let budgetIdx = headers.findIndex((h) => h.includes("budget") || h.includes("quote") || h.includes("rate") || h.includes("investment") || h.includes("price"));
 
-  // Fallbacks to default Google Form column ordering (A: Time, B: Name, C: Phone, D: Route/Dest, E: Email, F: Budget)
+  // Fallbacks to default positional order if column headers cannot be matched
   if (timeIdx === -1) timeIdx = 0;
-  if (nameIdx === -1) nameIdx = 1;
-  if (phoneIdx === -1) phoneIdx = 2;
-  if (destIdx === -1) destIdx = 3;
-  if (emailIdx === -1) emailIdx = 4;
-  if (budgetIdx === -1) budgetIdx = 5;
+  if (nameIdx === -1) nameIdx = headers.length > 1 ? 1 : -1;
+  if (phoneIdx === -1) phoneIdx = headers.length > 2 ? 2 : -1;
 
   const leads: EnquiryLead[] = [];
 
@@ -118,32 +133,70 @@ export function parseGoogleSheetData(rows: string[][]): EnquiryLead[] {
     const row = rows[i];
     if (!row || row.length < 2) continue;
 
-    const rawTime = row[timeIdx] || "";
-    const name = row[nameIdx] || "Guest Traveler";
-    const phone = row[phoneIdx] || "";
-    const rawDest = row[destIdx] || "Custom Trail";
-    const email = row[emailIdx] || "";
-    const budget = row[budgetIdx] || "";
+    const rawTime = timeIdx !== -1 && timeIdx < row.length ? row[timeIdx] : "";
+    const name = (nameIdx !== -1 && nameIdx < row.length ? row[nameIdx] : "") || "Guest Traveler";
+    const phone = phoneIdx !== -1 && phoneIdx < row.length ? row[phoneIdx] : "";
+    const rawDest = (destIdx !== -1 && destIdx < row.length ? row[destIdx] : "") || "Custom Trail";
+    const email = emailIdx !== -1 && emailIdx < row.length ? row[emailIdx] : "";
+    const budget = budgetIdx !== -1 && budgetIdx < row.length ? row[budgetIdx] : "";
+    const rawStatus = statusIdx !== -1 && statusIdx < row.length ? row[statusIdx].trim() : "";
+
+    const vibe = vibeIdx !== -1 && vibeIdx < row.length ? row[vibeIdx] : "";
+    const adults = adultsIdx !== -1 && adultsIdx < row.length ? row[adultsIdx] : "";
+    const children = childrenIdx !== -1 && childrenIdx < row.length ? row[childrenIdx] : "";
+    const durationVal = durationIdx !== -1 && durationIdx < row.length ? row[durationIdx] : "";
+    const hotelVal = hotelIdx !== -1 && hotelIdx < row.length ? row[hotelIdx] : "";
+    const flightsVal = flightsIdx !== -1 && flightsIdx < row.length ? row[flightsIdx] : "";
+    const monthVal = monthIdx !== -1 && monthIdx < row.length ? row[monthIdx] : "";
+    const notesVal = notesIdx !== -1 && notesIdx < row.length ? row[notesIdx] : "";
 
     if (!phone && !name && !rawDest) continue;
 
-    // Parse pipe-separated route details if formatted by InteractiveTrailBuilder
+    let parsedStatus: EnquiryLead["status"] = "New";
+    if (rawStatus) {
+      const lower = rawStatus.toLowerCase();
+      if (lower.includes("progress")) parsedStatus = "In Progress";
+      else if (lower.includes("contact")) parsedStatus = "Contacted";
+      else if (lower.includes("convert")) parsedStatus = "Converted";
+      else if (lower.includes("cancel")) parsedStatus = "Cancelled";
+      else if (lower.includes("new")) parsedStatus = "New";
+    }
+
     let destination = rawDest;
     let departureHub = "";
-    let duration = "";
+    let duration = durationVal ? (durationVal.toLowerCase().includes("day") || durationVal.endsWith("D") ? durationVal : `${durationVal} Days`) : "";
     let travelers = "";
-    let hotelTier = "";
-    let notes = "";
+    let hotelTier = hotelVal;
+    let notes = notesVal;
 
+    // Compose travelers string from vibe, adults, children if individual fields present
+    const travelerParts: string[] = [];
+    if (vibe) travelerParts.push(vibe);
+    if (adults) travelerParts.push(`${adults} Adults`);
+    if (children && children !== "0" && children.toLowerCase() !== "none") travelerParts.push(`${children} Kids`);
+    if (travelerParts.length > 0) {
+      travelers = travelerParts.join(" | ");
+    }
+
+    // Compose extra notes from special requests, travel month and flight preferences
+    const extraNotes: string[] = [];
+    if (notesVal) extraNotes.push(notesVal);
+    if (monthVal) extraNotes.push(`Travel Month: ${monthVal}`);
+    if (flightsVal) extraNotes.push(`Flights: ${flightsVal}`);
+    if (extraNotes.length > 0) {
+      notes = extraNotes.join(" | ");
+    }
+
+    // Fallback: parse pipe-separated route details if present in rawDest (for older entries)
     if (rawDest.includes("|")) {
       const parts = rawDest.split("|").map((p) => p.trim());
       destination = parts[0] || rawDest;
       for (let p = 1; p < parts.length; p++) {
         const part = parts[p];
         if (part.toLowerCase().includes("hub")) departureHub = part.replace(/hub/i, "").trim();
-        else if (part.includes("Adult") || part.includes("Kid") || part.includes("Couple")) travelers = part;
-        else if (part.endsWith("D") || part.toLowerCase().includes("days")) duration = part;
-        else if (part.includes("★") || part.toLowerCase().includes("luxury") || part.toLowerCase().includes("boutique")) hotelTier = part;
+        else if (!travelers && (part.includes("Adult") || part.includes("Kid") || part.includes("Couple"))) travelers = part;
+        else if (!duration && (part.endsWith("D") || part.toLowerCase().includes("days"))) duration = part;
+        else if (!hotelTier && (part.includes("★") || part.toLowerCase().includes("luxury") || part.toLowerCase().includes("boutique") || part.toLowerCase().includes("budget") || part.toLowerCase().includes("comfort") || part.toLowerCase().includes("villa"))) hotelTier = part;
         else if (part.toLowerCase().includes("notes:") || part.toLowerCase().includes("month:")) notes += (notes ? " | " : "") + part;
       }
     }
@@ -152,12 +205,26 @@ export function parseGoogleSheetData(rows: string[][]): EnquiryLead[] {
     const cleanPhone = (phone || name).replace(/[^a-zA-Z0-9]/g, "").slice(-6);
     const rowId = `gsheet-${i}-${cleanPhone}`;
 
-    // Parse date safely
+    // Parse date safely (handles DD/MM/YYYY HH:mm:ss, MM/DD/YYYY, and standard ISO formats)
     let parsedDate = new Date().toISOString();
     if (rawTime) {
-      const d = new Date(rawTime);
-      if (!isNaN(d.getTime())) {
-        parsedDate = d.toISOString();
+      const match = rawTime.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+      if (match) {
+        const day = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10) - 1;
+        const year = parseInt(match[3], 10);
+        const hour = match[4] ? parseInt(match[4], 10) : 0;
+        const min = match[5] ? parseInt(match[5], 10) : 0;
+        const sec = match[6] ? parseInt(match[6], 10) : 0;
+        const d = new Date(year, month, day, hour, min, sec);
+        if (!isNaN(d.getTime())) {
+          parsedDate = d.toISOString();
+        }
+      } else {
+        const d = new Date(rawTime);
+        if (!isNaN(d.getTime())) {
+          parsedDate = d.toISOString();
+        }
       }
     }
 
@@ -177,7 +244,7 @@ export function parseGoogleSheetData(rows: string[][]): EnquiryLead[] {
       notes: notes || undefined,
       date: parsedDate,
       createdAt: parsedDate,
-      status: "New",
+      status: parsedStatus,
     });
   }
 
@@ -194,7 +261,13 @@ export const getCloudSyncSettings = (): CloudSyncSettings => {
     if (!raw) {
       return DEFAULT_CLOUD_SETTINGS;
     }
-    return { ...DEFAULT_CLOUD_SETTINGS, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    const merged = { ...DEFAULT_CLOUD_SETTINGS, ...parsed };
+    // Fallback to hardcoded URL if saved URL is empty but hardcoded URL is defined
+    if (!merged.googleSheetUrl && HARDCODED_GOOGLE_SHEET_URL) {
+      merged.googleSheetUrl = HARDCODED_GOOGLE_SHEET_URL;
+    }
+    return merged;
   } catch (err) {
     console.error("Failed to load cloud sync settings", err);
     return DEFAULT_CLOUD_SETTINGS;
@@ -367,8 +440,7 @@ export const fetchEnquiriesFromCloud = async (): Promise<EnquiryLead[] | null> =
       ) {
         const sheetId = match[1];
         const gidMatch = url.match(/gid=([0-9]+)/);
-        const gid = gidMatch ? gidMatch[1] : "0";
-        url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+        url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv${gidMatch ? `&gid=${gidMatch[1]}` : ""}`;
       }
 
       const res = await fetch(url);
@@ -448,13 +520,23 @@ export const updateEnquiryInCloud = async (
         body: JSON.stringify(updates),
       });
       return res.ok;
-    } else if (settings.webhookUrl) {
-      const res = await fetch(settings.webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "update_enquiry", id, updates }),
-      });
-      return res.ok;
+    } else {
+      const appsScriptUrl = settings.webhookUrl || HARDCODED_APPS_SCRIPT_URL;
+      if (appsScriptUrl) {
+        const phoneClean = (updates.phone || id.split("-").pop() || "").replace(/[^0-9]/g, "");
+        await fetch(appsScriptUrl, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({
+            action: "update_status",
+            id,
+            phone: phoneClean || updates.phone || "",
+            status: updates.status || "New",
+            notes: updates.notes,
+          }),
+        });
+        return true;
+      }
     }
   } catch (err) {
     console.error("Cloud status update failed", err);
@@ -487,13 +569,21 @@ export const deleteEnquiryFromCloud = async (id: string): Promise<boolean> => {
         method: "DELETE",
       });
       return res.ok;
-    } else if (settings.webhookUrl) {
-      const res = await fetch(settings.webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "delete_enquiry", id }),
-      });
-      return res.ok;
+    } else {
+      const appsScriptUrl = settings.webhookUrl || HARDCODED_APPS_SCRIPT_URL;
+      if (appsScriptUrl) {
+        const phoneClean = (id.split("-").pop() || "").replace(/[^0-9]/g, "");
+        await fetch(appsScriptUrl, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({
+            action: "delete_enquiry",
+            id,
+            phone: phoneClean,
+          }),
+        });
+        return true;
+      }
     }
   } catch (err) {
     console.error("Cloud delete failed", err);
@@ -526,8 +616,7 @@ export const testCloudConnection = async (
       ) {
         const sheetId = match[1];
         const gidMatch = url.match(/gid=([0-9]+)/);
-        const gid = gidMatch ? gidMatch[1] : "0";
-        url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+        url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv${gidMatch ? `&gid=${gidMatch[1]}` : ""}`;
       }
 
       const res = await fetch(url);

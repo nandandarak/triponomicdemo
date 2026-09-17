@@ -3,7 +3,7 @@ import logo from "@/assets/logo.png";
 
 const Footer = () => {
   return (
-    <footer className="py-16 px-6 mt-12 bg-background">
+    <footer className="py-6 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 py-8 border-t border-border/50">
           {/* Logo */}
@@ -19,68 +19,62 @@ const Footer = () => {
           </Link>
 
           {/* Links */}
-          <nav className="flex flex-wrap items-center gap-6 md:gap-8">
+          <nav className="flex items-center justify-center flex-wrap gap-4 sm:gap-6 lg:gap-7">
             <Link
               to="/"
-              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               Home
             </Link>
             <Link
               to="/domestic"
-              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               Domestic
             </Link>
             <Link
               to="/international"
-              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               International
             </Link>
             <Link
               to="/hotels"
-              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               Hotels
             </Link>
             <Link
               to="/experiences"
-              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               Experiences
             </Link>
             <Link
               to="/about"
-              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               About
             </Link>
             <Link
               to="/faq"
-              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               FAQs
             </Link>
             <Link
               to="/enquire"
-              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-secondary text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               Contact
             </Link>
           </nav>
 
-          {/* Copyright & Admin Link */}
-          <div className="flex items-center gap-4">
-            <p className="text-sm font-secondary text-muted-foreground">
+          {/* Copyright */}
+          <div className="flex items-center shrink-0">
+            <p className="text-sm font-secondary text-muted-foreground whitespace-nowrap">
               © 2026 Triponomic. All rights reserved.
             </p>
-            <Link
-              to="/admin"
-              className="text-xs font-secondary text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 opacity-60 hover:opacity-100 border border-border/40 px-2 py-0.5 rounded"
-            >
-              Admin
-            </Link>
           </div>
         </div>
       </div>
