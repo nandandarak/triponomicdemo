@@ -79,6 +79,7 @@ interface FAQSectionProps {
   badge?: string;
   faqs?: FAQItem[];
   items?: FAQItem[];
+  showCategories?: boolean;
   className?: string;
   id?: string;
 }
@@ -89,6 +90,7 @@ const FAQSection = ({
   badge = "Clear Answers, Zero Doubts",
   faqs,
   items,
+  showCategories = true,
   className = "",
   id = "faq",
 }: FAQSectionProps) => {
