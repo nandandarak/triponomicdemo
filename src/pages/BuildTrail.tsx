@@ -66,7 +66,7 @@ const BuildTrail: React.FC = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#A5B4FC] text-xs font-bold tracking-widest uppercase mb-4 shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              ✨ TRIPONOMIC JOURNEY CRAFTER • 100% CUSTOMIZED ITINERARIES
+              TRIPONOMIC JOURNEY CRAFTER • 100% CUSTOMIZED ITINERARIES
             </div>
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-4">
