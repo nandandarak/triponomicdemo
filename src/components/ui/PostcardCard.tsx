@@ -129,7 +129,7 @@ const PostcardCard = ({
               </div>
             </div>
           ) : (
-            <div className="absolute inset-0 bg-[#FDFCF9] p-6 flex flex-col">
+            <div className="absolute inset-0 bg-[#FDFCF9] p-5 flex flex-col overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <h3 className="font-script text-3xl italic mb-6">{name}</h3>
 
               <div className="flex-1 space-y-4">
@@ -145,7 +145,7 @@ const PostcardCard = ({
                   <Coins className="w-5 h-5" />
                   <div>
                     <p className="text-xs uppercase">Ideal Budget</p>
-                    <p>From {data.investment}</p>
+                    <p>{data.investment.startsWith("From") ? data.investment : `From ${data.investment}`}</p>
                   </div>
                 </div>
 

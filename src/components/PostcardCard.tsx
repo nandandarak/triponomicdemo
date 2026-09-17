@@ -162,20 +162,20 @@ const PostcardCard = ({
             <div
               className="absolute inset-0 flex flex-col shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-emerald-100 rounded-2xl bg-white [backface-visibility:hidden] [transform:rotateY(180deg)]"
             >
-              <div className="flex-1 overflow-y-auto p-5">
-                <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+              <div className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 leading-tight">
                       {name}
                     </h3>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 inline-block mt-1">
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 inline-block mt-0.5">
                       Curated Itinerary
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-3.5">
-                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
+                <div className="space-y-2 sm:space-y-2.5">
+                  <div className="flex items-center gap-3 p-2 sm:p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
                     <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
                       <Clock className="w-4 h-4" />
                     </div>
@@ -185,17 +185,19 @@ const PostcardCard = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
+                  <div className="flex items-center gap-3 p-2 sm:p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
                     <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
                       <Coins className="w-4 h-4" />
                     </div>
                     <div>
                       <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Ideal Budget</p>
-                      <p className="text-sm font-semibold text-emerald-700">From {data.investment}</p>
+                      <p className="text-sm font-semibold text-emerald-700">
+                        {data.investment.startsWith("From") ? data.investment : `From ${data.investment}`}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
+                  <div className="flex items-center gap-3 p-2 sm:p-2.5 rounded-xl bg-gray-50/80 border border-gray-100">
                     <div className="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 shrink-0">
                       <Sun className="w-4 h-4" />
                     </div>
