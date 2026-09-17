@@ -76,22 +76,6 @@ const BuildTrail: React.FC = () => {
             <p className="text-white/80 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed mb-6 font-light">
               Tailor departure city, destination, pacing, and 5-star hotel tiers with custom tailored tariffs and instant WhatsApp itinerary export.
             </p>
-
-            {/* Quick trust strip */}
-            <div className="flex flex-wrap justify-center gap-3 text-xs font-semibold text-white/80">
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 backdrop-blur-sm">
-                <Compass className="w-3.5 h-3.5 text-[#93C5FD]" />
-                Special Partner Tariffs
-              </span>
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 backdrop-blur-sm">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#86EFAC]" />
-                Direct 5★ Partner Tariffs
-              </span>
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 backdrop-blur-sm">
-                <HeartHandshake className="w-3.5 h-3.5 text-amber-300" />
-                24/7 Dedicated Concierge
-              </span>
-            </div>
           </motion.div>
         </div>
       </section>
