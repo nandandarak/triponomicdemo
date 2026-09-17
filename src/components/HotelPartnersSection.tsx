@@ -84,7 +84,7 @@ const hotels = [
     tier: "Ultra Luxury",
     stars: 5,
     tagline: "The art of perfect hospitality",
-    image: "https://images.unsplash.com/photo-1549294413-26f195471c9b?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80",
     accentColor: "#8B7355",
   },
   {

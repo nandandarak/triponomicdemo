@@ -125,7 +125,7 @@ const hotels = [
     description:
       "Four Seasons sets the global gold standard for luxury — immaculate rooms, Michelin-worthy dining, and personalized service.",
     image:
-      "https://images.unsplash.com/photo-1549294413-26f195471c9b?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80",
     accentColor: "#8B7355",
     perk: "$100 Resort Credit",
     locations: ["Mumbai", "Bengaluru"],
@@ -257,6 +257,10 @@ const HotelCard = ({
             className="w-full h-full object-cover"
             animate={{ scale: hovered ? 1.08 : 1 }}
             transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80";
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
