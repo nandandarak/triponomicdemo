@@ -6,6 +6,7 @@ import {
   Users,
   Calendar,
   Clock,
+  Coins,
   Plane,
   Hotel,
   ShieldCheck,
@@ -429,8 +430,9 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
   const [children, setChildren] = useState(0);
   const [durationDays, setDurationDays] = useState(2);
 
-  // Stay Tier & Inclusions
+  // Stay Tier & Budget & Inclusions
   const [hotelTier, setHotelTier] = useState<"Comfort" | "Premium" | "Luxury" | "UltraLuxury">("Luxury");
+  const [budgetRange, setBudgetRange] = useState<string>("");
   const [includeFlights, setIncludeFlights] = useState(true);
   const [includeGourmetMeals, setIncludeGourmetMeals] = useState(true);
   const [includePrivateChauffeur, setIncludePrivateChauffeur] = useState(true);
@@ -585,6 +587,7 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
       travelVibe === "Couple" ? "Couple" : "Family";
 
     const finalDestName = destinationInput.trim() || currentDest.name;
+    const activeBudget = budgetRange.trim() || "Quote On Request";
 
     const rawMessage =
       `Hi Triponomic! I customized a trail on your website:\n\n` +
@@ -593,6 +596,7 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
       `📍 Destination: ${finalDestName}\n` +
       `👥 Travelers: ${adults} Adults${children > 0 ? `, ${children} Children` : ""} (${vibeLabel})\n` +
       `⏱ Duration: ${durationDays} Days\n` +
+      `💰 Budget Range: ${activeBudget}\n` +
       `🏨 Stays: ${
         hotelTier === "Comfort"
           ? "Comfort (Clean & Convenient Stays)"
@@ -617,6 +621,7 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
     travelVibe,
     durationDays,
     hotelTier,
+    budgetRange,
     includeFlights,
     includePrivateChauffeur,
     includeGourmetMeals,
@@ -643,12 +648,13 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
 
     setIsSubmitting(true);
     const formData = new FormData();
+    const activeBudget = budgetRange.trim() || "Quote On Request";
 
     // ── Core contact fields ──
     formData.append("entry.2005620554", customerName.trim());                   // Name
     formData.append("entry.1166974658", customerPhone.trim());                  // Phone
     formData.append("entry.1045781291", "trail-enquiry@triponomic.com");        // Email (internal tag)
-    formData.append("entry.1203831394", "Quote On Request");                    // Budget
+    formData.append("entry.1203831394", activeBudget);                          // Budget (CONNECTED TO GOOGLE FORM)
 
     // ── Destination ──
     const finalDestination = destinationInput.trim() || currentDest.name;
@@ -694,7 +700,7 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
           : hotelTier === "UltraLuxury"
           ? "Ultra Luxury"
           : "Luxury",
-      budget: `Quote On Request`,
+      budget: activeBudget,
       notes: specialRequests.trim() || undefined,
     });
 
@@ -1348,6 +1354,32 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
                         </span>
                       </div>
                     </SpotlightCard>
+                  </div>
+                </div>
+
+                {/* TARGET BUDGET INPUT */}
+                <div className="pt-2">
+                  <label className="block text-xs font-extrabold uppercase tracking-widest text-[#404762] mb-3 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#404762]/10 flex items-center justify-center text-[#404762]">
+                      <Coins className="w-3.5 h-3.5" />
+                    </span>
+                    2. Target Budget / Expected Spending
+                  </label>
+
+                  <div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/80 space-y-2">
+                    <div className="relative">
+                      <Coins className="w-4 h-4 text-[#404762] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={budgetRange}
+                        onChange={(e) => setBudgetRange(e.target.value)}
+                        placeholder="Enter your target budget (e.g. ₹35,000 / person, ₹1.5 Lakh total, or Flexible)"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:border-[#404762] focus:ring-2 focus:ring-[#404762]/20 bg-white text-sm font-medium text-gray-900 outline-none transition shadow-sm"
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-500 font-medium pl-1">
+                      💡 Enter your per-person or total estimated budget, or leave empty if flexible.
+                    </p>
                   </div>
                 </div>
 
