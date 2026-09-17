@@ -639,7 +639,9 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
       setNameError(true);
       hasError = true;
     }
-    if (!customerPhone.trim()) {
+    const phoneDigits = customerPhone.replace(/\D/g, "");
+    const isValidPhone = phoneDigits.length === 10 || (phoneDigits.length === 12 && phoneDigits.startsWith("91"));
+    if (!isValidPhone) {
       setPhoneError(true);
       hasError = true;
     }
@@ -714,7 +716,9 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
       setNameError(true);
       hasError = true;
     }
-    if (!customerPhone.trim()) {
+    const phoneDigits = customerPhone.replace(/\D/g, "");
+    const isValidPhone = phoneDigits.length === 10 || (phoneDigits.length === 12 && phoneDigits.startsWith("91"));
+    if (!isValidPhone) {
       setPhoneError(true);
       hasError = true;
     }
@@ -1535,8 +1539,8 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
                             />
                           </div>
                           {phoneError && (
-                            <p className="text-[11px] text-red-600 mt-1 font-medium">
-                              Please enter your WhatsApp contact number
+                            <p className="text-[11px] text-red-600 mt-1 font-semibold">
+                              ⚠ Please enter a valid 10-digit mobile number
                             </p>
                           )}
                         </div>
