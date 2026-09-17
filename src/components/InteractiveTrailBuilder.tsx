@@ -859,8 +859,8 @@ export const InteractiveTrailBuilder: React.FC<TrailBuilderProps> = ({
                       blurAmount={3}
                       borderColor="#404762"
                       glowColor="rgba(64, 71, 98, 0.35)"
-                      animationDuration={0.4}
-                      pauseBetweenAnimations={1.6}
+                      animationDuration={0.2}
+                      pauseBetweenAnimations={0.4}
                     />
                   </h2>
                 </div>
