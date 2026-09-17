@@ -870,7 +870,7 @@ export const AdminPortal: React.FC = () => {
 
         {/* TAB 4: SETTINGS & SYNC */}
         {activeTab === "settings" && (
-          <div className="max-w-3xl space-y-6">
+          <div className="w-full space-y-6">
             {/* Cloud Database & Live Cross-Device Sync Setup */}
             <div className="bg-slate-800/80 border border-amber-500/30 rounded-2xl p-6 space-y-5 shadow-lg relative overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/80 pb-4">
